@@ -22,7 +22,7 @@ The PDF never leaves your computer. Nothing is uploaded and there is no account.
 
 ## How it is built
 
-- One page, no build step. `redline.src.html` is the same page that runs as WOODWERD's private Redline on claude.ai (Drew's review cycle with Claude); `build.sh` wraps it into `index.html` for GitHub Pages. Off claude.ai it runs in public mode.
+- One page, no build step. `redline.src.html` is the same page that runs as WOODWERD Loop on claude.ai (Drew's private review cycle with Claude); `build.sh` wraps it into `index.html` for GitHub Pages. Off claude.ai it runs in public mode.
 - PDF rendering: pdf.js 3.11.174 (Apache-2.0). PDF writing: pdf-lib 1.17.1 (MIT). Fonts: Inter and JetBrains Mono (SIL OFL 1.1), bundled.
 - Measurements use the PDF's own sheet size, so a full-size sheet measures true at its printed scale.
 
