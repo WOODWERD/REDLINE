@@ -16,6 +16,10 @@ Part of the Ctrl toolkit, a WOODWERD toolkit. Review group: drawing sets.
 
 Each markup is written into the PDF as a real comment, so it shows and lists in Bluebeam, Acrobat, Preview or any PDF viewer.
 
+## WOODWERD Loop
+
+The same page can run inside your own Claude account as WOODWERD Loop, a review cycle where Claude works your markups and issues the next revision. Setup and the skill download: [loop/](https://woodwerd.github.io/REDLINE/loop/). The skill source is `loop/woodwerd-loop/SKILL.md`.
+
 ## Privacy
 
 The PDF never leaves your computer. Nothing is uploaded and there is no account. Your markups are kept in this browser's storage until you clear it, so you can close the tab and come back by opening the same PDF again.

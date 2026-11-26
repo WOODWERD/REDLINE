@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>WOODWERD Loop</title>
+<meta name="description" content="WOODWERD Loop: a drawing review cycle with Claude. Mark up, submit, get the next revision, repeat.">
+<meta name="robots" content="noindex">
+<style>
+@font-face{font-family:"Inter";font-weight:400;font-display:swap;src:url("../fonts/inter-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Inter";font-weight:500;font-display:swap;src:url("../fonts/inter-latin-500-normal.woff2") format("woff2")}
+@font-face{font-family:"Inter";font-weight:600;font-display:swap;src:url("../fonts/inter-latin-600-normal.woff2") format("woff2")}
+@font-face{font-family:"JetBrains Mono";font-weight:400;font-display:swap;src:url("../fonts/jetbrains-mono-latin-400-normal.woff2") format("woff2")}
+:root{
+  --accent:#C4944A; --accent-text:#8A5F22; --accent-tint:#F0E2C8;
+  --ground:#F9F7F3; --surface:#FFFFFF; --ink:#0C0B09; --ink-soft:#5D6267; --line:#E2E0DA; --line-strong:#C9C7C0; --on-ink:#F9F7F3; --ok:#2F9E5F;
+  --sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --b:16px; --t-micro:calc(var(--b)*.618); --t-cap:calc(var(--b)*.786); --t-h3:calc(var(--b)*1.272); --t-h2:calc(var(--b)*1.618); --t-h1:calc(var(--b)*2.618);
+  --s5:5px; --s8:8px; --s13:13px; --s21:21px; --s34:34px; --s55:55px; --r-ctl:8px; --r-box:13px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--accent-text:#D4A85E;--accent-tint:#3A2E16;--ground:#141311;--surface:#1C1A17;--ink:#ECEAE6;--ink-soft:#A3A8AD;--line:#2A2C2F;--line-strong:#3A3D41;--on-ink:#141311;color-scheme:dark}}
+:root[data-theme="dark"]{--accent-text:#D4A85E;--accent-tint:#3A2E16;--ground:#141311;--surface:#1C1A17;--ink:#ECEAE6;--ink-soft:#A3A8AD;--line:#2A2C2F;--line-strong:#3A3D41;--on-ink:#141311;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:var(--b);line-height:1.55}
+a{color:var(--accent-text);text-decoration-thickness:1px;text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.gut{padding-inline:max(16px,env(safe-area-inset-left,0px))}
+.wrap{max-width:860px;margin:0 auto}
+.strip{border-bottom:1px solid var(--line);font-size:var(--t-cap);padding-block:var(--s8)}
+.kit{font-size:var(--t-micro);letter-spacing:.22em;text-transform:uppercase;color:var(--accent-text);font-weight:600;display:flex;align-items:center;gap:var(--s8)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block}
+header.hero{border-bottom:2px solid var(--accent);padding-block:var(--s34) var(--s21)}
+h1{font-size:var(--t-h1);letter-spacing:.14em;font-weight:500;margin:0;line-height:1.1}
+.lede{font-size:var(--t-h3);color:var(--ink-soft);margin:var(--s13) 0 0;max-width:40ch}
+section{padding-block:var(--s34);border-bottom:1px solid var(--line)}
+h2{font-size:var(--t-h2);font-weight:600;margin:0 0 var(--s13);display:flex;gap:var(--s13);align-items:baseline}
+h2 .no{font-family:var(--mono);font-size:var(--t-cap);color:var(--accent-text);font-weight:400}
+p{margin:0 0 var(--s13);max-width:68ch}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:var(--s21);margin-top:var(--s21)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-box);padding:var(--s21);display:grid;gap:var(--s8);align-content:start}
+.card h3{margin:0;font-size:var(--t-h3);font-weight:600}
+.card .who{font-family:var(--mono);font-size:var(--t-micro);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+.card p{margin:0;color:var(--ink-soft)}
+.btn{display:inline-flex;align-items:center;gap:var(--s8);border:1px solid var(--ink);background:var(--ink);color:var(--on-ink);border-radius:var(--r-ctl);padding:var(--s8) var(--s21);font-weight:600;text-decoration:none;justify-self:start;margin-top:var(--s8)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line-strong)}
+.cycle{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s8);margin:var(--s21) 0 0;padding:0;list-style:none;counter-reset:c}
+.cycle li{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:var(--r-ctl);padding:var(--s13);font-size:var(--t-cap);counter-increment:c}
+.cycle li::before{content:counter(c);display:block;font-family:var(--mono);color:var(--accent-text);margin-bottom:var(--s5)}
+.cycle li b{display:block;font-size:var(--b);margin-bottom:var(--s5)}
+.back{font-family:var(--mono);font-size:var(--t-cap);color:var(--ink-soft);margin-top:var(--s13)}
+ol.steps{padding-left:1.3em;margin:var(--s13) 0 0;display:grid;gap:var(--s13);max-width:68ch}
+ol.steps li::marker{font-family:var(--mono);color:var(--accent-text)}
+code,kbd{font-family:var(--mono);font-size:.88em;background:var(--surface);border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+.note{font-size:var(--t-cap);color:var(--ink-soft);border-left:3px solid var(--line-strong);padding-left:var(--s13);margin-top:var(--s21)}
+table{border-collapse:collapse;width:100%;font-size:var(--t-cap);margin-top:var(--s13)}
+th,td{text-align:left;padding:var(--s8);border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-weight:400;font-size:var(--t-micro);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+td.y{color:var(--ok);font-weight:600}
+footer{padding-block:var(--s34);font-size:var(--t-cap);color:var(--ink-soft);display:flex;gap:var(--s13);align-items:center;flex-wrap:wrap}
+.badge{width:74px;height:30px;background:var(--ink);-webkit-mask:url("../img/woodwerd-badge.png") center/contain no-repeat;mask:url("../img/woodwerd-badge.png") center/contain no-repeat}
+.tag{font-size:var(--t-micro);letter-spacing:.22em;text-transform:uppercase}
+@media (max-width:700px){.pair{grid-template-columns:1fr}.cycle{grid-template-columns:1fr 1fr}:root{--t-h1:calc(var(--b)*2)}}
+</style>
+</head>
+<body>
+<div class="strip gut"><div class="wrap"><span class="kit"><span class="dot" aria-hidden="true"></span>Ctrl · a WOODWERD toolkit</span></div></div>
+<header class="hero gut"><div class="wrap">
+  <h1>LOOP</h1>
+  <p class="lede">A drawing review cycle with Claude. You mark up a set, Claude does the work and sends the next revision, and you review it again.</p>
+</div></header>
+<main class="gut"><div class="wrap">
+
+<section>
+  <h2><span class="no">01</span>Two ways to use it</h2>
+  <div class="pair">
+    <div class="card">
+      <span class="who">For anyone · nothing to install</span>
+      <h3>WOODWERD Redline</h3>
+      <p>Open a PDF in your browser, mark it up, and download it with your comments built in. Send the file back however you like. Nothing is uploaded.</p>
+      <a class="btn" href="../">Open Redline</a>
+    </div>
+    <div class="card">
+      <span class="who">For Claude users · one-time setup</span>
+      <h3>WOODWERD Loop</h3>
+      <p>The same page, running inside your own Claude account. Claude reads your markups, works them, replies under each one and issues the next revision.</p>
+      <a class="btn ghost" href="#install">Set up Loop</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="no">02</span>The cycle</h2>
+  <ol class="cycle">
+    <li><b>Mark up</b>Cloud, centerline, hatch an area, or call out a note on the set.</li>
+    <li><b>Submit</b>Your markups go to Claude. The page shows Sent, then Claude working.</li>
+    <li><b>Revise</b>Claude changes the drawings, replies under each markup and issues the next rev.</li>
+    <li><b>Review</b>Approve each reply or send it back with a note. Add new markups and submit again.</li>
+  </ol>
+  <p class="back">↻ Repeat until every markup is accomplished or superseded. Each rev starts clean, and the revision log keeps the history.</p>
+</section>
+
+<section id="install">
+  <h2><span class="no">03</span>Set up Loop</h2>
+  <p>You need a Claude account that can make artifacts that save data, and a place to upload skills.</p>
+  <ol class="steps">
+    <li><a href="woodwerd-loop.zip" download>Download the WOODWERD Loop skill</a> (a zip with one SKILL.md file).</li>
+    <li>In Claude, open your settings, go to where skills are managed, and upload the zip. You can rename it, for example to your own studio's name, by editing the <code>name</code> line in SKILL.md before you zip it again.</li>
+    <li>Start a chat and say <kbd>set up WOODWERD Loop</kbd>. Claude publishes your own private copy of the Loop page from this site's code and gives you the link. Pin it.</li>
+    <li>Attach a drawing set and say <kbd>loop this</kbd>. Claude loads it into your Loop page and sends the link.</li>
+  </ol>
+  <p class="note">Your Loop page and its markups live only in your Claude account. Nothing goes to WOODWERD. If the page says “Not saving”, your account can't save artifact data, so use Redline and send the downloaded PDF to Claude in a chat instead.</p>
+</section>
+
+<section>
+  <h2><span class="no">04</span>What each one does</h2>
+  <table>
+    <thead><tr><th></th><th>Redline</th><th>Loop</th></tr></thead>
+    <tbody>
+      <tr><td>Mark up any PDF (cloud, box, arrow, centerline, dashed, area, remove, callout, pen, highlight, measure)</td><td class="y">Yes</td><td class="y">Yes</td></tr>
+      <tr><td>Download the PDF with real comments for Bluebeam, Acrobat or Preview</td><td class="y">Yes</td><td class="y">Yes</td></tr>
+      <tr><td>Works without an account or install</td><td class="y">Yes</td><td>No</td></tr>
+      <tr><td>Submit to Claude and see Sent, Claude working and Replies ready</td><td>No</td><td class="y">Yes</td></tr>
+      <tr><td>Claude's replies under each markup, which you approve or send back</td><td>No</td><td class="y">Yes</td></tr>
+      <tr><td>Revisions, with a revision log of what was done and what was superseded</td><td>No</td><td class="y">Yes</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</div></main>
+<footer class="gut"><div class="wrap" style="display:flex;gap:13px;align-items:center;width:100%"><a href="https://woodwerd.com" aria-label="WOODWERD, woodwerd.com" style="display:flex;gap:13px;align-items:center;color:inherit;text-decoration:none"><span class="badge" aria-hidden="true"></span><span class="tag">Think · Design · Style</span></a></div></footer>
+</body>
+</html>
