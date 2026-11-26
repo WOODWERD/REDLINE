@@ -238,6 +238,11 @@ button:disabled{cursor:default;opacity:.45}
 .gh .files .sz{font-family:var(--mono);color:var(--ink-soft);white-space:nowrap}
 .gh .err{color:var(--fault)}
 .gh a{color:var(--accent-text)}
+.dact{display:flex;align-items:center;gap:var(--s5)}
+.drow .forget,.forgetall .forget{grid-column:1/-1;border:1px solid var(--fault);border-radius:var(--r-ctl);padding:var(--s8) var(--s13);display:grid;gap:var(--s8);font-size:var(--t-cap);background:var(--surface)}
+.forgetall{padding:var(--s8) var(--s13);border-top:1px solid var(--line);display:grid;gap:var(--s8);justify-items:start}
+.forgetall .forget{justify-self:stretch}
+.primary.danger{background:var(--fault);border-color:var(--fault);color:#fff}
 .retrow{display:flex;gap:var(--s5);flex-wrap:wrap;align-items:center}
 .empty{color:var(--ink-soft);padding:var(--s13) var(--s8);font-size:var(--t-cap)}
 .empty b{color:var(--ink);display:block;margin-bottom:var(--s5)}
@@ -602,9 +607,20 @@ function renderLibrary(){
       el("div",{style:"min-width:0"},el("div",{class:"nm",text:d.name||"Untitled PDF"}),el("div",{class:"sub",text:`${d.pages||"?"} page${d.pages===1?"":"s"} · ${stored}${d.createdAt?" · added "+fmtTime(d.createdAt):""}`})),
       el("div",{class:"rd"},el("span",{text:"Set"}),el("span",{text:d.round||"—"})),
       el("div",{class:"rd"},el("span",{text:"Open"}),el("span",{text:`${n} of ${tot}`})),
-      el("button",{class:"btn",onclick:()=>{location.hash=`#d-${d.id}`},text:"Open"})));
+      el("div",{class:"dact"},el("button",{class:"btn",onclick:()=>{location.hash=`#d-${d.id}`},text:"Open"}),PUBLIC?iconBtn("trash",`Remove ${d.name||"this PDF"} from this browser`,e=>askForget(e.currentTarget.closest(".drow"),[d])):null)));
   }
+  if(PUBLIC&&docs.length>1)box.append(el("div",{class:"forgetall"},el("button",{class:"link",text:"Remove all from this browser",onclick:e=>askForget(e.currentTarget.parentNode,docs)})));
 }
+/* public version: forget documents and their markups from this browser (the PDF files themselves are not touched) */
+function askForget(row,list){if(row.querySelector(".forget"))return;
+  const n=list.reduce((a,d)=>a+[...S.marks.values()].filter(m=>m.doc===d.id).length,0);
+  const what=list.length===1?`“${list[0].name||"this PDF"}”`:`all ${list.length} documents`;
+  const box=el("div",{class:"forget",role:"alert"},el("span",{text:`Remove ${what} and ${n} markup${n===1?"":"s"} from this browser? Download anything you want to keep first. Your PDF files aren't touched.`}),
+    el("div",{class:"crow"},el("button",{class:"primary danger",text:"Remove",onclick:()=>forgetDocs(list)}),el("button",{class:"btn",text:"Cancel",onclick:()=>box.remove()})));
+  row.append(box);box.querySelector(".danger").focus()}
+function forgetDocs(list){for(const d of list){S.docs.delete(d.id);local.delete(d.id);for(const [k,m] of [...S.marks])if(m.doc===d.id)S.marks.delete(k);
+    try{localStorage.removeItem(LS.marks(d.id));localStorage.removeItem("ww-scale-"+d.id)}catch{}}
+  saveLocal();renderLibrary()}
 $("#choose").addEventListener("click",e=>{e.preventDefault();$("#file").click()});
 $("#choose").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();$("#file").click()}});
 $("#file").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(f)handleFile(f);e.target.value=""});

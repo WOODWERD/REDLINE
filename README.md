@@ -26,7 +26,7 @@ Press **Connect GitHub** on the start page to open PDFs straight from a private 
 
 ## Privacy
 
-The PDF never leaves your computer. Nothing is uploaded and there is no account. Your markups are kept in this browser's storage until you clear it, so you can close the tab and come back by opening the same PDF again.
+The PDF never leaves your computer. Nothing is uploaded and there is no account. Your markups are kept in this browser's storage, so you can close the tab and come back by opening the same PDF again. Press the trash can beside a document (or "Remove all from this browser") to forget it and its markups.
 
 ## How it is built
 
