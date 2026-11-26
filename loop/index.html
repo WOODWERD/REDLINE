@@ -59,6 +59,26 @@ td.y{color:var(--ok);font-weight:600}
 footer{padding-block:var(--s34);font-size:var(--t-cap);color:var(--ink-soft);display:flex;gap:var(--s13);align-items:center;flex-wrap:wrap}
 .badge{width:74px;height:30px;background:var(--ink);-webkit-mask:url("../img/woodwerd-badge.png") center/contain no-repeat;mask:url("../img/woodwerd-badge.png") center/contain no-repeat}
 .tag{font-size:var(--t-micro);letter-spacing:.22em;text-transform:uppercase}
+.loopfig{margin:var(--s21) 0 0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-box);padding:var(--s13)}
+.loopfig svg{display:block;width:100%;height:auto;max-width:640px;margin:0 auto}
+.lp-track{fill:none;stroke:var(--accent);stroke-width:3}
+.lp-arrow{fill:var(--accent)}
+.lp-box{fill:var(--ground);stroke:var(--line-strong);stroke-width:1.5}
+.lp-box.cl{fill:var(--accent-tint);stroke:var(--accent)}
+.lp-no{font-family:var(--mono);font-size:15px;fill:var(--accent-text)}
+.lp-t{font-family:var(--sans);font-size:22px;font-weight:600;fill:var(--ink)}
+.lp-who{font-family:var(--mono);font-size:12px;letter-spacing:.14em;fill:var(--ink-soft)}
+.lp-c1{font-family:var(--sans);font-size:34px;font-weight:500;letter-spacing:.14em;fill:var(--ink)}
+.lp-c2{font-family:var(--sans);font-size:15px;fill:var(--ink-soft)}
+.shot{position:relative;margin:var(--s21) 0 0;border:1px solid var(--line-strong);border-radius:var(--r-box);overflow:hidden;background:var(--surface);box-shadow:0 8px 30px rgba(12,11,9,.08)}
+.shot img{display:block;width:100%;height:auto}
+.pin{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;background:var(--accent);color:#0C0B09;font:600 13px/28px var(--mono);text-align:center;box-shadow:0 0 0 3px var(--surface),0 2px 8px rgba(0,0,0,.3)}
+.legend{list-style:none;padding:0;margin:var(--s21) 0 0;display:grid;grid-template-columns:1fr 1fr;gap:var(--s13) var(--s21)}
+.legend li{display:grid;grid-template-columns:28px 1fr;gap:var(--s13);align-items:start;font-size:var(--t-cap);color:var(--ink-soft)}
+.legend .pin{position:static;transform:none}
+.legend b{display:block;color:var(--ink);font-size:var(--b)}
+.cap{font-size:var(--t-cap);color:var(--ink-soft);margin-top:var(--s8)}
+@media (max-width:700px){.legend{grid-template-columns:1fr}.pin{width:20px;height:20px;font-size:10px;line-height:20px}.legend .pin{width:28px;height:28px;font-size:13px;line-height:28px}}
 @media (max-width:700px){.pair{grid-template-columns:1fr}.cycle{grid-template-columns:1fr 1fr}:root{--t-h1:calc(var(--b)*2)}}
 </style>
 </head>
@@ -71,7 +91,40 @@ footer{padding-block:var(--s34);font-size:var(--t-cap);color:var(--ink-soft);dis
 <main class="gut"><div class="wrap">
 
 <section>
-  <h2><span class="no">01</span>Two ways to use it</h2>
+  <h2><span class="no">01</span>The cycle</h2>
+  <p>Loop keeps one conversation going on a drawing set. You and Claude take turns, and the page always shows whose turn it is.</p>
+<figure class="loopfig" style="margin-inline:0"><svg viewBox="0 10 680 380" role="img" aria-labelledby="lpT lpD">
+<title id="lpT">The Loop cycle</title><desc id="lpD">Four steps in a loop: you mark up the set, you submit it, Claude revises the drawings and replies, and you review. Then it repeats.</desc>
+<rect class="lp-track" x="135" y="70" width="410" height="260" rx="48"/>
+<path class="lp-arrow" d="M352 70 l-14 -8 v16z"/><path class="lp-arrow" d="M545 212 l-8 -14 h16z"/><path class="lp-arrow" d="M328 330 l14 -8 v16z"/><path class="lp-arrow" d="M135 188 l-8 14 h16z"/>
+<g><rect class="lp-box" x="30" y="28" width="210" height="84" rx="13"/><text class="lp-no" x="50" y="58">01</text><text class="lp-who" x="220" y="58" text-anchor="end">YOU</text><text class="lp-t" x="50" y="92">Mark up</text></g><g><rect class="lp-box" x="440" y="28" width="210" height="84" rx="13"/><text class="lp-no" x="460" y="58">02</text><text class="lp-who" x="630" y="58" text-anchor="end">YOU</text><text class="lp-t" x="460" y="92">Submit</text></g><g><rect class="lp-box cl" x="440" y="288" width="210" height="84" rx="13"/><text class="lp-no" x="460" y="318">03</text><text class="lp-who" x="630" y="318" text-anchor="end">CLAUDE</text><text class="lp-t" x="460" y="352">Revise</text></g><g><rect class="lp-box" x="30" y="288" width="210" height="84" rx="13"/><text class="lp-no" x="50" y="318">04</text><text class="lp-who" x="220" y="318" text-anchor="end">YOU</text><text class="lp-t" x="50" y="352">Review</text></g>
+<text class="lp-c1" x="340" y="198" text-anchor="middle">LOOP</text><text class="lp-c2" x="340" y="226" text-anchor="middle">Repeat until every markup is closed</text>
+</svg></figure>
+  <ol class="cycle">
+    <li><b>Mark up</b>Cloud, centerline, hatch an area, or call out a note on the set.</li>
+    <li><b>Submit</b>Your markups go to Claude. The page shows Sent, then Claude working.</li>
+    <li><b>Revise</b>Claude changes the drawings, replies under each markup and issues the next rev.</li>
+    <li><b>Review</b>Approve each reply or send it back with a note. Add new markups and submit again.</li>
+  </ol>
+  <p class="back">↻ Repeat until every markup is accomplished or superseded. Each rev starts clean, and the revision log keeps the history.</p>
+</section>
+
+<section>
+  <h2><span class="no">02</span>What you work in</h2>
+  <p>One page holds the drawing set, your markups and Claude's replies. This is a sample residence in the middle of a review: Claude has answered three markups and it's your turn.</p>
+  <figure class="shot" style="margin-inline:0"><img src="img/ui-full.webp" width="1440" height="790" alt="The Loop page showing a floor plan with red markups, a page list on the left, a toolbar on top, and a markup list on the right with Claude's reply and Accept and close or Not right, rework buttons." loading="lazy"><span class="pin" style="left:21%;top:7%" aria-hidden="true">A</span><span class="pin" style="left:2.2%;top:21%" aria-hidden="true">B</span><span class="pin" style="left:48.6%;top:63.3%" aria-hidden="true">C</span><span class="pin" style="left:75%;top:32.3%" aria-hidden="true">D</span><span class="pin" style="left:75%;top:46.8%" aria-hidden="true">E</span><span class="pin" style="left:74.3%;top:71.3%" aria-hidden="true">F</span></figure>
+  <ol class="legend"><li><span class="pin" aria-hidden="true">A</span><span><b>Drafting tools</b>Cloud, box, arrow, centerline, dashed line, hatched area, remove, callout, pen, highlight and a scaled measure.</span></li><li><span class="pin" aria-hidden="true">B</span><span><b>Pages</b>Every sheet in the set, with a count of the markups on each.</span></li><li><span class="pin" aria-hidden="true">C</span><span><b>Markups on the sheet</b>Numbered in the order you draw them. Each one gets a comment in the list.</span></li><li><span class="pin" aria-hidden="true">D</span><span><b>Whose turn it is</b>Sent, Claude working and Replies ready, plus a plain line saying what to do next.</span></li><li><span class="pin" aria-hidden="true">E</span><span><b>Download the PDF</b>Your markups as real comments that open in Bluebeam, Acrobat or Preview.</span></li><li><span class="pin" aria-hidden="true">F</span><span><b>Claude's reply</b>Claude answers under each markup. Accept and close it, or send it back with a note.</span></li></ol>
+</section>
+
+<section>
+  <h2><span class="no">03</span>Every project in one place</h2>
+  <p>All your sets live in one library, grouped by project, whichever chat they came from. Each set shows its revision and how many markups are still open. Open chat jumps back to the conversation working that set.</p>
+  <figure class="shot" style="margin-inline:0"><img src="img/ui-lib.webp" width="1060" height="445" alt="The Loop library with sets grouped under project headings, each with its revision, open markup count, and Open chat and Open set buttons." loading="lazy"></figure>
+  <p class="cap">Each revision starts clean. The older rev keeps its markups and history, one click back.</p>
+</section>
+
+<section>
+  <h2><span class="no">04</span>Two ways to use it</h2>
   <div class="pair">
     <div class="card">
       <span class="who">For anyone · nothing to install</span>
@@ -88,19 +141,10 @@ footer{padding-block:var(--s34);font-size:var(--t-cap);color:var(--ink-soft);dis
   </div>
 </section>
 
-<section>
-  <h2><span class="no">02</span>The cycle</h2>
-  <ol class="cycle">
-    <li><b>Mark up</b>Cloud, centerline, hatch an area, or call out a note on the set.</li>
-    <li><b>Submit</b>Your markups go to Claude. The page shows Sent, then Claude working.</li>
-    <li><b>Revise</b>Claude changes the drawings, replies under each markup and issues the next rev.</li>
-    <li><b>Review</b>Approve each reply or send it back with a note. Add new markups and submit again.</li>
-  </ol>
-  <p class="back">↻ Repeat until every markup is accomplished or superseded. Each rev starts clean, and the revision log keeps the history.</p>
-</section>
+
 
 <section id="install">
-  <h2><span class="no">03</span>Set up Loop</h2>
+  <h2><span class="no">05</span>Set up Loop</h2>
   <p>You need a Claude account that can make artifacts that save data, and a place to upload skills.</p>
   <ol class="steps">
     <li><a href="woodwerd-loop.zip" download>Download the WOODWERD Loop skill</a> (a zip with one SKILL.md file).</li>
@@ -112,7 +156,7 @@ footer{padding-block:var(--s34);font-size:var(--t-cap);color:var(--ink-soft);dis
 </section>
 
 <section>
-  <h2><span class="no">04</span>What each one does</h2>
+  <h2><span class="no">06</span>What each one does</h2>
   <table>
     <thead><tr><th></th><th>Redline Ctrl</th><th>Loop</th></tr></thead>
     <tbody>
