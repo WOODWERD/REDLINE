@@ -20,6 +20,10 @@ Each markup is written into the PDF as a real comment, so it shows and lists in 
 
 The same page can run inside your own Claude account as WOODWERD Loop, a review cycle where Claude works your markups and issues the next revision. Setup and the skill download: [loop/](https://woodwerd.github.io/REDLINE/loop/). The skill source is `loop/woodwerd-loop/SKILL.md`.
 
+## Optional: your own GitHub
+
+Press **Connect GitHub** on the start page to open PDFs straight from a private repository and save marked-up copies back to it. Each save is a commit beside the original, so you keep the history. Use a [fine-grained token](https://github.com/settings/personal-access-tokens/new) limited to that one repository with **Contents: Read and write**. The token stays in your browser (for this tab only, unless you tick *Remember on this device*) and is only ever sent to `api.github.com`.
+
 ## Privacy
 
 The PDF never leaves your computer. Nothing is uploaded and there is no account. Your markups are kept in this browser's storage until you clear it, so you can close the tab and come back by opening the same PDF again.

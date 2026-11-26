@@ -223,6 +223,21 @@ button:disabled{cursor:default;opacity:.45}
 .ibtn:hover{color:var(--ink);border-color:var(--line-strong);background:var(--surface)}
 .ibtn:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .ibtn.trash:hover{color:var(--fault);border-color:var(--fault)}
+.gh{margin:0 var(--s13) var(--s13);border:1px solid var(--line);border-radius:var(--r-box);padding:var(--s13);display:grid;gap:var(--s8);font-size:var(--t-cap)}
+.gh .ghhead{display:flex;align-items:center;gap:var(--s8);flex-wrap:wrap}
+.gh .ghhead b{font-size:var(--b)}
+.gh .ghhead .sp{flex:1}
+.gh form{display:grid;gap:var(--s8)}
+.gh label{display:grid;gap:3px;color:var(--ink-soft)}
+.gh input[type=text],.gh input[type=password]{border:1px solid var(--line-strong);border-radius:var(--r-ctl);background:var(--surface);padding:5px 8px;color:var(--ink);font-family:var(--mono);font-size:var(--t-cap)}
+.gh .two{display:grid;grid-template-columns:1fr 1fr;gap:var(--s8)}
+.gh .chk{display:flex;gap:var(--s5);align-items:center}
+.gh .files{display:grid;max-height:320px;overflow:auto;border-top:1px solid var(--line)}
+.gh .files button{all:unset;cursor:pointer;display:flex;gap:var(--s8);justify-content:space-between;padding:var(--s5) var(--s3);border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+.gh .files button:hover,.gh .files button:focus-visible{background:var(--accent-tint)}
+.gh .files .sz{font-family:var(--mono);color:var(--ink-soft);white-space:nowrap}
+.gh .err{color:var(--fault)}
+.gh a{color:var(--accent-text)}
 .retrow{display:flex;gap:var(--s5);flex-wrap:wrap;align-items:center}
 .empty{color:var(--ink-soft);padding:var(--s13) var(--s8);font-size:var(--t-cap)}
 .empty b{color:var(--ink);display:block;margin-bottom:var(--s5)}
@@ -354,6 +369,19 @@ button:disabled{cursor:default;opacity:.45}
             <span class="btn" role="button" tabindex="0" id="choose">Open a PDF</span>
             <input type="file" id="file" accept="application/pdf,.pdf" hidden>
           </label>
+          <div class="gh public-only" id="gh">
+            <div class="ghhead"><b>GitHub</b><span id="ghstate">Optional. Open PDFs from your own private repo and save marked-up copies back to it.</span><span class="sp"></span><button class="btn" id="ghconnect" type="button">Connect GitHub</button><button class="btn" id="ghrefresh" type="button" hidden>Refresh</button><button class="link" id="ghout" type="button" hidden>Disconnect</button></div>
+            <form id="ghform" hidden autocomplete="off">
+              <div class="two"><label>Repository (owner/name)<input type="text" id="ghrepo" placeholder="woodwerd/drawings" required spellcheck="false"></label><label>Branch<input type="text" id="ghbranch" placeholder="main" spellcheck="false"></label></div>
+              <label>Folder (optional)<input type="text" id="ghdir" placeholder="sets/terlingua" spellcheck="false"></label>
+              <label>Access token<input type="password" id="ghtoken" required placeholder="github_pat_…" spellcheck="false"></label>
+              <span>Make a <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">fine-grained token</a> for just this repository, with <b>Contents: Read and write</b>. It stays in this browser and is only sent to api.github.com.</span>
+              <label class="chk"><input type="checkbox" id="ghremember"> Remember on this device</label>
+              <div class="crow"><button class="primary" type="submit">Connect</button><button class="btn" type="button" id="ghcancel">Cancel</button></div>
+            </form>
+            <div class="err" id="gherr" hidden></div>
+            <div class="files" id="ghfiles" hidden></div>
+          </div>
           <div class="loadmsg" id="loadmsg" hidden><span class="sdot attention pulse"></span><span id="loadtxt"></span></div>
           <div class="docs" id="docs"></div>
         </div>
@@ -440,7 +468,7 @@ button:disabled{cursor:default;opacity:.45}
         <div class="submit public-only">
           <label class="field" for="rname" style="display:grid;gap:3px">Your name, shown on each comment<input id="rname" autocomplete="name" placeholder="First and last name" style="border:1px solid var(--line-strong);border-radius:8px;background:var(--surface);padding:5px 8px;color:var(--ink)"></label>
           <button class="primary" id="dlbtn2">Download marked-up PDF</button>
-          <div class="retrow"><button class="btn" id="sharebtn" hidden>Share…</button><a class="link" id="mailbtn" hidden>Email it</a></div>
+          <div class="retrow"><button class="btn" id="ghsave" hidden>Save to GitHub</button><button class="btn" id="sharebtn" hidden>Share…</button><a class="link" id="mailbtn" hidden>Email it</a></div>
           <div class="subnote" id="dlnote2">Your file stays on this computer. Download it, then send it back however you like.</div>
         </div>
         <div class="submit claude-only" id="submitbox">
@@ -516,7 +544,7 @@ if(PUBLIC)document.documentElement.classList.add("public");
 const LS={docs:"ww-redline-docs",marks:id=>"ww-redline-marks-"+id};
 function lsGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch{return false}}
-function saveLocal(){if(!PUBLIC)return;const docs=[...S.docs.values()].map(({id,name,fp,pages,round,size,createdAt,touchedAt})=>({id,name,fp,pages,round,size,createdAt,touchedAt}));
+function saveLocal(){if(!PUBLIC)return;const docs=[...S.docs.values()].map(({id,name,fp,pages,round,size,createdAt,touchedAt,gh})=>({id,name,fp,pages,round,size,createdAt,touchedAt,gh}));
   let ok=lsSet(LS.docs,docs);for(const d of docs)ok=lsSet(LS.marks(d.id),[...S.marks.values()].filter(m=>m.doc===d.id).map(m=>{const{n,...r}=m;return r}))&&ok;
   live(ok?"ok":"attention",ok?"Saved in this browser":"Couldn't save in this browser. Download your PDF before closing.")}
 let pdf=null,pageObj=null,baseR=1;
@@ -589,7 +617,7 @@ window.addEventListener("drop",e=>{e.preventDefault();dragDepth=0;$("#veil").hid
 
 function libMsg(t,err){const m=$("#loadmsg");if(!t){m.hidden=true;return}m.hidden=false;m.querySelector(".sdot").className="sdot "+(err?"fault":"attention pulse");$("#loadtxt").textContent=t}
 function guessRound(name){const m=/X\d+(?:\.\d+)+/i.exec(name)||/\b(?:rev|r)[\s._-]?\d+\b/i.exec(name);return m?m[0].toUpperCase():""}
-async function handleFile(file){
+async function handleFile(file,meta){
   if(S.doc)showLibrary();
   libMsg(`Reading ${file.name} · ${fmtMB(file.size)}…`);
   let doc;
@@ -601,6 +629,7 @@ async function handleFile(file){
     row={id,name:file.name.replace(/\.pdf$/i,""),fp,pages:doc.numPages,round:guessRound(file.name),size:file.size,createdAt:Date.now(),by:S.me||null,assetId:null};
     S.docs.set(id,row);
   }
+  if(meta&&meta.gh)row.gh=meta.gh;
   local.set(row.id,{pdf:doc,file});
   if(!row.assetId&&assets&&file.size<=MAX_ASSET){
     libMsg(`Storing ${file.name} so Claude can open it…`);
@@ -631,6 +660,10 @@ async function openDoc(id,page){
       try{const r=await fetch("/_blob/"+row.assetId);if(!r.ok)throw new Error(r.status===404?"The stored file is missing.":"Couldn't fetch the file ("+r.status+").");
         const data=new Uint8Array(await r.arrayBuffer());if(tok!==openTok)return;const keep=data.slice();pdf=await openPdfData(data);local.set(id,{pdf,bytes:keep})}
       catch(err){if(tok!==openTok)return;tmsg(`${err&&err.message||"Couldn't load the PDF."} Drop the same file to reopen it.`,true);renderList();return}
+    }else if(PUBLIC&&row.gh&&GH.cfg&&GH.cfg.repo===row.gh.repo){
+      tmsg(`Loading ${row.name||"PDF"} from GitHub…`);
+      try{const data=new Uint8Array(await ghRaw(row.gh.path,row.gh.branch));if(tok!==openTok)return;const keep=data.slice();pdf=await openPdfData(data);local.set(id,{pdf,bytes:keep})}
+      catch(err){if(tok!==openTok)return;tmsg(`${err&&err.message||"Couldn't load the PDF from GitHub."}`,true);renderList();return}
     }else{tmsg(PUBLIC?"Drop the same PDF here to pick up where you left off. Your markups are saved in this browser.":"This PDF isn't stored with the page yet. Drop the same file here to open it, and its markups come back.",true);renderList();return}
     if(tok!==openTok)return;
     pdf._wwid=id;S.pages=pdf.numPages;
@@ -1075,6 +1108,52 @@ $("#confirmyes").onclick=async()=>{
   $("#subnote").textContent=told?"":`Claude wasn't told automatically, so say "work the redlines on ${doc.name}" in the project chat.`;
 };
 
+/* ---------- GitHub (public version, optional): open PDFs from the user's own repo and save marked-up copies back ----------
+   The token lives only in this browser (sessionStorage, or localStorage when "Remember" is ticked) and is only sent to api.github.com. */
+const GH={cfg:null,key:"ww-redline-gh",
+  load(){for(const st of[sessionStorage,localStorage]){try{const v=JSON.parse(st.getItem(this.key)||"null");if(v&&v.token){this.cfg=v;return}}catch{}}},
+  set(c,remember){this.cfg=c;try{sessionStorage.removeItem(this.key);localStorage.removeItem(this.key);(remember?localStorage:sessionStorage).setItem(this.key,JSON.stringify(c))}catch{}},
+  clear(){this.cfg=null;try{sessionStorage.removeItem(this.key);localStorage.removeItem(this.key)}catch{}}};
+const encPath=p=>p.split("/").map(encodeURIComponent).join("/");
+async function gh(path,opts={}){const c=GH.cfg;
+  let r;try{r=await fetch("https://api.github.com"+path,{...opts,headers:{Authorization:"Bearer "+c.token,"X-GitHub-Api-Version":"2022-11-28",Accept:"application/vnd.github+json",...(opts.headers||{})}})}catch{throw new Error("Couldn't reach GitHub. Check your connection.")}
+  if(!r.ok&&!(opts.ok404&&r.status===404)){let m="";try{m=(await r.json()).message||""}catch{}
+    throw new Error(r.status===401?"GitHub didn't accept the token. Check it hasn't expired.":r.status===403?`The token can't do that on ${c.repo}${m?" ("+m+")":""}. It needs Contents: Read and write on this repository.`:r.status===404?`Not found on GitHub. Check the repository, branch and folder, and that the token can see ${c.repo}.`:`GitHub said ${r.status}${m?": "+m:""}.`)}
+  return r}
+async function ghRaw(path,branch){const r=await gh(`/repos/${GH.cfg.repo}/contents/${encPath(path)}?ref=${encodeURIComponent(branch||GH.cfg.branch)}`,{headers:{Accept:"application/vnd.github.raw"}});return r.arrayBuffer()}
+function b64(bytes){let s="";for(let i=0;i<bytes.length;i+=0x8000)s+=String.fromCharCode.apply(null,bytes.subarray(i,i+0x8000));return btoa(s)}
+async function ghPut(path,bytes,message,branch){const br=branch||GH.cfg.branch;
+  const cur=await gh(`/repos/${GH.cfg.repo}/contents/${encPath(path)}?ref=${encodeURIComponent(br)}`,{ok404:true});let sha;if(cur.ok){try{sha=(await cur.json()).sha}catch{}}
+  const r=await gh(`/repos/${GH.cfg.repo}/contents/${encPath(path)}`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({message,content:b64(bytes),branch:br,...(sha?{sha}:{})})});
+  const j=await r.json();return{html:j.content&&j.content.html_url||`https://github.com/${GH.cfg.repo}`}}
+function ghErr(t){const e=$("#gherr");e.hidden=!t;e.textContent=t||""}
+function ghRender(){const on=!!GH.cfg;$("#ghconnect").hidden=on;$("#ghrefresh").hidden=!on;$("#ghout").hidden=!on;$("#ghsave").hidden=!on;
+  $("#ghstate").textContent=on?`Connected to ${GH.cfg.repo} · ${GH.cfg.branch}${GH.cfg.dir?" · "+GH.cfg.dir+"/":""}`:"Optional. Open PDFs from your own private repo and save marked-up copies back to it.";
+  if(!on){$("#ghfiles").hidden=true;$("#ghfiles").innerHTML=""}}
+async function ghList(){const box=$("#ghfiles");ghErr("");box.hidden=false;box.innerHTML="";box.append(el("span",{text:"Listing PDFs…"}));
+  try{const c=GH.cfg;const r=await gh(`/repos/${c.repo}/git/trees/${encodeURIComponent(c.branch)}?recursive=1`);const j=await r.json();
+    const pre=c.dir?c.dir+"/":"";const files=(j.tree||[]).filter(t=>t.type==="blob"&&/\.pdf$/i.test(t.path)&&t.path.startsWith(pre)).sort((a,b)=>a.path.localeCompare(b.path)).slice(0,300);
+    box.innerHTML="";if(!files.length){box.append(el("span",{text:`No PDFs in ${c.repo}${c.dir?"/"+c.dir:""}.`}));return}
+    for(const f of files)box.append(el("button",{type:"button",title:"Open "+f.path,onclick:()=>ghOpen(f)},el("span",{text:f.path.slice(pre.length)}),el("span",{class:"sz",text:fmtMB(f.size||0)})));
+    if(j.truncated)box.append(el("span",{text:"The repository is large, so this list may be incomplete. Set a folder to narrow it."}))}
+  catch(err){box.hidden=true;ghErr(err.message)}}
+async function ghOpen(f){ghErr("");libMsg(`Downloading ${f.path} from GitHub…`);
+  try{const buf=await ghRaw(f.path);const file=new File([buf],f.path.split("/").pop(),{type:"application/pdf"});await handleFile(file,{gh:{repo:GH.cfg.repo,branch:GH.cfg.branch,path:f.path}})}
+  catch(err){libMsg("");ghErr(err.message)}}
+if(PUBLIC){GH.load();ghRender();if(GH.cfg)ghList();
+  $("#ghconnect").onclick=()=>{$("#ghform").hidden=false;$("#ghconnect").hidden=true;$("#ghrepo").focus()};
+  $("#ghcancel").onclick=()=>{$("#ghform").hidden=true;ghRender()};
+  $("#ghout").onclick=()=>{GH.clear();ghErr("");ghRender()};
+  $("#ghrefresh").onclick=()=>ghList();
+  $("#ghform").addEventListener("submit",async e=>{e.preventDefault();ghErr("");
+    const repo=$("#ghrepo").value.trim().replace(/^https?:\/\/github\.com\//i,"").replace(/\.git$/,"").replace(/\/+$/,"");
+    if(!/^[\w.-]+\/[\w.-]+$/.test(repo)){ghErr("Type the repository as owner/name, for example woodwerd/drawings.");return}
+    const cfg={repo,branch:$("#ghbranch").value.trim()||"",dir:$("#ghdir").value.trim().replace(/^\/+|\/+$/g,""),token:$("#ghtoken").value.trim()};
+    GH.cfg=cfg;try{const r=await gh(`/repos/${repo}`);const j=await r.json();if(!cfg.branch)cfg.branch=j.default_branch||"main";
+      if(j.permissions&&j.permissions.push===false)ghErr("Connected, but this token can't save to the repo. Opening PDFs still works.")}
+    catch(err){GH.cfg=null;ghErr(err.message);return}
+    GH.set(cfg,$("#ghremember").checked);$("#ghtoken").value="";$("#ghform").hidden=true;ghRender();ghList()});
+}
 /* ---------- boot ---------- */
 buildTools();setTool("cloud");
 if(!pdfLib())live("fault","PDF reader didn't load. Reload the page.");
@@ -1134,7 +1213,11 @@ async function downloadMarked(note,btn,mode){
     const fname=`${(S.doc.name||"drawing").replace(/[\\/:*?"<>|]+/g,"-")} - redlines - ${author.replace(/[\\/:*?"<>|]+/g,"-")} - ${day}.pdf`;
     const blob=new Blob([out.bytes],{type:"application/pdf"});
     const cnt=`${out.count} comment${out.count===1?"":"s"}`;
-    if(PUBLIC&&mode==="share"){const file=new File([blob],fname,{type:"application/pdf"});
+    if(PUBLIC&&mode==="github"){const src=S.doc.gh,dir=src?src.path.replace(/[^/]*$/,"").replace(/\/$/,""):GH.cfg.dir,path=(dir?dir+"/":"")+fname;
+      note.textContent=`Saving to ${GH.cfg.repo}…`;
+      const res=await ghPut(path,out.bytes,`Redlines: ${S.doc.name||"drawing"} (${cnt}) by ${author}`,src&&src.repo===GH.cfg.repo?src.branch:GH.cfg.branch);
+      note.textContent="";note.append(document.createTextNode(`Saved “${fname}” with ${cnt} to ${GH.cfg.repo}. `),el("a",{href:res.html,target:"_blank",rel:"noopener",text:"Open on GitHub"}))}
+    else if(PUBLIC&&mode==="share"){const file=new File([blob],fname,{type:"application/pdf"});
       try{await navigator.share({files:[file],title:fname});note.textContent=`Shared “${fname}” with ${cnt}.`}catch(err){note.textContent=err&&err.name==="AbortError"?"Share cancelled.":"This browser couldn't share the file. Use Download instead."}}
     else if(PUBLIC){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=fname;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000);
       note.textContent=`Downloaded “${fname}” with ${cnt}. ${RET.to?"Send it back to "+RET.to+" however you like.":"Send it back however you like."}`}
@@ -1145,6 +1228,9 @@ async function downloadMarked(note,btn,mode){
 }
 $("#dlbtn2").onclick=()=>downloadMarked($("#dlnote2"),$("#dlbtn2"));
 $("#sharebtn").onclick=()=>downloadMarked($("#dlnote2"),$("#sharebtn"),"share");
+$("#ghsave").onclick=()=>downloadMarked($("#dlnote2"),$("#ghsave"),"github");
+
+
 /* optional link params for the public version: ?to=Name&email=address sets who the file goes back to */
 const RET=(()=>{const q=new URLSearchParams(location.search),c=v=>(v||"").trim().slice(0,80);return{to:c(q.get("to")),email:/^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(c(q.get("email")))?c(q.get("email")):""}})();
 if(PUBLIC){
