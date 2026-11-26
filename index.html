@@ -1022,11 +1022,14 @@ function updateSubmit(){
 function renderFlow(){
   const f=$("#flow");if(PUBLIC||!S.doc||!colM){f.hidden=true;return}
   const all=docMarks(),rv=all.filter(needsReview).length,dr=drafts().length,rs=responses().length,last=lastSubFor(S.doc.id);
-  const prev=prevDocOf(S.doc),newer=nextDocOf(S.doc),prevRv=prev?[...S.marks.values()].filter(m=>m.doc===prev.id&&needsReview(m)).length:0;
+  const prev=prevDocOf(S.doc),newer=nextDocOf(S.doc),prevRv=prev?[...S.marks.values()].filter(m=>m.doc===prev.id&&needsReview(m)).length:0,
+    prevOpen=prev?[...S.marks.values()].filter(m=>m.doc===prev.id&&isOpen(m)).length:0,carried=docMarks().some(m=>m.carriedFrom);
+  const revText=p=>carried?`This is Claude's revision of ${docLabel(p)}. Open markups came forward from it, tagged “from ${docLabel(p)}”.`:`This is Claude's revision of ${docLabel(p)}. Its markups stay on ${docLabel(p)}; this set starts clean.`;
   const goDoc=id=>{location.hash="#d-"+id};
   if(!last&&!rv&&!newer){if(!prev){f.hidden=true;return}
-    f.hidden=false;$("#steps").innerHTML="";$("#flowmsg").className="";$("#flowmsg").textContent=`This is Claude's revision of ${docLabel(prev)}. Open markups came forward from it, tagged “from ${docLabel(prev)}”. Review the set, answer Claude's replies, mark up anything still wrong, then submit.`;
-    const nx=$("#flownext");nx.innerHTML="";if(prevRv)nx.append(el("b",{text:"Also: "}),document.createTextNode(`${prevRv} repl${prevRv>1?"ies":"y"} on ${prev.round||prev.name} to approve or answer. `),el("button",{class:"link",text:"Open "+(prev.round||prev.name),onclick:()=>goDoc(prev.id)}));
+    f.hidden=false;$("#steps").innerHTML="";$("#flowmsg").className="";$("#flowmsg").textContent=revText(prev)+" Review it, mark up anything still wrong, then submit.";
+    const nx=$("#flownext");nx.innerHTML="";
+    if(prevRv||(!carried&&prevOpen))nx.append(el("b",{text:"On "+docLabel(prev)+": "}),document.createTextNode(prevRv?`${prevRv} repl${prevRv>1?"ies":"y"} to approve or answer. `:`${prevOpen} markup${prevOpen>1?"s":""} still open. `),el("button",{class:"link",text:"Open "+docLabel(prev)+" →",onclick:()=>goDoc(prev.id)}));
     return}
   f.hidden=false;const rev=last&&last.revision&&last.revision.doc?last.revision:(newer?{doc:newer.id,name:newer.name,round:newer.round}:null);
   const st=last?(last.status||"submitted"):"replied",order=["submitted","received","replied"],idx=st==="working"?1:Math.max(0,order.indexOf(st));
@@ -1037,7 +1040,7 @@ function renderFlow(){
       if(age>15*60e3){m.className="warnline";m.textContent=`Sent ${fmtTime(last.at)} and not picked up yet. Say "work the redlines on ${S.doc.name}" in the project chat.`}}
     else if(st==="received"||st==="working")m.textContent=`Claude picked it up ${fmtTime(last.receivedAt||last.at)}${last.note?": "+last.note:"."}`;
     else m.textContent=`Claude replied ${fmtTime(last.repliedAt||last.at)}${last.note?": "+last.note:"."}`;
-  }else m.textContent=prev?`This is Claude's revision of ${docLabel(prev)}. Open markups came forward from it, tagged “from ${docLabel(prev)}”.`:"";
+  }else m.textContent=prev?revText(prev):"";
   const nx=$("#flownext");nx.innerHTML="";
   if(rev&&st==="replied"){nx.append(el("b",{text:"Your turn: "}),document.createTextNode(`review revision ${rev.round||rev.name||""}. `),el("button",{class:"link",text:"Open it",onclick:()=>goDoc(rev.doc)}));
     if(rv)nx.append(document.createTextNode(` ${rv} repl${rv>1?"ies":"y"} here to approve or answer too. `),el("button",{class:"link",text:"Show them",onclick:()=>{$("#fscope").value="all";$("#fstatus").value="review";renderList()}}));
