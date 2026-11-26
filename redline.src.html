@@ -289,14 +289,14 @@ button:disabled{cursor:default;opacity:.45}
           <li><span class="mk"></span><span class="nm">Media Ctrl</span><span class="ln">A desk remote for media playback.</span></li>
           <li><span class="mk"></span><span class="nm">Claude Ctrl</span><span class="ln">A desk controller for Claude.</span></li></ul></div>
         <div><h4>Phone <span>· no board needed</span></h4><ul><li><span class="mk"></span><span class="nm">CtrlClock</span><span class="ln">A clock app for the phone.</span></li></ul></div>
-        <div><h4>Review <span>· drawing sets</span></h4><ul><li class="cur" aria-current="page"><span class="mk"></span><span><span class="nm"><span class="claude-only">Loop</span><span class="public-only">Redline</span></span><span class="here">You are here</span></span><span class="ln"><span class="claude-only">Review a drawing set with Claude: mark up, submit, get the next rev.</span><span class="public-only">Mark up any PDF and send it back.</span></span></li></ul></div>
+        <div><h4>Review <span>· drawing sets</span></h4><ul><li class="cur" aria-current="page"><span class="mk"></span><span><span class="nm"><span class="claude-only">Loop</span><span class="public-only">Redline Ctrl</span></span><span class="here">You are here</span></span><span class="ln"><span class="claude-only">Review a drawing set with Claude: mark up, submit, get the next rev.</span><span class="public-only">Mark up any PDF and send it back.</span></span></li></ul></div>
       </div>
     </details>
   </div>
 
   <header class="head gut">
     <div class="prod">
-      <h1><span class="claude-only">LOOP</span><span class="public-only">REDLINE</span></h1>
+      <h1><span class="claude-only">LOOP</span><span class="public-only">REDLINE CTRL</span></h1>
       <span class="purpose claude-only">Mark up a drawing set and send the markups to Claude.</span><span class="purpose public-only" id="ppurpose">Mark up a PDF, then download it or share it back.</span>
       <span class="ver">v1.0</span>
     </div>
@@ -511,7 +511,7 @@ let db=null,userApi=null,comments=null,assets=null,colM=null,colD=null;
 const local=new Map(); /* docId -> {pdf, file|bytes} for this session */
 /* Public mode: served outside claude.ai (GitHub Pages). No account, nothing uploaded; work is kept in this browser. */
 const PUBLIC=!(window.claude&&typeof window.claude.use==="function");
-if(PUBLIC)document.title="WOODWERD Redline";
+if(PUBLIC)document.title="Redline Ctrl";
 if(PUBLIC)document.documentElement.classList.add("public");
 const LS={docs:"ww-redline-docs",marks:id=>"ww-redline-marks-"+id};
 function lsGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}}
