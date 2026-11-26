@@ -180,6 +180,14 @@ button:disabled{cursor:default;opacity:.45}
 .confirm{border:1px solid var(--line-strong);border-radius:var(--r-ctl);padding:var(--s8);display:grid;gap:var(--s8);background:var(--ground);font-size:var(--t-cap)}
 .crow{display:flex;gap:var(--s8)}
 .subnote{font-size:var(--t-cap);color:var(--ink-soft)}
+.flow{border:1px solid var(--line-strong);border-radius:var(--r-ctl);padding:var(--s8);display:grid;gap:var(--s5);font-size:var(--t-cap);background:var(--surface)}
+.steps{display:flex;gap:var(--s3)}
+.steps span{flex:1;text-align:center;padding:3px 2px;border-radius:6px;border:1px solid var(--line-strong);font-family:var(--mono);font-size:var(--t-micro);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft)}
+.steps span.on{color:var(--ok);border-color:var(--ok)}
+.steps span.now{color:var(--accent-text);border-color:var(--accent);background:var(--accent-tint);font-weight:600}
+.flow .warnline{color:var(--attention)}
+.flow .next b{font-weight:600;color:var(--ink)}
+.retrow{display:flex;gap:var(--s5);flex-wrap:wrap;align-items:center}
 .empty{color:var(--ink-soft);padding:var(--s13) var(--s8);font-size:var(--t-cap)}
 .empty b{color:var(--ink);display:block;margin-bottom:var(--s5)}
 
@@ -250,7 +258,7 @@ button:disabled{cursor:default;opacity:.45}
   <header class="head gut">
     <div class="prod">
       <h1>REDLINE</h1>
-      <span class="purpose claude-only">Mark up a drawing set and send the markups to Claude.</span><span class="purpose public-only">Mark up a drawing set and send it back to WOODWERD.</span>
+      <span class="purpose claude-only">Mark up a drawing set and send the markups to Claude.</span><span class="purpose public-only" id="ppurpose">Mark up a PDF, then download it or share it back.</span>
       <span class="ver">v1.0</span>
     </div>
     <div class="sp"></div>
@@ -277,7 +285,7 @@ button:disabled{cursor:default;opacity:.45}
         </div>
         <p style="margin-top:8px">Measurements use the PDF's own sheet size, so a 36 × 24 sheet measures true at its printed scale. A set printed to a smaller sheet will not.</p>
         <h3 class="public-only">Send it back</h3>
-        <p class="public-only">Type your name, press <b>Download marked-up PDF</b>, and email that file back to WOODWERD. Each markup is a real PDF comment, so it shows in Bluebeam, Acrobat, Preview or any PDF viewer.</p>
+        <p class="public-only">Type your name and press <b>Download marked-up PDF</b>. Send the file back however you like: email, text, a shared folder. Each markup is a real PDF comment, so it shows in Bluebeam, Acrobat, Preview or any PDF viewer.</p>
         <div class="claude-only">
         <h3>Send for review</h3>
         <p>Markups stay drafts until you press <b>Submit</b>. Claude gets the batch, works each one, and replies under it here.</p>
@@ -303,7 +311,7 @@ button:disabled{cursor:default;opacity:.45}
           <div class="band"><span class="no">01</span><h2>Documents</h2><span class="state" id="libstate"></span><span class="why">Every set you have redlined. Open one, or drop a new PDF.</span></div>
           <label class="drop" id="drop">
             <strong>Drop a PDF here</strong>
-            <p class="claude-only">Any drawing set or document. It is stored with this page so you and Claude open the same file, and the markups stay with it.</p><p class="public-only">Open the drawing set WOODWERD sent you. It stays on your computer; nothing is uploaded.</p>
+            <p class="claude-only">Any drawing set or document. It is stored with this page so you and Claude open the same file, and the markups stay with it.</p><p class="public-only">Open the PDF you were sent, or any PDF. It stays on your computer; nothing is uploaded.</p>
             <span class="btn" role="button" tabindex="0" id="choose">Open a PDF</span>
             <input type="file" id="file" accept="application/pdf,.pdf" hidden>
           </label>
@@ -314,9 +322,9 @@ button:disabled{cursor:default;opacity:.45}
           <div class="band"><span class="no">02</span><h2>How it works</h2><span class="state"></span><span class="why">Three steps, no account needed.</span></div>
           <div class="how">
             <ol>
-              <li>Open the PDF WOODWERD sent you. Pick <b>Cloud</b>, <b>Arrow</b> or <b>Callout</b> and drag on the drawing.</li>
+              <li>Open the PDF. Pick <b>Cloud</b>, <b>Arrow</b> or <b>Callout</b> and drag on the drawing.</li>
               <li>Type what should change in the comment box beside each markup.</li>
-              <li>Type your name, press <b>Download marked-up PDF</b>, and email the file back.</li>
+              <li>Type your name, press <b>Download marked-up PDF</b>, and send the file back however you like.</li>
             </ol>
           </div>
         </div>
@@ -392,7 +400,8 @@ button:disabled{cursor:default;opacity:.45}
         <div class="submit public-only">
           <label class="field" for="rname" style="display:grid;gap:3px">Your name, shown on each comment<input id="rname" autocomplete="name" placeholder="First and last name" style="border:1px solid var(--line-strong);border-radius:8px;background:var(--surface);padding:5px 8px;color:var(--ink)"></label>
           <button class="primary" id="dlbtn2">Download marked-up PDF</button>
-          <div class="subnote" id="dlnote2">Email the downloaded PDF back to WOODWERD. Your file stays on this computer.</div>
+          <div class="retrow"><button class="btn" id="sharebtn" hidden>Share…</button><a class="link" id="mailbtn" hidden>Email it</a></div>
+          <div class="subnote" id="dlnote2">Your file stays on this computer. Download it, then send it back however you like.</div>
         </div>
         <div class="submit claude-only" id="submitbox">
           <button class="primary" id="submitbtn">Submit markups for review</button>
@@ -401,6 +410,7 @@ button:disabled{cursor:default;opacity:.45}
             <div class="crow"><button class="primary" id="confirmyes">Submit</button><button class="btn" id="confirmno">Cancel</button></div>
           </div>
           <div class="subnote" id="subnote"></div>
+          <div class="flow" id="flow" hidden aria-live="polite"><div class="steps" id="steps"></div><div id="flowmsg"></div><div class="next" id="flownext"></div></div>
           <button class="link" id="dlbtn" style="justify-self:start">Download marked-up PDF</button>
           <div class="subnote" id="dlnote" hidden></div>
         </div>
@@ -877,7 +887,41 @@ function updateSubmit(){
   if(!colM)n.textContent="Markups are kept in this tab only. Open this page on claude.ai, signed in, to save and submit them.";
   else if(last)n.textContent=`Last submitted ${fmtTime(last.at)}.${d.length||r.length?" New markups and your responses wait here until you submit.":""}`;
   else n.textContent=d.length?"Markups stay drafts until you submit them. Claude works only submitted markups.":"Add markups, then submit them here.";
+  if(colM&&last)n.textContent=d.length||r.length?"New markups and your responses stay drafts until you submit them.":"";
+  renderFlow();
 }
+/* round status: submitted -> received -> replied, written by Claude into submissions/<id> (status, receivedAt, repliedAt, note, next) */
+function renderFlow(){
+  const f=$("#flow");if(PUBLIC||!S.doc||!colM){f.hidden=true;return}
+  const all=docMarks(),rv=all.filter(needsReview).length,dr=drafts().length,rs=responses().length,last=lastSubFor(S.doc.id);
+  const prev=S.doc.prev&&S.docs.get(S.doc.prev),prevRv=prev?[...S.marks.values()].filter(m=>m.doc===prev.id&&needsReview(m)).length:0;
+  const goDoc=id=>{location.hash="#d-"+id};
+  if(!last&&!rv){if(!prev){f.hidden=true;return}
+    f.hidden=false;$("#steps").innerHTML="";$("#flowmsg").className="";$("#flowmsg").textContent=`This is Claude's revision of ${prev.round||prev.name}. Review it and mark up anything still wrong, then submit.`;
+    const nx=$("#flownext");nx.innerHTML="";if(prevRv)nx.append(el("b",{text:"Also: "}),document.createTextNode(`${prevRv} repl${prevRv>1?"ies":"y"} on ${prev.round||prev.name} to approve or answer. `),el("button",{class:"link",text:"Open "+(prev.round||prev.name),onclick:()=>goDoc(prev.id)}));
+    return}
+  f.hidden=false;const rev=last&&last.revision&&last.revision.doc?last.revision:null;
+  const st=last?(last.status||"submitted"):"replied",order=["submitted","received","replied"],idx=st==="working"?1:Math.max(0,order.indexOf(st));
+  $("#steps").innerHTML="";["Sent","Claude working",rev?"Revision ready":"Replies ready"].forEach((t,i)=>{const sp=el("span",{text:t});if(i<idx||(i===idx&&st==="replied"))sp.className="on";else if(i===idx)sp.className="now";$("#steps").append(sp)});
+  const m=$("#flowmsg");m.className="";
+  if(last){const age=Date.now()-(last.at||0);
+    if(st==="submitted"){m.textContent=`Sent ${fmtTime(last.at)}. Waiting for Claude to pick it up (usually a minute or two).`;
+      if(age>15*60e3){m.className="warnline";m.textContent=`Sent ${fmtTime(last.at)} and not picked up yet. Say "work the redlines on ${S.doc.name}" in the project chat.`}}
+    else if(st==="received"||st==="working")m.textContent=`Claude picked it up ${fmtTime(last.receivedAt||last.at)}${last.note?": "+last.note:"."}`;
+    else m.textContent=`Claude replied ${fmtTime(last.repliedAt||last.at)}${last.note?": "+last.note:"."}`;
+  }else m.textContent="";
+  const nx=$("#flownext");nx.innerHTML="";
+  if(rev&&st==="replied"){nx.append(el("b",{text:"Your turn: "}),document.createTextNode(`review revision ${rev.round||rev.name||""}. `),el("button",{class:"link",text:"Open it",onclick:()=>goDoc(rev.doc)}));
+    if(rv)nx.append(document.createTextNode(` ${rv} repl${rv>1?"ies":"y"} here to approve or answer too. `),el("button",{class:"link",text:"Show them",onclick:()=>{$("#fscope").value="all";$("#fstatus").value="review";renderList()}}));
+    else if(last.next)nx.append(document.createTextNode(" "+last.next))}
+  else if(rv){nx.append(el("b",{text:"Your turn: "}),document.createTextNode(`${rv} repl${rv>1?"ies":"y"} to review. `),
+    el("button",{class:"link",text:"Show them",onclick:()=>{$("#fscope").value="all";$("#fstatus").value="review";renderList()}}),
+    document.createTextNode(" Approve or answer each, then press Submit to send your responses."))}
+  else if(dr||rs)nx.append(el("b",{text:"Your turn: "}),document.createTextNode("press Submit to send what you've added."));
+  else if(st==="replied")nx.append(el("b",{text:"Nothing waiting on you. "}),document.createTextNode(last&&last.next?last.next:"Add markups any time and submit them."));
+  else nx.append(el("b",{text:"Nothing needed from you "}),document.createTextNode("while Claude works. Replies appear under each markup."));
+}
+setInterval(()=>{try{renderFlow()}catch{}},60000);
 $("#submitbtn").onclick=()=>{const d=drafts(),r=responses();if(!d.length&&!r.length)return;const pg=[...new Set(d.map(m=>m.page))].sort((a,b)=>a-b);
   const acc=r.filter(m=>m.review==="accepted").length,rw=r.length-acc,bits=[];
   if(d.length)bits.push(`${d.length} new markup${d.length>1?"s":""} on ${pg.length===1?"page":"pages"} ${pg.join(", ")}`);if(acc)bits.push(`${acc} approval${acc>1?"s":""}`);if(rw)bits.push(`${rw} rework note${rw>1?"s":""}`);
@@ -893,7 +937,7 @@ $("#confirmyes").onclick=async()=>{
     for(const m of d){m.submissionId=sid;m.submittedAt=at;await colM.doc(m.id).update({submissionId:sid,submittedAt:at})}
     for(const m of rs){m.answerSent=true;await colM.doc(m.id).update({answerSent:true,answerSubmission:sid})}
   }catch(err){failSave(err);btn.disabled=false;return}
-  S.subs.set(sid,{id:sid,doc:doc.id,at,count:d.length});
+  S.subs.set(sid,{id:sid,doc:doc.id,at,count:d.length,status:"submitted"});
   let told=false;
   try{if(comments&&anchor&&(await comments.canSendToClaude())==="available"){
     const lines=d.map(m=>`#${m.n} p${m.page} ${LABEL[m.type]||m.type}: ${(m.text||"(no comment)").replace(/\s+/g," ").slice(0,140)}`);
@@ -904,7 +948,8 @@ $("#confirmyes").onclick=async()=>{
     if(new TextEncoder().encode(text).length>3900)text=text.slice(0,1300)+"\n… (full list in the markups data)";
     await comments.sendToClaude({anchor,text});told=true}}catch{}
   $("#confirm").hidden=true;$("#submitbtn").hidden=false;btn.disabled=false;renderList();
-  $("#subnote").textContent=told?`Submitted ${fmtTime(at)}. Claude has them and will reply under each markup.`:`Submitted ${fmtTime(at)}. Claude wasn't told automatically, so tell Claude "work the redlines on ${doc.name}".`;
+  renderFlow();
+  $("#subnote").textContent=told?"":`Claude wasn't told automatically, so say "work the redlines on ${doc.name}" in the project chat.`;
 };
 
 /* ---------- boot ---------- */
@@ -948,11 +993,11 @@ if(!PUBLIC)(async()=>{
   }catch{clearTimeout(timer);live("attention","Not saving. Open this page on claude.ai, signed in.");S.dbReady=true;renderLibrary()}
 })();
 /* ---------- download marked-up PDF ---------- */
-async function downloadMarked(note,btn){
+async function downloadMarked(note,btn,mode){
   if(!S.doc||!pdf){note.hidden=false;note.textContent="Open a PDF first.";return}
   const marks=docMarks();if(!marks.length){note.hidden=false;note.textContent="Add a markup first.";return}
-  const author=(PUBLIC?$("#rname").value.trim():"")||(S.me&&S.names[S.me])||"WOODWERD";
-  if(PUBLIC){if(!$("#rname").value.trim()){note.hidden=false;note.textContent="Type your name first, so WOODWERD knows whose comments these are.";$("#rname").focus();return}store.set("ww-redline-name",author)}
+  const author=(PUBLIC?$("#rname").value.trim():"")||(S.me&&S.names[S.me])||(PUBLIC?"Reviewer":"WOODWERD");
+  if(PUBLIC){if(!$("#rname").value.trim()){note.hidden=false;note.textContent="Type your name first, so whoever reads the PDF knows whose comments these are.";$("#rname").focus();return}store.set("ww-redline-name",author)}
   btn.disabled=true;note.hidden=false;note.textContent="Writing your markups into the PDF…";
   try{
     const loc=local.get(S.doc.id)||{};let bytes=loc.bytes;if(!bytes&&loc.file)bytes=new Uint8Array(await loc.file.arrayBuffer());
@@ -964,14 +1009,26 @@ async function downloadMarked(note,btn){
     const d=new Date(),day=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
     const fname=`${(S.doc.name||"drawing").replace(/[\\/:*?"<>|]+/g,"-")} - redlines - ${author.replace(/[\\/:*?"<>|]+/g,"-")} - ${day}.pdf`;
     const blob=new Blob([out.bytes],{type:"application/pdf"});
-    if(PUBLIC){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=fname;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000);
-      note.textContent=`Downloaded “${fname}” with ${out.count} comment${out.count===1?"":"s"}. Email it back to WOODWERD.`}
+    const cnt=`${out.count} comment${out.count===1?"":"s"}`;
+    if(PUBLIC&&mode==="share"){const file=new File([blob],fname,{type:"application/pdf"});
+      try{await navigator.share({files:[file],title:fname});note.textContent=`Shared “${fname}” with ${cnt}.`}catch(err){note.textContent=err&&err.name==="AbortError"?"Share cancelled.":"This browser couldn't share the file. Use Download instead."}}
+    else if(PUBLIC){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=fname;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000);
+      note.textContent=`Downloaded “${fname}” with ${cnt}. ${RET.to?"Send it back to "+RET.to+" however you like.":"Send it back however you like."}`}
     else{const dl=await window.claude.use("downloads");if(!dl)throw new Error("Downloads aren't available in this view.");
       try{await dl.save({filename:fname,data:blob});note.textContent=`Saved “${fname}” with ${out.count} comment${out.count===1?"":"s"}.`}catch(err){note.textContent=err&&err.code==="declined"?"Download cancelled.":`Couldn't save the file (${err&&err.code||"error"}).`}}
   }catch(err){note.textContent=`Couldn't write the PDF: ${err&&err.message||"unknown error"}`}
   btn.disabled=false;
 }
 $("#dlbtn2").onclick=()=>downloadMarked($("#dlnote2"),$("#dlbtn2"));
+$("#sharebtn").onclick=()=>downloadMarked($("#dlnote2"),$("#sharebtn"),"share");
+/* optional link params for the public version: ?to=Name&email=address sets who the file goes back to */
+const RET=(()=>{const q=new URLSearchParams(location.search),c=v=>(v||"").trim().slice(0,80);return{to:c(q.get("to")),email:/^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(c(q.get("email")))?c(q.get("email")):""}})();
+if(PUBLIC){
+  try{if(navigator.canShare&&navigator.canShare({files:[new File([new Uint8Array(1)],"t.pdf",{type:"application/pdf"})]}))$("#sharebtn").hidden=false}catch{}
+  if(RET.to){$("#ppurpose").textContent=`Mark up this PDF, then send it back to ${RET.to}.`;$("#dlnote2").textContent=`Your file stays on this computer. Download it, then send it back to ${RET.to} however you like.`}
+  if(RET.email){const mb=$("#mailbtn");mb.hidden=false;mb.textContent=`Email ${RET.to||RET.email}`;
+    mb.onclick=()=>{const nm=S.doc&&S.doc.name||"the drawings";mb.href=`mailto:${RET.email}?subject=${encodeURIComponent("Redlines: "+nm)}&body=${encodeURIComponent("Marked-up PDF attached.\n\n(Attach the file you just downloaded.)")}`}}
+}
 $("#dlbtn").onclick=()=>downloadMarked($("#dlnote"),$("#dlbtn"));
 async function resolveNames(){if(!userApi||!userApi.profiles)return;const ids=[...new Set([...S.marks.values()].map(m=>m.author).filter(Boolean))].filter(i=>!(i in S.names));if(!ids.length)return;
   try{const ps=await userApi.profiles(ids);let ch=false;ids.forEach(i=>{const n=ps&&ps[i]&&ps[i].name;S.names[i]=n||"";ch=ch||!!n});if(ch&&S.doc)renderList()}catch{}}
