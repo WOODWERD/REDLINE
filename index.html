@@ -101,8 +101,19 @@ button:disabled{cursor:default;opacity:.45}
 .seg svg{width:16px;height:16px;flex:none}
 
 /* workspace */
-.work{min-height:0;display:grid;grid-template-columns:200px minmax(0,1fr) 330px;grid-template-rows:auto minmax(0,1fr);grid-template-areas:"bar bar bar" "rail table list"}
-.bar{grid-area:bar;display:flex;align-items:center;gap:var(--s8);flex-wrap:wrap;padding-block:var(--s5);background:var(--surface);border-bottom:1px solid var(--line)}
+.work{--railw:200px;--listw:clamp(300px,26vw,440px);min-height:0;display:grid;grid-template-columns:var(--railw) minmax(0,1fr) var(--listw);grid-template-rows:auto minmax(0,1fr);grid-template-areas:"bar bar bar" "rail table list"}
+/* one fixed top bar: identity column as wide as the page previews, tools in one row, scale and size fixed on the right */
+.bar{grid-area:bar;display:grid;grid-template-columns:var(--railw) minmax(0,1fr) auto;align-items:center;column-gap:var(--s13);padding-block:var(--s5);padding-left:0!important;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar-id{display:flex;align-items:center;gap:var(--s5);min-width:0;padding-left:var(--s8)}
+.bar-id #back{padding-inline:var(--s5);flex:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.bar-id .docname{flex:1;min-width:0;flex-wrap:wrap;row-gap:0}
+.bar-id .docname b{max-width:100%}
+.bar-tools{display:flex;align-items:center;gap:var(--s8);min-width:0;overflow-x:auto;scrollbar-width:thin}
+.bar-tools>*{flex:none}
+.bar-meta{display:flex;align-items:center;gap:var(--s8);justify-content:flex-end}
+.bar-meta .readout{display:inline-block;min-width:21ch;text-align:right}
+.live{min-width:24ch}
 .btn{border:1px solid var(--line-strong);background:var(--surface);border-radius:var(--r-ctl);padding:var(--s3) var(--s13);min-height:32px;display:inline-flex;align-items:center;gap:var(--s5);white-space:nowrap}
 .btn:hover:not(:disabled){background:var(--ground);border-color:var(--ink-soft)}
 .btn:active:not(:disabled){transform:translateY(1px)}
@@ -166,11 +177,16 @@ button:disabled{cursor:default;opacity:.45}
 .items{overflow:auto;padding:var(--s8);display:flex;flex-direction:column;gap:var(--s8);min-height:0;flex:1}
 .item{border:1px solid var(--line);border-radius:var(--r-ctl);padding:var(--s8);display:grid;gap:var(--s8);background:var(--ground)}
 .item.sel{border-color:var(--ink)}
-.item .top{display:flex;align-items:center;gap:var(--s8);font-size:var(--t-cap)}
+.item .top{display:flex;align-items:center;flex-wrap:wrap;gap:var(--s5) var(--s8);font-size:var(--t-cap);min-width:0}
+.item .top .meta{flex:1 1 8ch}
+.item{min-width:0;overflow-wrap:anywhere}
+.grp{grid-template-columns:minmax(0,1fr);min-width:0}
+.log{overflow-wrap:anywhere}
+.flow{min-width:0;overflow-wrap:anywhere}
 .item .num{font-family:var(--mono);font-weight:500;min-width:30px}
 .item .ink{width:10px;height:10px;border-radius:50%;flex:none}
 .item .meta{color:var(--ink-soft);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.item textarea{width:100%;min-height:46px;resize:vertical;border:1px solid var(--line-strong);border-radius:var(--r-ctl);background:var(--surface);padding:var(--s5) var(--s8);font-size:var(--t-cap)}
+.item textarea{width:100%;min-height:46px;max-height:40vh;resize:vertical;field-sizing:content;border:1px solid var(--line-strong);border-radius:var(--r-ctl);background:var(--surface);padding:var(--s5) var(--s8);font-size:var(--t-cap)}
 .item .row{display:flex;gap:var(--s8);align-items:center;justify-content:space-between}
 .st{display:inline-flex;align-items:center;gap:var(--s5);font-size:var(--t-micro);letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line-strong);border-radius:var(--r-ctl);padding:2px var(--s8);background:var(--surface);white-space:nowrap;min-height:0}
 .st:hover{border-color:var(--ink-soft)}
@@ -245,7 +261,10 @@ button:disabled{cursor:default;opacity:.45}
 .badge{display:block;height:34px;width:74px;background:currentColor;-webkit-mask:url("img/woodwerd-badge.png") center/contain no-repeat;mask:url("img/woodwerd-badge.png") center/contain no-repeat}
 .tag{font-size:var(--t-micro);letter-spacing:.22em;text-transform:uppercase;color:var(--ink-soft)}
 
+@media (max-width:1280px){.seg.tools button span,.seg.tools kbd{display:none}.bar-meta .field{font-size:0;gap:0}.bar-meta .field select{font-size:var(--t-cap)}}
 @media (max-width:900px){
+  .bar{grid-template-columns:minmax(0,1fr);row-gap:var(--s5);padding-left:max(16px,env(safe-area-inset-left,0px))!important}
+  .bar-id{padding-left:0}.bar-meta{justify-content:flex-start}
   .work{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(340px,68vh) auto;grid-template-areas:"bar" "table" "list";overflow:auto}
   .work .lib{grid-row:auto}
   .list .items{overflow:visible}
@@ -369,12 +388,12 @@ button:disabled{cursor:default;opacity:.45}
 
     <!-- document view -->
     <div class="bar gut" id="bar" hidden>
-      <button class="btn" id="back" title="Back to all documents"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Documents</button>
-      <div class="docname"><b id="dname"></b><label for="round">Set</label><input id="round" placeholder="X1.0" autocomplete="off"></div>
-      <select class="pagepick" id="pagepick" aria-label="Page"></select>
+      <div class="bar-id"><button class="btn" id="back" title="Back to all documents" aria-label="Documents"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><span class="sr">Documents</span></button>
+      <div class="docname"><b id="dname"></b><label for="round">Set</label><input id="round" placeholder="X1.0" autocomplete="off"></div></div>
+      <div class="bar-tools"><select class="pagepick" id="pagepick" aria-label="Page"></select>
       <div class="seg tools" role="toolbar" aria-label="Markup tools" id="toolbar"></div>
-      <div class="colors" role="group" aria-label="Markup colour" id="colors"></div>
-      <label class="field" for="scale">Scale
+      <div class="colors" role="group" aria-label="Markup colour" id="colors"></div></div>
+      <div class="bar-meta"><label class="field" for="scale">Scale
         <select id="scale">
           <option value="0.0625">1/16" = 1'-0"</option>
           <option value="0.09375">3/32" = 1'-0"</option>
@@ -392,7 +411,7 @@ button:disabled{cursor:default;opacity:.45}
           <option value="12">Full size</option>
         </select>
       </label>
-      <span class="readout" id="psize"></span>
+      <span class="readout" id="psize"></span></div>
     </div>
     <aside class="rail area" id="rail" hidden aria-label="Pages">
       <div class="band"><span class="no">01</span><h2>Pages</h2><span class="state" id="pgstate"></span></div>
@@ -879,7 +898,8 @@ function renderList(focusNew){
   for(const m of rows){
     const ta=el("textarea",{"data-mid":m.id,"aria-label":`Comment for markup ${m.n}`,placeholder:m.type==="callout"?"Note text (shows on the page)":"What should change here?"});
     ta.value=m.text||"";
-    let tmr;ta.addEventListener("input",()=>{m.text=ta.value;if(m.type==="callout")render();clearTimeout(tmr);tmr=setTimeout(()=>patch(m.id,{text:ta.value}),600)});
+    const fitTa=()=>{if(CSS.supports&&CSS.supports("field-sizing","content"))return;ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight+2,innerHeight*.4)+"px"};requestAnimationFrame(fitTa);
+    let tmr;ta.addEventListener("input",()=>{fitTa();m.text=ta.value;if(m.type==="callout")render();clearTimeout(tmr);tmr=setTimeout(()=>patch(m.id,{text:ta.value}),600)});
     ta.addEventListener("focus",()=>{if(S.sel!==m.id){S.sel=m.id;render();box.querySelectorAll(".item").forEach(x=>x.classList.toggle("sel",x.dataset.id===m.id))}});
     const s=stateOf(m);const[label,dotc]=ST[s];
     const stb=el("span",{class:"st"},el("span",{class:"sdot "+(dotc==="soft"?"":dotc)}),document.createTextNode(label));
