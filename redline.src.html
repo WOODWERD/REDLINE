@@ -507,9 +507,13 @@ function showView(v){
   const doc=v==="doc";$("#lib").hidden=doc;["#bar","#rail","#table","#list"].forEach(s=>$(s).hidden=!doc);
 }
 function showLibrary(){S.doc=null;pdf=null;pageObj=null;showView("lib");renderLibrary();if(location.hash)setHash("")}
-const isClosed=m=>m.status==="done"&&m.review==="accepted";
+const isClosed=m=>!!m.carriedTo||(m.status==="done"&&m.review==="accepted");
 const isOpen=m=>!isClosed(m);
-const needsReview=m=>!!m.reply&&!m.review;
+const needsReview=m=>!m.carriedTo&&!!m.reply&&!m.review;
+/* revisions: Claude carries open markups onto the new revision's doc (copy.carriedFrom = old id, old.carriedTo = new id) */
+const docLabel=d=>d?(d.round||d.name||"earlier set"):"earlier set";
+function prevDocOf(doc){if(doc.prev&&S.docs.get(doc.prev))return S.docs.get(doc.prev);for(const m of S.marks.values())if(m.doc===doc.id&&m.carriedFrom){const o=S.marks.get(m.carriedFrom);if(o&&S.docs.get(o.doc))return S.docs.get(o.doc)}return null}
+function nextDocOf(doc){for(const d of S.docs.values())if(d.prev===doc.id)return d;for(const m of S.marks.values())if(m.doc===doc.id&&m.carriedTo){const n=S.marks.get(m.carriedTo);if(n&&S.docs.get(n.doc))return S.docs.get(n.doc)}return null}
 function openCount(id){let n=0;for(const m of S.marks.values())if(m.doc===id&&isOpen(m))n++;return n}
 function renderLibrary(){
   const box=$("#docs");box.innerHTML="";
@@ -818,11 +822,11 @@ function saved(){live("ok","Saved · Claude can read these")}
 function failSave(err){live(err&&err.code==="permission_denied"?"attention":"fault",err&&err.code==="permission_denied"?"You can view but not add markups":"Couldn't save. Check your connection.")}
 
 /* ---------- markups list ---------- */
-function stateOf(m){if(isClosed(m))return"closed";if(needsReview(m))return m.status==="ask"?"ask":m.status==="done"?"done":"review";
+function stateOf(m){if(m.carriedTo)return"carried";if(isClosed(m))return"closed";if(needsReview(m))return m.status==="ask"?"ask":m.status==="done"?"done":"review";
   if(m.review&&!m.answerSent)return m.review==="rework"?"rework":"approved";if(m.submissionId)return"sent";return"draft"}
 /* label, dot class, filter group */
 const ST={draft:["Draft","","draft"],sent:["With Claude","soft","sent"],review:["Your review","attention","review"],ask:["Question","attention","review"],done:["Done · review","attention","review"],
-  approved:["Approved · to send","soft","sent"],rework:["Rework · to send","soft","sent"],closed:["Closed","ok","closed"]};
+  carried:["Carried forward","ok","closed"],approved:["Approved · to send","soft","sent"],rework:["Rework · to send","soft","sent"],closed:["Closed","ok","closed"]};
 function setReview(m,review,answer){const f={review,answer:answer||"",answerAt:Date.now(),answerSent:false};Object.assign(m,f);patch(m.id,f);renderList();updateCounts()}
 function undoReview(m){Object.assign(m,{review:null,answer:"",answerSent:false});
   if(colM)colM.doc(m.id).update({review:null,answer:"",answerSent:false,updatedAt:Date.now()}).then(saved,failSave);renderList();updateCounts()}
@@ -849,18 +853,19 @@ function renderList(focusNew){
     const len=m.type==="measure"?" "+measureText(Math.hypot(m.pts[1][0]-m.pts[0][0],m.pts[1][1]-m.pts[0][1]),m.scale||.25):"";
     const inkDot=el("span",{class:"ink"});inkDot.style.background=m.color;
     const item=el("div",{class:"item"+(S.sel===m.id?" sel":""),"data-id":m.id},
-      el("div",{class:"top"},el("span",{class:"num",text:"#"+m.n}),inkDot,el("span",{class:"meta",text:`p${m.page} · ${LABEL[m.type]||m.type}${len}${who?" · "+who:""}`}),stb),
+      el("div",{class:"top"},el("span",{class:"num",text:"#"+m.n}),inkDot,el("span",{class:"meta",text:`p${m.page} · ${LABEL[m.type]||m.type}${len}${who?" · "+who:""}${m.carriedFrom?" · from "+docLabel(S.docs.get((S.marks.get(m.carriedFrom)||{}).doc)):""}`}),stb),
       ta,
       m.reply?el("div",{class:"reply"+(m.status==="ask"?" ask":"")},el("b",{text:"Claude: "}),document.createTextNode(m.reply)):null,
       m.review?el("div",{class:"answer"},el("b",{text:m.review==="rework"?"You, rework: ":"You: "}),document.createTextNode(m.answer||(m.status==="done"?"Accepted and closed.":"Plan approved.")),m.answerSent?null:el("span",{class:"pend",text:" Not sent yet."})):null,
       reviewRow(m),
+      m.carriedTo&&S.marks.get(m.carriedTo)?el("div",{class:"row"},el("button",{class:"link",text:"Continued on "+docLabel(S.docs.get(S.marks.get(m.carriedTo).doc))+" →",onclick:()=>{const n=S.marks.get(m.carriedTo);location.hash="#d-"+n.doc+"-p"+n.page}})):null,
       el("div",{class:"row"},el("button",{class:"link",text:"Show on page",onclick:()=>{if(m.page!==S.page)goPage(m.page,true).then(()=>select(m.id));else select(m.id)}}),
         el("button",{class:"link",text:"Delete",onclick:()=>remove(m.id)})));
     box.append(item);
     if((focusNew&&m.id===S.sel)||active===m.id){ta.focus();if(focusNew)item.scrollIntoView({block:"nearest"})}
   }
 }
-function reviewRow(m){
+function reviewRow(m){if(m.carriedTo)return null;
   if(!m.reply)return null;const r=el("div",{class:"review"});
   if(!m.review){const done=m.status==="done";
     r.append(el("button",{class:"go",text:done?"Accept and close":"Approve plan",title:done?"Close this markup":"Tell Claude to go ahead",onclick:()=>setReview(m,"accepted")}),
@@ -875,7 +880,7 @@ function reviewRow(m){
 $("#fscope").onchange=()=>renderList();$("#fstatus").onchange=()=>renderList();
 
 /* ---------- submit for review ---------- */
-function drafts(){return docMarks().filter(m=>!m.submissionId&&m.status==="open")}
+function drafts(){return docMarks().filter(m=>!m.submissionId&&!m.carriedFrom&&m.status==="open")}
 function responses(){return docMarks().filter(m=>m.review&&!m.answerSent)}
 function lastSubFor(id){let best=null;for(const s of S.subs.values())if(s.doc===id&&(!best||s.at>best.at))best=s;return best}
 function updateSubmit(){
@@ -894,13 +899,13 @@ function updateSubmit(){
 function renderFlow(){
   const f=$("#flow");if(PUBLIC||!S.doc||!colM){f.hidden=true;return}
   const all=docMarks(),rv=all.filter(needsReview).length,dr=drafts().length,rs=responses().length,last=lastSubFor(S.doc.id);
-  const prev=S.doc.prev&&S.docs.get(S.doc.prev),prevRv=prev?[...S.marks.values()].filter(m=>m.doc===prev.id&&needsReview(m)).length:0;
+  const prev=prevDocOf(S.doc),newer=nextDocOf(S.doc),prevRv=prev?[...S.marks.values()].filter(m=>m.doc===prev.id&&needsReview(m)).length:0;
   const goDoc=id=>{location.hash="#d-"+id};
-  if(!last&&!rv){if(!prev){f.hidden=true;return}
-    f.hidden=false;$("#steps").innerHTML="";$("#flowmsg").className="";$("#flowmsg").textContent=`This is Claude's revision of ${prev.round||prev.name}. Review it and mark up anything still wrong, then submit.`;
+  if(!last&&!rv&&!newer){if(!prev){f.hidden=true;return}
+    f.hidden=false;$("#steps").innerHTML="";$("#flowmsg").className="";$("#flowmsg").textContent=`This is Claude's revision of ${docLabel(prev)}. Open markups came forward from it, tagged “from ${docLabel(prev)}”. Review the set, answer Claude's replies, mark up anything still wrong, then submit.`;
     const nx=$("#flownext");nx.innerHTML="";if(prevRv)nx.append(el("b",{text:"Also: "}),document.createTextNode(`${prevRv} repl${prevRv>1?"ies":"y"} on ${prev.round||prev.name} to approve or answer. `),el("button",{class:"link",text:"Open "+(prev.round||prev.name),onclick:()=>goDoc(prev.id)}));
     return}
-  f.hidden=false;const rev=last&&last.revision&&last.revision.doc?last.revision:null;
+  f.hidden=false;const rev=last&&last.revision&&last.revision.doc?last.revision:(newer?{doc:newer.id,name:newer.name,round:newer.round}:null);
   const st=last?(last.status||"submitted"):"replied",order=["submitted","received","replied"],idx=st==="working"?1:Math.max(0,order.indexOf(st));
   $("#steps").innerHTML="";["Sent","Claude working",rev?"Revision ready":"Replies ready"].forEach((t,i)=>{const sp=el("span",{text:t});if(i<idx||(i===idx&&st==="replied"))sp.className="on";else if(i===idx)sp.className="now";$("#steps").append(sp)});
   const m=$("#flowmsg");m.className="";
@@ -909,11 +914,11 @@ function renderFlow(){
       if(age>15*60e3){m.className="warnline";m.textContent=`Sent ${fmtTime(last.at)} and not picked up yet. Say "work the redlines on ${S.doc.name}" in the project chat.`}}
     else if(st==="received"||st==="working")m.textContent=`Claude picked it up ${fmtTime(last.receivedAt||last.at)}${last.note?": "+last.note:"."}`;
     else m.textContent=`Claude replied ${fmtTime(last.repliedAt||last.at)}${last.note?": "+last.note:"."}`;
-  }else m.textContent="";
+  }else m.textContent=prev?`This is Claude's revision of ${docLabel(prev)}. Open markups came forward from it, tagged “from ${docLabel(prev)}”.`:"";
   const nx=$("#flownext");nx.innerHTML="";
   if(rev&&st==="replied"){nx.append(el("b",{text:"Your turn: "}),document.createTextNode(`review revision ${rev.round||rev.name||""}. `),el("button",{class:"link",text:"Open it",onclick:()=>goDoc(rev.doc)}));
     if(rv)nx.append(document.createTextNode(` ${rv} repl${rv>1?"ies":"y"} here to approve or answer too. `),el("button",{class:"link",text:"Show them",onclick:()=>{$("#fscope").value="all";$("#fstatus").value="review";renderList()}}));
-    else if(last.next)nx.append(document.createTextNode(" "+last.next))}
+    else if(last&&last.next)nx.append(document.createTextNode(" "+last.next))}
   else if(rv){nx.append(el("b",{text:"Your turn: "}),document.createTextNode(`${rv} repl${rv>1?"ies":"y"} to review. `),
     el("button",{class:"link",text:"Show them",onclick:()=>{$("#fscope").value="all";$("#fstatus").value="review";renderList()}}),
     document.createTextNode(" Approve or answer each, then press Submit to send your responses."))}
