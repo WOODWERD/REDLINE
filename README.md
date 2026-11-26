@@ -7,7 +7,7 @@ Part of the Ctrl toolkit, a WOODWERD toolkit. Review group: drawing sets.
 ## For customers
 
 1. Open the link you were sent, then open the PDF (drag it onto the page or press **Open a PDF**).
-2. Mark it up: Cloud, Box, Arrow, Callout, Pen, Highlight and Measure. Type what should change beside each markup.
+2. Mark it up: Cloud, Box, Arrow, Centerline, Dashed line, hatched Area, Remove (box with an X), Callout, Pen, Highlight and Measure. Type what should change beside each markup.
 3. Type your name and press **Download marked-up PDF**. Send the file back however you like: email, text, a shared folder. On phones and some browsers a **Share** button sends it straight to Mail, Messages and other apps.
 
 ## Sending someone the link
