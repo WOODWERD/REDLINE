@@ -229,6 +229,10 @@ button:disabled{cursor:default;opacity:.45}
 .log .rnd li button:hover,.log .rnd li button:focus-visible{text-decoration:underline;text-decoration-color:var(--accent)}
 .oc{font-family:var(--mono);font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.06em;margin-right:4px}
 .oc.done{color:var(--ok)}.oc.superseded{color:var(--ink-soft)}.oc.reworked,.oc.planned{color:var(--accent-text)}.oc.ask{color:var(--attention)}
+.ibtn{display:inline-grid;place-items:center;width:32px;height:32px;border:1px solid transparent;border-radius:var(--r-ctl);background:transparent;color:var(--ink-soft);padding:0}
+.ibtn:hover{color:var(--ink);border-color:var(--line-strong);background:var(--surface)}
+.ibtn:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.ibtn.trash:hover{color:var(--fault);border-color:var(--fault)}
 .retrow{display:flex;gap:var(--s5);flex-wrap:wrap;align-items:center}
 .empty{color:var(--ink-soft);padding:var(--s13) var(--s8);font-size:var(--t-cap)}
 .empty b{color:var(--ink);display:block;margin-bottom:var(--s5)}
@@ -949,8 +953,8 @@ function renderList(focusNew){
       m.status==="superseded"&&m.supersededNote?el("div",{class:"snote",text:m.supersededNote}):null,
       reviewRow(m),
       m.carriedTo&&S.marks.get(m.carriedTo)?el("div",{class:"row"},el("button",{class:"link",text:"Continued on "+docLabel(S.docs.get(S.marks.get(m.carriedTo).doc))+" →",onclick:()=>{const n=S.marks.get(m.carriedTo);location.hash="#d-"+n.doc+"-p"+n.page}})):null,
-      el("div",{class:"row"},el("button",{class:"link",text:"Show on page",onclick:()=>{if(m.page!==S.page)goPage(m.page,true).then(()=>select(m.id));else select(m.id)}}),
-        el("button",{class:"link",text:"Delete",onclick:()=>remove(m.id)})));
+      el("div",{class:"row"},iconBtn("view",`Show #${m.n} on page ${m.page}`,()=>{if(m.page!==S.page)goPage(m.page,true).then(()=>select(m.id));else select(m.id)}),
+        iconBtn("trash",`Delete #${m.n}`,()=>remove(m.id))));
     groupBox(s).append(item);
     if((focusNew&&m.id===S.sel)||active===m.id){ta.focus();if(focusNew)item.scrollIntoView({block:"nearest"})}
   }
@@ -974,6 +978,9 @@ function mTags(m){const t=[];
   if(m.plannedFor&&!m.doneIn)t.push(el("span",{class:"mtag plan",text:"Planned for "+m.plannedFor}));
   if(m.status==="superseded")t.push(el("span",{class:"mtag",text:"Superseded"+(m.supersededBy?" by "+m.supersededBy:"")}));
   return t.length?el("div",{class:"mtags"},...t):null}
+const ICONS={view:'<path d="M3.5 2h9L16.5 6v12h-13z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M12.5 2v4h4" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M5.2 12c1.2-2.3 2.9-3.5 4.8-3.5s3.6 1.2 4.8 3.5c-1.2 2.3-2.9 3.5-4.8 3.5S6.4 14.3 5.2 12z" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="10" cy="12" r="1.6" fill="currentColor"/>',
+  trash:'<path d="M3.5 5.5h13M8 5.5V3.5h4v2M5.5 5.5l.8 11h7.4l.8-11M8.5 8.5v5.5M11.5 8.5v5.5" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>'};
+function iconBtn(kind,label,onclick){const b=el("button",{class:"ibtn "+kind,title:label,"aria-label":label,onclick});b.innerHTML=`<svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">${ICONS[kind]}</svg>`;return b}
 /* ---------- revision log: rounds/<round> {round, at, note, sheets[], items:[{id, outcome, note}]} written by Claude ---------- */
 function jumpTo(id){const m=S.marks.get(id);if(!m)return;if(m.doc!==S.doc.id){location.hash="#d-"+m.doc+"-p"+m.page;return}
   if(m.page!==S.page)goPage(m.page,true).then(()=>select(m.id));else select(m.id)}
