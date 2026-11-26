@@ -197,6 +197,22 @@ button:disabled{cursor:default;opacity:.45}
 .steps span.now{color:var(--accent-text);border-color:var(--accent);background:var(--accent-tint);font-weight:600}
 .flow .warnline{color:var(--attention)}
 .flow .next b{font-weight:600;color:var(--ink)}
+.grp{border:0;display:grid;gap:var(--s8)}
+.grp>summary{cursor:pointer;font-family:var(--mono);font-size:var(--t-micro);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);padding:var(--s3) 0;list-style-position:inside}
+.grp>summary b{color:var(--ink);font-weight:500}
+.mtags{display:flex;flex-wrap:wrap;gap:var(--s3)}
+.mtag{font-family:var(--mono);font-size:var(--t-micro);letter-spacing:.04em;border:1px solid var(--line-strong);border-radius:6px;padding:1px 5px;color:var(--ink-soft)}
+.mtag.ok{color:var(--ok);border-color:var(--ok)}.mtag.plan{color:var(--accent-text);border-color:var(--accent)}
+.snote{font-size:var(--t-cap);color:var(--ink-soft)}
+.log{border:1px solid var(--line);border-radius:var(--r-ctl);background:var(--surface);font-size:var(--t-cap)}
+.log>summary{cursor:pointer;padding:var(--s5) var(--s8);font-weight:600}
+.log .rnd{border-top:1px solid var(--line);padding:var(--s5) var(--s8)}
+.log .rnd>summary{cursor:pointer}
+.log .rnd ul{list-style:none;margin:var(--s5) 0 0;padding:0;display:grid;gap:var(--s3)}
+.log .rnd li button{all:unset;cursor:pointer;display:block}
+.log .rnd li button:hover,.log .rnd li button:focus-visible{text-decoration:underline;text-decoration-color:var(--accent)}
+.oc{font-family:var(--mono);font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.06em;margin-right:4px}
+.oc.done{color:var(--ok)}.oc.superseded{color:var(--ink-soft)}.oc.reworked,.oc.planned{color:var(--accent-text)}.oc.ask{color:var(--attention)}
 .retrow{display:flex;gap:var(--s5);flex-wrap:wrap;align-items:center}
 .empty{color:var(--ink-soft);padding:var(--s13) var(--s8);font-size:var(--t-cap)}
 .empty b{color:var(--ink);display:block;margin-bottom:var(--s5)}
@@ -426,9 +442,10 @@ button:disabled{cursor:default;opacity:.45}
         </div>
         <div class="filters">
           <select id="fscope" aria-label="Which pages"><option value="page">This page</option><option value="all">All pages</option></select>
-          <select id="fstatus" aria-label="Status"><option value="any">Any status</option><option value="open">Open</option><option value="review">Needs my review</option><option value="draft">Draft</option><option value="sent">With Claude</option><option value="closed">Closed</option></select>
+          <select id="fstatus" aria-label="Status"><option value="any">Any status</option><option value="open">Open</option><option value="review">Needs my review</option><option value="draft">Draft</option><option value="sent">With Claude</option><option value="closed">Accomplished</option><option value="superseded">Superseded</option></select>
         </div>
       </div>
+      <details class="log" id="log" hidden><summary id="logsum">Revision log</summary><div id="logbody"></div></details>
       <div class="items" id="items"></div>
     </aside>
   </div>
@@ -491,7 +508,7 @@ function applyTheme(t){const r=document.documentElement;if(t==="light"||t==="dar
 document.querySelectorAll("#theme button").forEach(b=>b.addEventListener("click",()=>{store.set("ww-theme",b.dataset.t);applyTheme(b.dataset.t)}));
 applyTheme(store.get("ww-theme")||"system");
 /* close disclosures on outside click / Escape */
-document.addEventListener("click",e=>{document.querySelectorAll("details[open]").forEach(d=>{if(!d.contains(e.target))d.open=false})});
+document.addEventListener("click",e=>{document.querySelectorAll("details[open]:not(.grp):not(.log):not(.rnd)").forEach(d=>{if(!d.contains(e.target))d.open=false})});
 
 /* ---------- status line ---------- */
 function live(kind,text){const d=$("#livedot");d.className="sdot "+(kind||"")+(kind==="attention-pulse"?" attention pulse":"");if(kind==="attention-pulse")d.className="sdot attention pulse";$("#livetxt").textContent=text}
@@ -517,9 +534,10 @@ function showView(v){
   const doc=v==="doc";$("#lib").hidden=doc;["#bar","#rail","#table","#list"].forEach(s=>$(s).hidden=!doc);
 }
 function showLibrary(){S.doc=null;pdf=null;pageObj=null;showView("lib");renderLibrary();if(location.hash)setHash("")}
-const isClosed=m=>!!m.carriedTo||(m.status==="done"&&m.review==="accepted");
+const isSup=m=>m.status==="superseded"||!!m.carriedTo;
+const isClosed=m=>isSup(m)||(m.status==="done"&&m.review==="accepted");
 const isOpen=m=>!isClosed(m);
-const needsReview=m=>!m.carriedTo&&!!m.reply&&!m.review;
+const needsReview=m=>!isSup(m)&&!!m.reply&&!m.review;
 /* revisions: Claude carries open markups onto the new revision's doc (copy.carriedFrom = old id, old.carriedTo = new id) */
 const docLabel=d=>d?(d.round||d.name||"earlier set"):"earlier set";
 function prevDocOf(doc){if(doc.prev&&S.docs.get(doc.prev))return S.docs.get(doc.prev);for(const m of S.marks.values())if(m.doc===doc.id&&m.carriedFrom){const o=S.marks.get(m.carriedFrom);if(o&&S.docs.get(o.doc))return S.docs.get(o.doc)}return null}
@@ -832,11 +850,11 @@ function saved(){live("ok","Saved · Claude can read these")}
 function failSave(err){live(err&&err.code==="permission_denied"?"attention":"fault",err&&err.code==="permission_denied"?"You can view but not add markups":"Couldn't save. Check your connection.")}
 
 /* ---------- markups list ---------- */
-function stateOf(m){if(m.carriedTo)return"carried";if(isClosed(m))return"closed";if(needsReview(m))return m.status==="ask"?"ask":m.status==="done"?"done":"review";
+function stateOf(m){if(m.carriedTo)return"carried";if(m.status==="superseded")return"superseded";if(isClosed(m))return"closed";if(needsReview(m))return m.status==="ask"?"ask":m.status==="done"?"done":"review";
   if(m.review&&!m.answerSent)return m.review==="rework"?"rework":"approved";if(m.submissionId)return"sent";return"draft"}
 /* label, dot class, filter group */
 const ST={draft:["Draft","","draft"],sent:["With Claude","soft","sent"],review:["Your review","attention","review"],ask:["Question","attention","review"],done:["Done · review","attention","review"],
-  carried:["Carried forward","ok","closed"],approved:["Approved · to send","soft","sent"],rework:["Rework · to send","soft","sent"],closed:["Closed","ok","closed"]};
+  carried:["Carried forward","soft","superseded"],superseded:["Superseded","soft","superseded"],approved:["Approved · to send","soft","sent"],rework:["Rework · to send","soft","sent"],closed:["Closed","ok","closed"]};
 function setReview(m,review,answer){const f={review,answer:answer||"",answerAt:Date.now(),answerSent:false};Object.assign(m,f);patch(m.id,f);renderList();updateCounts()}
 function undoReview(m){Object.assign(m,{review:null,answer:"",answerSent:false});
   if(colM)colM.doc(m.id).update({review:null,answer:"",answerSent:false,updatedAt:Date.now()}).then(saved,failSave);renderList();updateCounts()}
@@ -847,10 +865,17 @@ function renderList(focusNew){
   const rows=all.filter(m=>(scope==="all"||m.page===S.page)&&(fs==="any"||(fs==="open"?isOpen(m):ST[stateOf(m)][2]===fs)));
   const open=all.filter(isOpen).length,rv=all.filter(needsReview).length;
   $("#tally").textContent=PUBLIC?`${all.length} markup${all.length===1?"":"s"}`:`${open} open · ${rv} to review`;
-  updateSubmit();
+  updateSubmit();renderLog();
   const active=document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.mid;
   if(!rows.length){box.append(el("div",{class:"empty"},el("b",{text:scope==="page"?"No markups on this page yet.":"No markups yet."}),
     document.createTextNode("Pick Cloud, Arrow or Callout and drag on the page. Each markup gets a number and a comment box here.")));return}
+  /* group like a commit: what needs Drew, what Claude has, drafts, then accomplished and superseded (collapsed) */
+  const G=PUBLIC?null:{review:["Your review",true],sent:["With Claude",true],draft:["Drafts",true],closed:["Accomplished",false],superseded:["Superseded",false]},gb={};
+  S.grpOpen=S.grpOpen||{};
+  if(G){const cnt={};rows.forEach(m=>{const k=ST[stateOf(m)][2];cnt[k]=(cnt[k]||0)+1});
+    for(const k of Object.keys(G)){if(!cnt[k])continue;const d=el("details",{class:"grp"});d.open=k in S.grpOpen?S.grpOpen[k]:G[k][1];
+      d.addEventListener("toggle",()=>{S.grpOpen[k]=d.open});d.append(el("summary",{},el("b",{text:G[k][0]}),document.createTextNode(` · ${cnt[k]}`)));gb[k]=d;box.append(d)}}
+  const groupBox=st=>G?gb[ST[st][2]]:box;
   for(const m of rows){
     const ta=el("textarea",{"data-mid":m.id,"aria-label":`Comment for markup ${m.n}`,placeholder:m.type==="callout"?"Note text (shows on the page)":"What should change here?"});
     ta.value=m.text||"";
@@ -867,11 +892,13 @@ function renderList(focusNew){
       ta,
       m.reply?el("div",{class:"reply"+(m.status==="ask"?" ask":"")},el("b",{text:"Claude: "}),document.createTextNode(m.reply)):null,
       m.review?el("div",{class:"answer"},el("b",{text:m.review==="rework"?"You, rework: ":"You: "}),document.createTextNode(m.answer||(m.status==="done"?"Accepted and closed.":"Plan approved.")),m.answerSent?null:el("span",{class:"pend",text:" Not sent yet."})):null,
+      mTags(m),
+      m.status==="superseded"&&m.supersededNote?el("div",{class:"snote",text:m.supersededNote}):null,
       reviewRow(m),
       m.carriedTo&&S.marks.get(m.carriedTo)?el("div",{class:"row"},el("button",{class:"link",text:"Continued on "+docLabel(S.docs.get(S.marks.get(m.carriedTo).doc))+" →",onclick:()=>{const n=S.marks.get(m.carriedTo);location.hash="#d-"+n.doc+"-p"+n.page}})):null,
       el("div",{class:"row"},el("button",{class:"link",text:"Show on page",onclick:()=>{if(m.page!==S.page)goPage(m.page,true).then(()=>select(m.id));else select(m.id)}}),
         el("button",{class:"link",text:"Delete",onclick:()=>remove(m.id)})));
-    box.append(item);
+    groupBox(s).append(item);
     if((focusNew&&m.id===S.sel)||active===m.id){ta.focus();if(focusNew)item.scrollIntoView({block:"nearest"})}
   }
 }
@@ -888,6 +915,32 @@ function reviewRow(m){if(m.carriedTo)return null;
   else return null;
   return r}
 $("#fscope").onchange=()=>renderList();$("#fstatus").onchange=()=>renderList();
+
+function mTags(m){const t=[];
+  if(m.doneIn)t.push(el("span",{class:"mtag ok",text:"Done in "+m.doneIn}));
+  if(m.plannedFor&&!m.doneIn)t.push(el("span",{class:"mtag plan",text:"Planned for "+m.plannedFor}));
+  if(m.status==="superseded")t.push(el("span",{class:"mtag",text:"Superseded"+(m.supersededBy?" by "+m.supersededBy:"")}));
+  return t.length?el("div",{class:"mtags"},...t):null}
+/* ---------- revision log: rounds/<round> {round, at, note, sheets[], items:[{id, outcome, note}]} written by Claude ---------- */
+function jumpTo(id){const m=S.marks.get(id);if(!m)return;if(m.doc!==S.doc.id){location.hash="#d-"+m.doc+"-p"+m.page;return}
+  if(m.page!==S.page)goPage(m.page,true).then(()=>select(m.id));else select(m.id)}
+function renderLog(){const lg=$("#log");if(PUBLIC||!S.doc){lg.hidden=true;return}
+  const chain=new Set([S.doc.id]);let d=S.doc;for(let i=0;i<20&&(d=prevDocOf(d));i++)chain.add(d.id);
+  const rs=[...(S.rounds||new Map()).values()].filter(r=>r.doc?chain.has(r.doc):(r.round&&r.round===S.doc.round)||(r.items||[]).some(i=>{const m=S.marks.get(i.id);return m&&chain.has(m.doc)}))
+    .sort((a,b)=>(b.at||0)-(a.at||0));
+  if(!rs.length){lg.hidden=true;return}lg.hidden=false;numberAll();
+  $("#logsum").textContent=`Revision log · ${rs.length} round${rs.length>1?"s":""}`;
+  const body=$("#logbody");const keep=new Set([...body.querySelectorAll("details[open]")].map(x=>x.dataset.r));body.innerHTML="";
+  rs.forEach((r,i)=>{const items=r.items||[],c={};items.forEach(x=>c[x.outcome]=(c[x.outcome]||0)+1);
+    const sum=["done","superseded","reworked","planned","ask"].filter(k=>c[k]).map(k=>`${c[k]} ${k}`).join(", ");
+    const det=el("details",{class:"rnd","data-r":r.id});det.open=keep.size?keep.has(r.id):i===0;
+    det.append(el("summary",{},el("b",{text:r.round||r.id}),document.createTextNode(` · ${r.at?fmtTime(r.at):""}${sum?" · "+sum:""}`)));
+    if(r.note)det.append(el("div",{class:"snote",text:r.note}));
+    if(r.sheets&&r.sheets.length)det.append(el("div",{class:"snote",text:"Sheets: "+r.sheets.join(", ")}));
+    const ul=el("ul");items.forEach(x=>{const m=S.marks.get(x.id);
+      ul.append(el("li",{},el("button",{onclick:()=>jumpTo(x.id),title:m?"Show this markup":"Markup not found"},el("span",{class:"oc "+(x.outcome||""),text:x.outcome||""}),
+        document.createTextNode(`${m&&m.doc===S.doc.id?"#"+m.n+" ":m?"#"+m.n+" ("+docLabel(S.docs.get(m.doc))+") ":""}${x.note||(m&&m.text)||""}`))))});
+    det.append(ul);body.append(det)})}
 
 /* ---------- submit for review ---------- */
 function drafts(){return docMarks().filter(m=>!m.submissionId&&!m.carriedFrom&&m.status==="open")}
@@ -984,6 +1037,7 @@ if(!PUBLIC)(async()=>{
     if(userApi){try{S.me=await userApi.id()}catch{}}
     if(!db)throw 0;
     colM=db.collection("markups");colD=db.collection("docs");
+    db.collection("rounds").onSnapshot(sn=>{S.rounds=new Map(sn.docs.map(d=>[d.id,{...d.data(),id:d.id}]));renderLog()},()=>{});
     db.collection("submissions").orderBy("at","desc").limit(100).onSnapshot(sn=>{S.subs=new Map(sn.docs.map(d=>[d.id,{...d.data(),id:d.id}]));updateSubmit()},()=>{});
     let gotD=false,gotM=false;
     colD.onSnapshot(sn=>{
