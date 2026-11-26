@@ -248,7 +248,15 @@ button:disabled{cursor:default;opacity:.45}
 .gh .files .sz{font-family:var(--mono);color:var(--ink-soft);white-space:nowrap}
 .gh .err{color:var(--fault)}
 .gh a{color:var(--accent-text)}
-.dact{display:flex;align-items:center;gap:var(--s5)}
+.dact{display:flex;align-items:center;gap:var(--s5);flex-wrap:wrap;justify-content:flex-end}
+.dact a.btn{text-decoration:none;color:var(--ink)}
+.pgroup{display:flex;align-items:baseline;gap:var(--s8);padding:var(--s13) var(--s13) var(--s5);border-top:1px solid var(--line)}
+.pgroup .pn{font-size:var(--t-micro);letter-spacing:.22em;text-transform:uppercase;color:var(--accent-text);font-weight:600}
+.pgroup .pc{font-family:var(--mono);font-size:var(--t-micro);color:var(--ink-soft)}
+.drow .dmeta{grid-column:1/-1;border:1px solid var(--line-strong);border-radius:var(--r-ctl);padding:var(--s8) var(--s13);display:grid;gap:var(--s8);font-size:var(--t-cap);background:var(--surface)}
+.dmeta label{display:grid;gap:3px;color:var(--ink-soft)}
+.dmeta input{border:1px solid var(--line-strong);border-radius:var(--r-ctl);background:var(--ground);padding:5px 8px;color:var(--ink)}
+.dmeta .err{color:var(--fault)}
 .drow .forget,.forgetall .forget{grid-column:1/-1;border:1px solid var(--fault);border-radius:var(--r-ctl);padding:var(--s8) var(--s13);display:grid;gap:var(--s8);font-size:var(--t-cap);background:var(--surface)}
 .forgetall{padding:var(--s8) var(--s13);border-top:1px solid var(--line);display:grid;gap:var(--s8);justify-items:start}
 .forgetall .forget{justify-self:stretch}
@@ -610,17 +618,36 @@ function renderLibrary(){
   const docs=[...S.docs.values()].sort((a,b)=>(b.touchedAt||b.createdAt||0)-(a.touchedAt||a.createdAt||0));
   $("#libstate").textContent=S.dbReady?`${docs.length} document${docs.length===1?"":"s"}`:(db?"Loading…":"");
   if(!docs.length){box.append(el("div",{class:"empty",style:"padding:13px 21px"},el("b",{text:S.dbReady||!db?"No documents yet.":"Loading documents…"}),document.createTextNode(S.dbReady||!db?"Drop a PDF above to start the first review.":"")));return}
-  for(const d of docs){
+  /* Loop: group the library by project; each set can link back to the chat that runs it */
+  const groups=new Map();for(const d of docs){const k=PUBLIC?"":(d.project||"").trim();if(!groups.has(k))groups.set(k,[]);groups.get(k).push(d)}
+  const keys=[...groups.keys()].sort((a,b)=>!a?1:!b?-1:a.localeCompare(b));
+  for(const k of keys){
+    if(!PUBLIC&&(keys.length>1||k))box.append(el("div",{class:"pgroup"},el("span",{class:"pn",text:k||"No project"}),el("span",{class:"pc",text:`${groups.get(k).length} set${groups.get(k).length>1?"s":""}`})));
+  for(const d of groups.get(k)){
     const n=openCount(d.id);const tot=[...S.marks.values()].filter(m=>m.doc===d.id).length;
     const stored=d.assetId?"Stored here":(local.has(d.id)?"This device only":"File not stored");
     box.append(el("div",{class:"drow"},
       el("div",{style:"min-width:0"},el("div",{class:"nm",text:d.name||"Untitled PDF"}),el("div",{class:"sub",text:`${d.pages||"?"} page${d.pages===1?"":"s"} · ${stored}${d.createdAt?" · added "+fmtTime(d.createdAt):""}`})),
       el("div",{class:"rd"},el("span",{text:"Set"}),el("span",{text:d.round||"—"})),
       el("div",{class:"rd"},el("span",{text:"Open"}),el("span",{text:`${n} of ${tot}`})),
-      el("div",{class:"dact"},el("button",{class:"btn",onclick:()=>{location.hash=`#d-${d.id}`},text:"Open"}),PUBLIC?iconBtn("trash",`Remove ${d.name||"this PDF"} from this browser`,e=>askForget(e.currentTarget.closest(".drow"),[d])):null)));
-  }
+      el("div",{class:"dact"},
+        !PUBLIC&&d.chat?el("a",{class:"btn",href:d.chat,target:"_blank",rel:"noopener",title:"Open the chat working on this set"},document.createTextNode("Open chat ↗")):null,
+        el("button",{class:"btn",onclick:()=>{location.hash=`#d-${d.id}`},text:PUBLIC?"Open":"Open set"}),
+        PUBLIC?iconBtn("trash",`Remove ${d.name||"this PDF"} from this browser`,e=>askForget(e.currentTarget.closest(".drow"),[d])):iconBtn("edit",`Project and chat link for ${d.name||"this set"}`,e=>editDocMeta(e.currentTarget.closest(".drow"),d)))));
+  }}
   if(PUBLIC&&docs.length>1)box.append(el("div",{class:"forgetall"},el("button",{class:"link",text:"Remove all from this browser",onclick:e=>askForget(e.currentTarget.parentNode,docs)})));
 }
+function editDocMeta(row,d){if(row.querySelector(".dmeta"))return;
+  const projects=[...new Set([...S.docs.values()].map(x=>(x.project||"").trim()).filter(Boolean))].sort();
+  const dl=el("datalist",{id:"projlist"});projects.forEach(p=>dl.append(el("option",{value:p})));
+  const pj=el("input",{type:"text",value:d.project||"",list:"projlist",placeholder:"e.g. Terlingua Concept"}),ch=el("input",{type:"url",value:d.chat||"",placeholder:"https://claude.ai/…"});
+  const err=el("span",{class:"err"});
+  const f=el("form",{class:"dmeta"},dl,el("label",{},document.createTextNode("Project"),pj),el("label",{},document.createTextNode("Chat link (paste the address of the chat working on this set)"),ch),err,
+    el("div",{class:"crow"},el("button",{class:"primary",type:"submit",text:"Save"}),el("button",{class:"btn",type:"button",text:"Cancel",onclick:()=>f.remove()})));
+  f.addEventListener("submit",async e=>{e.preventDefault();const project=pj.value.trim().slice(0,80),chat=ch.value.trim();
+    if(chat&&!/^https:\/\/claude\.ai\//.test(chat)){err.textContent="Paste a claude.ai link, starting with https://claude.ai/.";return}
+    d.project=project;d.chat=chat;if(colD){try{await colD.doc(d.id).update({project,chat});saved()}catch(er){failSave(er)}}renderLibrary()});
+  row.append(f);pj.focus()}
 /* public version: forget documents and their markups from this browser (the PDF files themselves are not touched) */
 function askForget(row,list){if(row.querySelector(".forget"))return;
   const n=list.reduce((a,d)=>a+[...S.marks.values()].filter(m=>m.doc===d.id).length,0);
@@ -1030,6 +1057,7 @@ function mTags(m){const t=[];
   if(m.status==="superseded")t.push(el("span",{class:"mtag",text:"Superseded"+(m.supersededBy?" by "+m.supersededBy:"")}));
   return t.length?el("div",{class:"mtags"},...t):null}
 const ICONS={view:'<path d="M3.5 2h9L16.5 6v12h-13z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M12.5 2v4h4" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M5.2 12c1.2-2.3 2.9-3.5 4.8-3.5s3.6 1.2 4.8 3.5c-1.2 2.3-2.9 3.5-4.8 3.5S6.4 14.3 5.2 12z" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="10" cy="12" r="1.6" fill="currentColor"/>',
+  edit:'<path d="M4 16l1-4 8.5-8.5 3 3L8 15z M11.5 5.5l3 3" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>',
   trash:'<path d="M3.5 5.5h13M8 5.5V3.5h4v2M5.5 5.5l.8 11h7.4l.8-11M8.5 8.5v5.5M11.5 8.5v5.5" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>'};
 function iconBtn(kind,label,onclick){const b=el("button",{class:"ibtn "+kind,title:label,"aria-label":label,onclick});b.innerHTML=`<svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">${ICONS[kind]}</svg>`;return b}
 /* ---------- revision log: rounds/<round> {round, at, note, sheets[], items:[{id, outcome, note}]} written by Claude ---------- */

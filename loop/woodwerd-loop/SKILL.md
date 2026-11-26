@@ -37,6 +37,7 @@ To update the Loop page later, repeat steps 1 and 2 and publish to the same URL.
 3. Upload it: `Artifact` publish with `url` = LOOP, `file_path` = the PDF and `asset: true`. The limit is 20 MiB. For a larger file, ask the user to drop it on the page instead (it then lives on that device only).
 4. Write the doc row: `ArtifactData set` on collection `docs`, with a short lowercase id of letters and digits:
    `{name, round, assetId, pages, size, createdAt, touchedAt, source: "claude"}`. `round` is the set's revision name, such as `R1` or `X1.0.14`. Times are epoch ms. For a new revision of an earlier set, add `prev: <old doc id>`.
+   Add `project` (the project or job name, so the library groups sets by project) and, if you know this chat's claude.ai address, `chat` (it gives the set an **Open chat** button). For a new revision, copy both from the previous doc. If you don't know the chat address, say so, and the user can paste it with the pencil button beside the set.
 5. Reply with the deep link `LOOP#d-<docId>` (add `-p<n>` for a page).
 
 ## Work a submission ("work the redlines", or a comment sent from the page)
