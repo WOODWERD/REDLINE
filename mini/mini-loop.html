@@ -1,0 +1,1593 @@
+<title>WOODWERD Mini Loop</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: drafting-table instrument. Toolkit strip, product header, then pages rail | sheet on the table | markups list, footer mark below.
+   Tokens from WOODWERD Digital. Spacing Fibonacci (3 5 8 13 21 34 55), type steps of sqrt(phi) on a 15px body. */
+@font-face{font-family:"Inter";font-weight:400;font-display:swap;src:url("fonts/inter-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Inter";font-weight:500;font-display:swap;src:url("fonts/inter-latin-500-normal.woff2") format("woff2")}
+@font-face{font-family:"Inter";font-weight:600;font-display:swap;src:url("fonts/inter-latin-600-normal.woff2") format("woff2")}
+@font-face{font-family:"JetBrains Mono";font-weight:400;font-display:swap;src:url("fonts/jetbrains-mono-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"JetBrains Mono";font-weight:500;font-display:swap;src:url("fonts/jetbrains-mono-latin-500-normal.woff2") format("woff2")}
+:root{
+  --accent:#C4944A; --accent-text:#8A5F22; --accent-tint:#F0E2C8;
+  --ground:#F9F7F3; --surface:#FFFFFF; --ink:#0C0B09; --ink-soft:#5D6267; --line:#E2E0DA; --line-strong:#C9C7C0;
+  --table:#ECE9E2; --on-ink:#F9F7F3;
+  --ok:#2F9E5F; --attention:#FF9F43; --fault:#D0453A;
+  --sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --b:15px; --t-micro:calc(var(--b)*.618); --t-cap:calc(var(--b)*.786); --t-h3:calc(var(--b)*1.272); --t-h2:calc(var(--b)*1.618);
+  --s3:3px; --s5:5px; --s8:8px; --s13:13px; --s21:21px; --s34:34px; --s55:55px;
+  --r-ctl:8px; --r-box:13px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --accent-text:#D4A85E; --accent-tint:#3A2E16; --ground:#141311; --surface:#1C1A17; --ink:#ECEAE6; --ink-soft:#A3A8AD;
+  --line:#2A2C2F; --line-strong:#3A3D41; --table:#0E0D0C; --on-ink:#141311; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --accent-text:#D4A85E; --accent-tint:#3A2E16; --ground:#141311; --surface:#1C1A17; --ink:#ECEAE6; --ink-soft:#A3A8AD;
+  --line:#2A2C2F; --line-strong:#3A3D41; --table:#0E0D0C; --on-ink:#141311; color-scheme:dark}
+[hidden]{display:none!important}
+html.public .claude-only{display:none!important}
+html:not(.public) .public-only{display:none!important}
+html.public .st{display:none}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:var(--b);line-height:1.45;overflow:hidden}
+button,select,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+button:disabled{cursor:default;opacity:.45}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+.app{height:100%;display:grid;grid-template-rows:auto auto 1fr auto;min-height:0}
+
+/* toolkit strip */
+.strip{display:flex;align-items:center;gap:var(--s13);padding-block:var(--s5);background:var(--ground);border-bottom:1px solid var(--line);font-size:var(--t-cap);min-width:0}
+.strip .kit{display:flex;align-items:center;gap:var(--s8);white-space:nowrap;font-size:var(--t-micro);letter-spacing:.22em;text-transform:uppercase;color:var(--accent-text);font-weight:600}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none;display:inline-block}
+.strip .pitch{color:var(--ink-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.tools-menu{position:relative}
+.tools-menu summary{list-style:none;cursor:pointer;padding:var(--s3) var(--s8);border:1px solid var(--line-strong);border-radius:var(--r-ctl);white-space:nowrap;color:var(--ink)}
+.tools-menu summary::-webkit-details-marker{display:none}
+.tools-menu summary:hover{background:var(--surface)}
+.tools-menu .menu{position:absolute;right:0;top:calc(100% + var(--s5));z-index:30;width:min(340px,calc(100vw - 32px));background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r-box);padding:var(--s13);display:grid;gap:var(--s13);box-shadow:0 8px 34px rgba(0,0,0,.18)}
+.menu h4{margin:0 0 var(--s5);font-size:var(--t-micro);letter-spacing:.22em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+.menu h4 span{letter-spacing:0;text-transform:none;font-weight:400}
+.menu ul{list-style:none;margin:0;padding:0;display:grid;gap:var(--s5)}
+.menu li{display:grid;grid-template-columns:auto 1fr;column-gap:var(--s8);align-items:baseline}
+.menu li .nm{font-weight:600}
+.menu li .ln{grid-column:2;color:var(--ink-soft);font-size:var(--t-cap)}
+.menu li .here{font-size:var(--t-micro);letter-spacing:.12em;text-transform:uppercase;color:var(--accent-text);margin-left:var(--s5)}
+.menu li .mk{width:8px;height:8px;border-radius:50%;border:1px solid var(--line-strong);transform:translateY(-1px)}
+.menu li.cur .mk{background:var(--accent);border-color:var(--accent)}
+
+/* product header */
+.head{display:flex;align-items:center;gap:var(--s13) var(--s21);flex-wrap:wrap;padding-block:var(--s8);background:var(--surface);border-bottom:2px solid var(--accent)}
+.prod{display:flex;align-items:baseline;gap:var(--s13);min-width:0;flex-wrap:wrap}
+.prod h1{margin:0;font-size:var(--t-h2);letter-spacing:.14em;font-weight:600;line-height:1}
+.prod .purpose{color:var(--ink-soft);font-size:var(--t-cap)}
+.prod .ver{font-family:var(--mono);font-size:var(--t-micro);color:var(--ink-soft);border:1px solid var(--line-strong);border-radius:var(--r-ctl);padding:0 var(--s5)}
+.head .sp{flex:1}
+.live{display:flex;align-items:center;gap:var(--s5);font-size:var(--t-cap);color:var(--ink-soft);white-space:nowrap}
+.sdot{width:9px;height:9px;border-radius:50%;flex:none;border:1.5px solid var(--line-strong);background:transparent}
+.sdot.ok{background:var(--ok);border-color:var(--ok)}
+.sdot.attention{background:var(--attention);border-color:var(--attention)}
+.sdot.fault{background:var(--fault);border-color:var(--fault)}
+.sdot.pulse{animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.35}}
+.guide summary{list-style:none;cursor:pointer;color:var(--accent-text);text-decoration:underline;text-underline-offset:3px;font-size:var(--t-cap)}
+.guide summary::-webkit-details-marker{display:none}
+.guide{position:relative}
+.guide .pop{position:absolute;right:0;top:calc(100% + var(--s8));z-index:30;width:min(420px,calc(100vw - 32px));background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r-box);padding:var(--s13) var(--s21);box-shadow:0 8px 34px rgba(0,0,0,.18);font-size:var(--t-cap);line-height:1.5;max-height:70vh;overflow:auto}
+.pop h3{font-size:var(--b);margin:var(--s13) 0 var(--s5)}
+.pop h3:first-child{margin-top:0}
+.pop p{margin:0 0 var(--s8)}
+.pop kbd{font-family:var(--mono);border:1px solid var(--line-strong);border-radius:4px;padding:0 4px;font-size:var(--t-micro)}
+.keys{display:grid;grid-template-columns:auto 1fr;gap:var(--s3) var(--s13)}
+.seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:var(--r-ctl);padding:2px;gap:2px;background:var(--ground)}
+.seg button{border:0;background:transparent;border-radius:6px;padding:var(--s3) var(--s8);display:inline-flex;align-items:center;gap:var(--s5);white-space:nowrap;min-height:30px}
+.seg button:hover{background:var(--line)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--on-ink)}
+.seg svg{width:16px;height:16px;flex:none}
+
+/* workspace */
+.work{--railw:200px;--listw:clamp(300px,26vw,440px);min-height:0;display:grid;grid-template-columns:var(--railw) minmax(0,1fr) var(--listw);grid-template-rows:auto minmax(0,1fr);grid-template-areas:"bar bar bar" "rail table list"}
+/* one fixed top bar: identity column as wide as the page previews, tools in one row, scale and size fixed on the right */
+.bar{grid-area:bar;display:grid;grid-template-columns:var(--railw) minmax(0,1fr) auto;align-items:center;column-gap:var(--s13);padding-block:var(--s5);padding-left:0!important;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar-id{display:flex;align-items:center;gap:var(--s5);min-width:0;padding-left:var(--s8)}
+.bar-id #back{padding-inline:var(--s5);flex:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.bar-id .docname{flex:1;min-width:0;flex-wrap:wrap;row-gap:0}
+.bar-id .docname b{max-width:100%}
+.bar-tools{display:flex;align-items:center;gap:var(--s8);min-width:0;overflow-x:auto;scrollbar-width:thin}
+.bar-tools>*{flex:none}
+.bar-meta{display:flex;align-items:center;gap:var(--s8);justify-content:flex-end}
+.bar-meta .readout{display:inline-block;min-width:21ch;text-align:right}
+.live{min-width:24ch}
+.btn{border:1px solid var(--line-strong);background:var(--surface);border-radius:var(--r-ctl);padding:var(--s3) var(--s13);min-height:32px;display:inline-flex;align-items:center;gap:var(--s5);white-space:nowrap}
+.btn:hover:not(:disabled){background:var(--ground);border-color:var(--ink-soft)}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.primary{border:1px solid var(--ink);background:var(--ink);color:var(--on-ink);border-radius:var(--r-ctl);padding:var(--s5) var(--s13);font-weight:600;min-height:34px}
+.primary:hover:not(:disabled){opacity:.88}
+.docname{display:flex;align-items:center;gap:var(--s8);min-width:0}
+.docname b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:28ch}
+.docname input{width:9ch;border:1px solid var(--line-strong);border-radius:var(--r-ctl);background:var(--ground);padding:2px var(--s5);font-family:var(--mono);font-size:var(--t-cap)}
+.docname label{font-size:var(--t-micro);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft)}
+.sw{width:22px;height:22px;border-radius:50%;border:2px solid var(--surface);outline:1px solid var(--line-strong);padding:0;min-height:0}
+.sw[aria-pressed="true"]{outline:2px solid var(--ink)}
+.colors{display:flex;gap:var(--s5);align-items:center;padding-inline:var(--s5)}
+.field{display:flex;align-items:center;gap:var(--s5);font-size:var(--t-cap);color:var(--ink-soft)}
+.field select,.pagepick{border:1px solid var(--line-strong);background:var(--surface);border-radius:var(--r-ctl);padding:var(--s3) var(--s5);color:var(--ink)}
+.readout{font-family:var(--mono);font-size:var(--t-cap);color:var(--ink-soft);white-space:nowrap}
+.pagepick{display:none}
+
+/* area header band */
+.area{display:flex;flex-direction:column;min-height:0;background:var(--surface)}
+.band{display:grid;grid-template-columns:auto 1fr auto;align-items:baseline;gap:0 var(--s8);padding:var(--s8) var(--s13);background:var(--ink);color:var(--on-ink)}
+.band .no{font-family:var(--mono);font-size:var(--t-cap);opacity:.7}
+.band h2{margin:0;font-size:var(--t-cap);letter-spacing:.18em;text-transform:uppercase;font-weight:600}
+.band .state{font-family:var(--mono);font-size:var(--t-micro);white-space:nowrap}
+.band .why{grid-column:2/4;font-size:var(--t-micro);opacity:.75}
+
+/* pages rail */
+.rail{grid-area:rail;border-right:1px solid var(--line)}
+.pages{overflow:auto;padding:var(--s8);display:flex;flex-direction:column;gap:var(--s8);min-height:0;flex:1}
+.pg{display:grid;gap:var(--s5);text-align:left;border:1px solid transparent;background:transparent;border-radius:var(--r-ctl);padding:var(--s5)}
+.pg:hover{background:var(--ground)}
+.pg[aria-current="true"]{border-color:var(--ink);background:var(--ground)}
+.pg canvas{width:100%;height:auto;display:block;background:#fff;border:1px solid var(--line);border-radius:3px}
+.pg .lbl{display:flex;justify-content:space-between;align-items:center;font-size:var(--t-cap)}
+.pg .lbl b{font-family:var(--mono);font-weight:500}
+.count{font-family:var(--mono);font-size:var(--t-micro);border:1px solid var(--attention);color:var(--ink);border-radius:8px;padding:0 var(--s5)}
+
+/* table */
+.table{grid-area:table;position:relative;overflow:hidden;background:var(--table);touch-action:none}
+.stage{position:absolute;left:0;top:0;transform-origin:0 0;box-shadow:0 2px 13px rgba(0,0,0,.25);background:#fff}
+.stage canvas{position:absolute;left:0;top:0;display:block}
+.stage svg{position:absolute;left:0;top:0;overflow:visible}
+.table[data-tool="pan"]{cursor:grab}
+.table.panning{cursor:grabbing}
+.table[data-tool="select"]{cursor:default}
+.table:not([data-tool="pan"]):not([data-tool="select"]){cursor:crosshair}
+.zoom{position:absolute;right:max(13px,env(safe-area-inset-right,0px));bottom:var(--s13);display:flex;gap:var(--s5);align-items:center}
+.zoom .btn{min-height:30px;padding:var(--s3) var(--s8)}
+.zoom output{font-family:var(--mono);font-size:var(--t-cap);background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r-ctl);padding:var(--s3) var(--s8);min-width:56px;text-align:center}
+.hint{position:absolute;left:var(--s13);bottom:var(--s13);font-size:var(--t-cap);color:var(--ink-soft);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-ctl);padding:var(--s3) var(--s8);max-width:50%}
+.mk{cursor:pointer}
+.mk.sel .hit{stroke:var(--accent);stroke-opacity:.45}
+.tmsg{position:absolute;inset:0;display:grid;place-items:center;padding:var(--s34);text-align:center;color:var(--ink-soft)}
+.tmsg > div{max-width:46ch;display:grid;gap:var(--s8);justify-items:center}
+
+/* markups list */
+.list{grid-area:list;border-left:1px solid var(--line)}
+.lhead{padding:var(--s13);border-bottom:1px solid var(--line);display:grid;gap:var(--s8)}
+.tally{font-family:var(--mono);font-size:var(--t-cap);color:var(--ink-soft)}
+.filters{display:flex;gap:var(--s5);flex-wrap:wrap}
+.filters select{border:1px solid var(--line-strong);background:var(--ground);border-radius:var(--r-ctl);padding:2px var(--s5);font-size:var(--t-cap)}
+.items{overflow:auto;padding:var(--s8);display:flex;flex-direction:column;gap:var(--s8);min-height:0;flex:1}
+.item{border:1px solid var(--line);border-radius:var(--r-ctl);padding:var(--s8);display:grid;gap:var(--s8);background:var(--ground)}
+.item.sel{border-color:var(--ink)}
+.item .top{display:flex;align-items:center;flex-wrap:wrap;gap:var(--s5) var(--s8);font-size:var(--t-cap);min-width:0}
+.item .top .meta{flex:1 1 8ch}
+.item{min-width:0;overflow-wrap:anywhere}
+.grp{grid-template-columns:minmax(0,1fr);min-width:0}
+.log{overflow-wrap:anywhere}
+.flow{min-width:0;overflow-wrap:anywhere}
+.item .num{font-family:var(--mono);font-weight:500;min-width:30px}
+.item .ink{width:10px;height:10px;border-radius:50%;flex:none}
+.item .meta{color:var(--ink-soft);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item textarea{width:100%;min-height:46px;max-height:40vh;resize:vertical;field-sizing:content;border:1px solid var(--line-strong);border-radius:var(--r-ctl);background:var(--surface);padding:var(--s5) var(--s8);font-size:var(--t-cap)}
+.item .row{display:flex;gap:var(--s8);align-items:center;justify-content:space-between}
+.st{display:inline-flex;align-items:center;gap:var(--s5);font-size:var(--t-micro);letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line-strong);border-radius:var(--r-ctl);padding:2px var(--s8);background:var(--surface);white-space:nowrap;min-height:0}
+.st:hover{border-color:var(--ink-soft)}
+.reply{font-size:var(--t-cap);border:1px solid var(--line);border-left:3px solid var(--ok);padding:var(--s5) var(--s8);background:var(--surface);border-radius:0 var(--r-ctl) var(--r-ctl) 0}
+.reply.ask{border-left-color:var(--attention)}
+.reply b{font-weight:600}
+.answer{font-size:var(--t-cap);border:1px solid var(--line);border-left:3px solid var(--accent);padding:var(--s5) var(--s8);background:var(--surface);border-radius:0 var(--r-ctl) var(--r-ctl) 0}
+.answer b{font-weight:600}
+.answer .pend{color:var(--ink-soft)}
+.review{display:flex;gap:var(--s8);align-items:center;flex-wrap:wrap}
+.review textarea{flex-basis:100%}
+.go{border:1px solid var(--ok);background:var(--ok);color:#fff;border-radius:var(--r-ctl);padding:var(--s3) var(--s13);min-height:30px;font-weight:600}
+.go:hover{filter:brightness(1.08)}
+.link{border:0;background:none;color:var(--accent-text);padding:0;font-size:var(--t-cap);text-decoration:underline;text-underline-offset:3px;min-height:0}
+.submit{display:grid;gap:var(--s8)}
+.submit .primary{width:100%}
+.confirm{border:1px solid var(--line-strong);border-radius:var(--r-ctl);padding:var(--s8);display:grid;gap:var(--s8);background:var(--ground);font-size:var(--t-cap)}
+.crow{display:flex;gap:var(--s8)}
+.subnote{font-size:var(--t-cap);color:var(--ink-soft)}
+.flow{border:1px solid var(--line-strong);border-radius:var(--r-ctl);padding:var(--s8);display:grid;gap:var(--s5);font-size:var(--t-cap);background:var(--surface)}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s3)}
+.steps span{flex:1;text-align:center;padding:3px 2px;border-radius:6px;border:1px solid var(--line-strong);font-family:var(--mono);font-size:var(--t-micro);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft)}
+.steps span.on{color:var(--ok);border-color:var(--ok)}
+.steps span.now{color:var(--accent-text);border-color:var(--accent);background:var(--accent-tint);font-weight:600}
+.flow .warnline{color:var(--attention)}
+.flow .next b{font-weight:600;color:var(--ink)}
+.grp{border:0;display:grid;gap:var(--s8)}
+.grp>summary{cursor:pointer;font-family:var(--mono);font-size:var(--t-micro);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);padding:var(--s3) 0;list-style-position:inside}
+.grp>summary b{color:var(--ink);font-weight:500}
+.mtags{display:flex;flex-wrap:wrap;gap:var(--s3)}
+.mtag{font-family:var(--mono);font-size:var(--t-micro);letter-spacing:.04em;border:1px solid var(--line-strong);border-radius:6px;padding:1px 5px;color:var(--ink-soft)}
+.mtag.ok{color:var(--ok);border-color:var(--ok)}.mtag.plan{color:var(--accent-text);border-color:var(--accent)}
+.snote{font-size:var(--t-cap);color:var(--ink-soft)}
+.stdrow{display:grid;gap:var(--s5);font-size:var(--t-cap)}
+.stdchip{display:flex;align-items:center;gap:var(--s5);flex-wrap:wrap}
+.stdchip .sref{all:unset;cursor:pointer;font-family:var(--mono);font-size:var(--t-micro);letter-spacing:.04em;border:1px solid var(--accent);color:var(--accent-text);border-radius:6px;padding:1px 6px;background:var(--accent-tint)}
+.stdchip .sref:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.stdchip .x{all:unset;cursor:pointer;color:var(--ink-soft);padding:0 4px;font-size:var(--b);line-height:1}
+.stdchip .x:hover{color:var(--fault)}
+.stdrule{color:var(--ink-soft);border-left:3px solid var(--accent);padding-left:var(--s8)}
+.chk{font-family:var(--mono);font-size:var(--t-micro);border-radius:6px;padding:1px 6px;border:1px solid}
+.chk.pass{color:var(--ok);border-color:var(--ok)}.chk.warn{color:var(--accent-text);border-color:var(--attention)}.chk.fail{color:var(--fault);border-color:var(--fault)}
+.stdpick{display:flex;gap:var(--s5);align-items:center}
+.stdpick input{flex:1;min-width:0;border:1px solid var(--line-strong);border-radius:var(--r-ctl);background:var(--surface);padding:3px var(--s8);font-size:var(--t-cap);color:var(--ink)}
+.stdpop{width:min(520px,calc(100vw - 32px))!important}
+.stdpop .sfil{display:flex;gap:var(--s5);flex-wrap:wrap;margin-bottom:var(--s8)}
+.stdpop .sfil button{border:1px solid var(--line-strong);background:var(--ground);border-radius:var(--r-ctl);padding:2px var(--s8);font-size:var(--t-micro)}
+.stdpop .sfil button[aria-pressed="true"]{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
+.stdpop input[type=search]{width:100%;border:1px solid var(--line-strong);border-radius:var(--r-ctl);background:var(--ground);padding:5px var(--s8);color:var(--ink);margin-bottom:var(--s8)}
+.stdpop .sitem{border-top:1px solid var(--line);padding:var(--s5) 0;display:grid;gap:2px}
+.stdpop .sitem b{font-weight:600}
+.stdpop .sitem .r{font-family:var(--mono);font-size:var(--t-micro);color:var(--accent-text);margin-right:var(--s5)}
+.stdpop .sitem p{margin:0;color:var(--ink-soft)}
+.stdpop .sitem .cite{justify-self:start}
+.stdpop .snote2{color:var(--ink-soft);font-size:var(--t-micro);margin:0 0 var(--s8)}
+.log{border:1px solid var(--line);border-radius:var(--r-ctl);background:var(--surface);font-size:var(--t-cap)}
+.log>summary{cursor:pointer;padding:var(--s5) var(--s8);font-weight:600}
+.log .rnd{border-top:1px solid var(--line);padding:var(--s5) var(--s8)}
+.log .rnd>summary{cursor:pointer}
+.log .rnd ul{list-style:none;margin:var(--s5) 0 0;padding:0;display:grid;gap:var(--s3)}
+.log .rnd li button{all:unset;cursor:pointer;display:block}
+.log .rnd li button:hover,.log .rnd li button:focus-visible{text-decoration:underline;text-decoration-color:var(--accent)}
+.oc{font-family:var(--mono);font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.06em;margin-right:4px}
+.oc.done{color:var(--ok)}.oc.superseded{color:var(--ink-soft)}.oc.reworked,.oc.planned{color:var(--accent-text)}.oc.ask{color:var(--attention)}
+.ibtn{display:inline-grid;place-items:center;width:32px;height:32px;border:1px solid transparent;border-radius:var(--r-ctl);background:transparent;color:var(--ink-soft);padding:0}
+.ibtn:hover{color:var(--ink);border-color:var(--line-strong);background:var(--surface)}
+.ibtn:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.ibtn.trash:hover{color:var(--fault);border-color:var(--fault)}
+.gh{margin:0 var(--s13) var(--s13);border:1px solid var(--line);border-radius:var(--r-box);padding:var(--s13);display:grid;gap:var(--s8);font-size:var(--t-cap)}
+.gh .ghhead{display:flex;align-items:center;gap:var(--s8);flex-wrap:wrap}
+.gh .ghhead b{font-size:var(--b)}
+.gh .ghhead .sp{flex:1}
+.gh form{display:grid;gap:var(--s8)}
+.gh label{display:grid;gap:3px;color:var(--ink-soft)}
+.gh input[type=text],.gh input[type=password]{border:1px solid var(--line-strong);border-radius:var(--r-ctl);background:var(--surface);padding:5px 8px;color:var(--ink);font-family:var(--mono);font-size:var(--t-cap)}
+.gh .two{display:grid;grid-template-columns:1fr 1fr;gap:var(--s8)}
+.gh .chk{display:flex;gap:var(--s5);align-items:center}
+.gh .files{display:grid;max-height:320px;overflow:auto;border-top:1px solid var(--line)}
+.gh .files button{all:unset;cursor:pointer;display:flex;gap:var(--s8);justify-content:space-between;padding:var(--s5) var(--s3);border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+.gh .files button:hover,.gh .files button:focus-visible{background:var(--accent-tint)}
+.gh .files .sz{font-family:var(--mono);color:var(--ink-soft);white-space:nowrap}
+.gh .err{color:var(--fault)}
+.gh a{color:var(--accent-text)}
+.dact{display:flex;align-items:center;gap:var(--s5);flex-wrap:wrap;justify-content:flex-end}
+.dact a.btn{text-decoration:none;color:var(--ink)}
+.pgroup{display:flex;align-items:baseline;gap:var(--s8);padding:var(--s13) var(--s13) var(--s5);border-top:1px solid var(--line)}
+.pgroup .pn{font-size:var(--t-micro);letter-spacing:.22em;text-transform:uppercase;color:var(--accent-text);font-weight:600}
+.pgroup .pc{font-family:var(--mono);font-size:var(--t-micro);color:var(--ink-soft)}
+.drow .dmeta{grid-column:1/-1;border:1px solid var(--line-strong);border-radius:var(--r-ctl);padding:var(--s8) var(--s13);display:grid;gap:var(--s8);font-size:var(--t-cap);background:var(--surface)}
+.dmeta label{display:grid;gap:3px;color:var(--ink-soft)}
+.dmeta input{border:1px solid var(--line-strong);border-radius:var(--r-ctl);background:var(--ground);padding:5px 8px;color:var(--ink)}
+.dmeta .err{color:var(--fault)}
+.drow .forget,.forgetall .forget{grid-column:1/-1;border:1px solid var(--fault);border-radius:var(--r-ctl);padding:var(--s8) var(--s13);display:grid;gap:var(--s8);font-size:var(--t-cap);background:var(--surface)}
+.forgetall{padding:var(--s8) var(--s13);border-top:1px solid var(--line);display:grid;gap:var(--s8);justify-items:start}
+.forgetall .forget{justify-self:stretch}
+.primary.danger{background:var(--fault);border-color:var(--fault);color:#fff}
+.retrow{display:flex;gap:var(--s5);flex-wrap:wrap;align-items:center}
+.empty{color:var(--ink-soft);padding:var(--s13) var(--s8);font-size:var(--t-cap)}
+.empty b{color:var(--ink);display:block;margin-bottom:var(--s5)}
+
+/* library */
+.lib{grid-column:1/-1;grid-row:1/-1;overflow:auto;min-height:0;padding-block:var(--s34)}
+.lib-in{max-width:1040px;margin:0 auto;display:grid;gap:var(--s21)}
+.lib .area{border:1px solid var(--line);border-radius:var(--r-box);overflow:hidden}
+.drop{margin:var(--s13);border:1.5px dashed var(--line-strong);border-radius:var(--r-box);padding:var(--s34) var(--s21);display:grid;gap:var(--s8);justify-items:center;text-align:center;background:var(--ground)}
+.drop.over,.dropall.over .drop{border-color:var(--accent);background:var(--accent-tint)}
+.drop p{margin:0;color:var(--ink-soft);max-width:56ch;font-size:var(--t-cap)}
+.drop strong{font-size:var(--t-h3);font-weight:600}
+.docs{display:grid}
+.drow{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:var(--s5) var(--s21);align-items:center;padding:var(--s13);border-top:1px solid var(--line)}
+.drow .nm{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.drow .sub{font-size:var(--t-cap);color:var(--ink-soft)}
+.drow .rd{display:grid;justify-items:end;font-size:var(--t-cap)}
+.drow .rd span:first-child{font-size:var(--t-micro);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft)}
+.drow .rd span:last-child{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.how{padding:var(--s13) var(--s21);display:grid;gap:var(--s8);font-size:var(--t-cap);color:var(--ink-soft)}
+.how ol{margin:0;padding-left:var(--s21);display:grid;gap:var(--s5)}
+.how b{color:var(--ink)}
+.dropveil{position:fixed;inset:0;z-index:50;background:color-mix(in srgb,var(--ground) 70%,transparent);display:grid;place-items:center;pointer-events:none}
+.dropveil div{border:2px dashed var(--accent);border-radius:var(--r-box);padding:var(--s34) var(--s55);background:var(--surface);font-weight:600}
+.loadmsg{display:flex;align-items:center;gap:var(--s8);font-size:var(--t-cap);color:var(--ink-soft);padding:0 var(--s13) var(--s13)}
+
+/* footer mark */
+.foot{display:flex;align-items:center;gap:var(--s13);padding-block:var(--s5);border-top:1px solid var(--line);background:var(--ground);color:var(--ink)}
+.foot a{display:inline-flex;align-items:center;gap:var(--s13);color:inherit;text-decoration:none}
+.badge{display:block;height:34px;width:74px;background:currentColor;-webkit-mask:url("img/woodwerd-badge.png") center/contain no-repeat;mask:url("img/woodwerd-badge.png") center/contain no-repeat}
+.tag{font-size:var(--t-micro);letter-spacing:.22em;text-transform:uppercase;color:var(--ink-soft)}
+
+@media (max-width:1560px){.seg.tools button span,.seg.tools kbd{display:none}.bar-meta .field{font-size:0;gap:0}.bar-meta .field select{font-size:var(--t-cap)}}
+@media (max-width:900px){
+  .bar{grid-template-columns:minmax(0,1fr);row-gap:var(--s5);padding-left:max(16px,env(safe-area-inset-left,0px))!important}
+  .bar-id{padding-left:0}.bar-meta{justify-content:flex-start}
+  .work{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(340px,68vh) auto;grid-template-areas:"bar" "table" "list";overflow:auto}
+  .work .lib{grid-row:auto}
+  .list .items{overflow:visible}
+  .rail{display:none}
+  .pagepick{display:block}
+  .seg.tools button span,.seg.tools kbd{display:none}
+  .hint{display:none}
+  .list{border-left:0;border-top:1px solid var(--line)}
+  .prod .purpose{display:none}
+  .drow{grid-template-columns:minmax(0,1fr) auto}
+  .drow .rd{display:none}
+}
+@media (max-width:560px){.strip .pitch{display:none}.foot .tag{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* ---------- Mini Loop additions (build-mini.py) ---------- */
+#revbtn{display:none!important}
+.drow{grid-template-columns:72px minmax(0,1fr) auto auto auto}
+.lthumb{width:72px;height:48px;border-radius:var(--r-ctl);background:var(--ground);border:1px solid var(--line);overflow:hidden;display:grid;place-items:center}
+.lthumb img{width:100%;height:100%;object-fit:cover;display:block}
+.drow-btns{display:flex;gap:var(--s8);flex-wrap:wrap;justify-content:center}
+.drop .primary-ish{background:var(--ink);color:var(--on-ink);border-color:var(--ink);font-weight:600}
+.drop .primary-ish:hover{opacity:.88;background:var(--ink)!important}
+#tmsgin input{font:inherit}
+#tmsgin .err{color:var(--fault);font-size:var(--t-cap)}
+@media (max-width:900px){.drow{grid-template-columns:56px minmax(0,1fr) auto}.lthumb{width:56px;height:40px}}
+.bar-meta .field #calbtn{font-size:var(--t-cap)}
+
+</style>
+
+<div class="app" id="app">
+  <div class="strip gut">
+    <span class="kit"><span class="dot" aria-hidden="true"></span>Ctrl · a WOODWERD toolkit</span>
+    <span class="pitch">Small instruments for the bench, the desk and the drawing set.</span>
+    <details class="tools-menu" id="toolsmenu">
+      <summary>All tools</summary>
+      <div class="menu">
+        <div><h4>Build <span>· the hardware</span></h4><ul><li><span class="mk"></span><span class="nm">Ctrl Case</span><span class="ln">Printed case for the Cheap Yellow Display board.</span></li></ul></div>
+        <div><h4>Load <span>· the bench</span></h4><ul><li><span class="mk"></span><span class="nm">ESP Ctrl</span><span class="ln">Set up and load a board from the browser.</span></li></ul></div>
+        <div><h4>Run <span>· what the board becomes</span></h4><ul>
+          <li><span class="mk"></span><span class="nm">Flow Ctrl</span><span class="ln">A Bluetooth desk button for Wispr Flow.</span></li>
+          <li><span class="mk"></span><span class="nm">Media Ctrl</span><span class="ln">A desk remote for media playback.</span></li>
+          <li><span class="mk"></span><span class="nm">Claude Ctrl</span><span class="ln">A desk controller for Claude.</span></li></ul></div>
+        <div><h4>Phone <span>· no board needed</span></h4><ul><li><span class="mk"></span><span class="nm">CtrlClock</span><span class="ln">A clock app for the phone.</span></li></ul></div>
+        <div><h4>Review <span>· drawing sets</span></h4><ul><li class="cur" aria-current="page"><span class="mk"></span><span><span class="nm"><span class="claude-only">Mini Loop</span><span class="public-only">Redline Ctrl</span></span><span class="here">You are here</span></span><span class="ln"><span class="claude-only">Review a screen grab or render with Claude: paste, mark up, submit.</span><span class="public-only">Mark up any PDF and send it back.</span></span></li></ul></div>
+      </div>
+    </details>
+  </div>
+
+  <header class="head gut">
+    <div class="prod">
+      <h1><span class="claude-only">MINI LOOP</span><span class="public-only">REDLINE CTRL</span></h1>
+      <span class="purpose claude-only">Paste a screen grab, mark it up, and send the markups to Claude.</span><span class="purpose public-only" id="ppurpose">Mark up a PDF, then download it or share it back.</span>
+      <span class="ver">v1.0</span>
+    </div>
+    <div class="sp"></div>
+    <span class="live" id="live"><span class="sdot pulse attention" id="livedot"></span><span id="livetxt">Connecting…</span></span>
+    <details class="guide" id="guide">
+      <summary>Guide</summary>
+      <div class="pop">
+        <h3>Start a review</h3>
+        <p>Take a screen grab (on a Mac, <b>⌘⇧4</b> then hold <b>Control</b> as you drag puts it on the clipboard; on Windows, <b>Win+Shift+S</b>), then press <b>Ctrl+V</b> or <b>⌘V</b> on this page. You can also drop a PNG or JPG, or ask Claude in a chat to “mini loop this”.</p>
+        <p>Paste while an image is open and the grab becomes its next version (v1, v2…), so a fix in Fusion is one grab away from the next round.</p>
+        <p class="public-only">Your PDF stays on your computer. Nothing is uploaded, and your markups are saved in this browser until you clear its data.</p>
+        <h3>Mark up</h3>
+        <div class="keys">
+          <kbd>V</kbd><span>Select, move, Delete removes</span>
+          <kbd>H</kbd><span>Pan (or hold Space)</span>
+          <kbd>C</kbd><span>Cloud an area</span>
+          <kbd>R</kbd><span>Box</span>
+          <kbd>A</kbd><span>Arrow</span>
+          <kbd>T</kbd><span>Callout with note text</span>
+          <kbd>P</kbd><span>Pen</span>
+          <kbd>I</kbd><span>Highlight</span>
+          <kbd>M</kbd><span>Measure at the chosen scale</span>
+          <kbd>W</kbd><span>Fit width · <kbd>Ctrl 0</kbd> fit page</span>
+        </div>
+        <h3>Cite a standard</h3>
+        <p>Under any markup, press <b>Cite a standard</b> and type a word (aisle, landing, toilet, revision) to tag it with an NCS drafting convention, an NKBA kitchen or bath guideline, or an ICON 3D-printed wall rule. Tag a <b>Measure</b> and it is checked against the numbers: ✓ meets, ! meets the minimum but not the recommendation, ✗ fails. <b>Standards</b> at the top lists them all.</p>
+        <p style="margin-top:8px">Screen grabs have no scale until you set one. Press <b>Set scale</b>, drag along something whose length you know, and type it (36", 3'-0" or 914mm). Measures then read in feet and inches and tagged ones are checked. Perspective views do not measure true; use an orthographic view.</p>
+        <h3 class="public-only">Send it back</h3>
+        <p class="public-only">Type your name and press <b>Download marked-up PNG</b>. Send the file back however you like: email, text, a shared folder. Each markup is a real PDF comment, so it shows in Bluebeam, Acrobat, Preview or any PDF viewer.</p>
+        <div class="claude-only">
+        <h3>Send for review</h3>
+        <p>Markups stay drafts until you press <b>Submit edits</b>. Claude is called right away and posts a response round (for example X1.0.17r): a reply under every markup with the planned change or a question. No drawing happens yet.</p>
+        <h3>Answer Claude</h3>
+        <p>Under each reply, press <b>Approve plan</b> (or <b>Accept and close</b> when it's done), or <b>Answer / change</b> to send a rework note. When you have been through them, press <b>Commit changes</b>. Claude is called again, draws the approved changes and issues the next version (X1.0.18). Rework notes get a fresh reply first if they change the plan. Accepted, finished markups close and drop out of the open count. <b>Needs my review</b> in the filter shows what's waiting on you.</p>
+        <h3>Send a PDF to someone</h3>
+        <p><b>Download marked-up PNG</b> saves the image with your markups drawn on it.</p>
+        </div>
+      </div>
+    </details>
+    <details class="guide" id="stds">
+      <summary>Standards</summary>
+      <div class="pop stdpop">
+        <p class="snote2">Drafting conventions, kitchen and bath planning guidelines, and ICON 3D-printed wall rules to check a set against. Select a markup, then press <b>Cite</b> to tag it. A tagged measurement is checked against the numbers.</p>
+        <input type="search" id="stdq" placeholder="Search: aisle, landing, toilet, core, revision…" aria-label="Search standards">
+        <div class="sfil" id="stdsets"></div>
+        <div id="stdlist"></div>
+      </div>
+    </details>
+    <div class="seg" role="group" aria-label="Theme" id="theme">
+      <button data-t="system" title="Follow the system" aria-label="Follow the system theme"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="8" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 13.5h5" stroke="currentColor" stroke-width="1.4"/></svg></button>
+      <button data-t="light" title="Light" aria-label="Light theme"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3" stroke="currentColor" stroke-width="1.4"/></svg></button>
+      <button data-t="dark" title="Dark" aria-label="Dark theme"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13 9.5A5.5 5.5 0 016.5 3a5.5 5.5 0 106.5 6.5z" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></button>
+    </div>
+  </header>
+
+  <div class="work" id="work">
+    <!-- library -->
+    <section class="lib gut" id="lib">
+      <div class="lib-in">
+        <div class="area">
+          <div class="band"><span class="no">01</span><h2>Images</h2><span class="state" id="libstate"></span><span class="why">Every image you have looped. Paste a screen grab, or drop an image.</span></div>
+          <label class="drop" id="drop">
+            <strong>Paste or drop an image</strong>
+            <p class="claude-only">Press <b>Ctrl+V</b> (<b>⌘V</b> on a Mac) anywhere on this page to paste a screen grab, or drop a PNG or JPG. It is stored with this page so you and Claude open the same image, and the markups stay with it.</p><p class="public-only">Open the PDF you were sent, or any PDF. It stays on your computer; nothing is uploaded.</p>
+            <span class="drow-btns"><span class="btn primary-ish" role="button" tabindex="0" id="pastebtn">Paste from clipboard</span><span class="btn" role="button" tabindex="0" id="choose">Open an image</span></span>
+            <input type="file" id="file" accept="image/png,image/jpeg,image/webp,image/gif,.png,.jpg,.jpeg,.webp,.gif" hidden>
+          </label>
+          <div class="gh public-only" id="gh">
+            <div class="ghhead"><b>GitHub</b><span id="ghstate">Optional. Open PDFs from your own private repo and save marked-up copies back to it.</span><span class="sp"></span><button class="btn" id="ghconnect" type="button">Connect GitHub</button><button class="btn" id="ghrefresh" type="button" hidden>Refresh</button><button class="link" id="ghout" type="button" hidden>Disconnect</button></div>
+            <form id="ghform" hidden autocomplete="off">
+              <div class="two"><label>Repository (owner/name)<input type="text" id="ghrepo" placeholder="woodwerd/drawings" required spellcheck="false"></label><label>Branch<input type="text" id="ghbranch" placeholder="main" spellcheck="false"></label></div>
+              <label>Folder (optional)<input type="text" id="ghdir" placeholder="sets/terlingua" spellcheck="false"></label>
+              <label>Access token<input type="password" id="ghtoken" required placeholder="github_pat_…" spellcheck="false"></label>
+              <span>Make a <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">fine-grained token</a> for just this repository, with <b>Contents: Read and write</b>. It stays in this browser and is only sent to api.github.com.</span>
+              <label class="chk"><input type="checkbox" id="ghremember"> Remember on this device</label>
+              <div class="crow"><button class="primary" type="submit">Connect</button><button class="btn" type="button" id="ghcancel">Cancel</button></div>
+            </form>
+            <div class="err" id="gherr" hidden></div>
+            <div class="files" id="ghfiles" hidden></div>
+          </div>
+          <div class="loadmsg" id="loadmsg" hidden><span class="sdot attention pulse"></span><span id="loadtxt"></span></div>
+          <div class="docs" id="docs"></div>
+        </div>
+        <div class="area public-only">
+          <div class="band"><span class="no">02</span><h2>How it works</h2><span class="state"></span><span class="why">Three steps, no account needed.</span></div>
+          <div class="how">
+            <ol>
+              <li>Open the PDF. Pick <b>Cloud</b>, <b>Arrow</b> or <b>Callout</b> and drag on the drawing.</li>
+              <li>Type what should change in the comment box beside each markup.</li>
+              <li>Type your name, press <b>Download marked-up PNG</b>, and send the file back however you like.</li>
+            </ol>
+            <p class="public-only" style="margin-top:13px;font-size:var(--t-cap);color:var(--ink-soft)">Work with Claude? <a href="loop/" style="color:var(--accent-text)">WOODWERD Loop</a> runs this same page as a review cycle: Claude works your markups and sends back the next revision.</p>
+          </div>
+        </div>
+        <div class="area claude-only">
+          <div class="band"><span class="no">02</span><h2>Start from a chat</h2><span class="state"></span><span class="why">The quickest way to loop on a render Claude makes.</span></div>
+          <div class="how">
+            <ol>
+              <li>In a chat, ask Claude for a render or capture and say <b>“mini loop this”</b>, or attach your own image. Or paste a screen grab straight onto this page.</li>
+              <li>Claude adds it here and replies with a link straight to it.</li>
+              <li>Mark it up and press <b>Submit edits</b>. Claude replies under each markup, then you approve or answer and press <b>Commit changes</b> for the next version.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- document view -->
+    <div class="bar gut" id="bar" hidden>
+      <div class="bar-id"><button class="btn" id="back" title="Back to all documents" aria-label="Documents"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><span class="sr">Documents</span></button>
+      <div class="docname"><b id="dname"></b><label for="round">Version</label><input id="round" placeholder="v1" autocomplete="off"></div></div>
+      <div class="bar-tools"><select class="pagepick" id="pagepick" aria-label="Page"></select>
+      <div class="seg tools" role="toolbar" aria-label="Markup tools" id="toolbar"></div>
+      <div class="colors" role="group" aria-label="Markup colour" id="colors"></div></div>
+      <div class="bar-meta"><label class="field" for="scale">Scale
+        <select id="scale"><option value="-1" selected>Not to scale</option></select><button class="btn" id="calbtn" type="button" title="Draw along something whose real length you know">Set scale</button>
+      </label>
+      <span class="readout" id="psize"></span></div>
+    </div>
+    <aside class="rail area" id="rail" hidden aria-label="Pages">
+      <div class="band"><span class="no">01</span><h2>Image</h2><span class="state" id="pgstate"></span></div>
+      <nav class="pages" id="pages"></nav>
+    </aside>
+    <main class="table" id="table" data-tool="cloud" hidden>
+      <div class="stage" id="stage">
+        <canvas id="base"></canvas>
+        <canvas id="detail"></canvas>
+        <svg id="ink" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/></marker>
+            <marker id="tick" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M5,0 L5,10" stroke="context-stroke" stroke-width="2" fill="none"/></marker>
+          </defs>
+          <g id="layer"></g><g id="draft"></g>
+        </svg>
+      </div>
+      <div class="tmsg" id="tmsg" hidden><div id="tmsgin"></div></div>
+      <div class="hint" id="hint"></div>
+      <div class="zoom">
+        <button class="btn" id="zout" aria-label="Zoom out">−</button>
+        <output id="zlvl">100%</output>
+        <button class="btn" id="zin" aria-label="Zoom in">+</button>
+        <button class="btn" id="zfit" title="Fit the whole page (Ctrl+0)">Fit page</button>
+        <button class="btn" id="zwidth" title="Fit page width (W)">Fit width</button>
+      </div>
+    </main>
+    <aside class="list area" id="list" hidden aria-label="Markups">
+      <div class="band"><span class="no">02</span><h2>Markups</h2><span class="state" id="tally"></span><span class="why claude-only">Numbered in the order drawn. Drafts until you submit.</span><span class="why public-only">Numbered in the order drawn.</span></div>
+      <div class="lhead">
+        <div class="submit public-only">
+          <label class="field" for="rname" style="display:grid;gap:3px">Your name, shown on each comment<input id="rname" autocomplete="name" placeholder="First and last name" style="border:1px solid var(--line-strong);border-radius:8px;background:var(--surface);padding:5px 8px;color:var(--ink)"></label>
+          <button class="primary" id="dlbtn2">Download marked-up PNG</button>
+          <div class="retrow"><button class="btn" id="ghsave" hidden>Save to GitHub</button><button class="btn" id="sharebtn" hidden>Share…</button><a class="link" id="mailbtn" hidden>Email it</a></div>
+          <div class="subnote" id="dlnote2">Your file stays on this computer. Download it, then send it back however you like.</div>
+        </div>
+        <div class="submit claude-only" id="submitbox">
+          <button class="primary" id="submitbtn">Submit edits</button>
+          <button class="primary" id="commitbtn">Commit changes</button>
+          <button class="btn" id="revbtn">Build REV and save set</button>
+          <div class="confirm" id="confirm" hidden>
+            <span id="confirmtxt"></span>
+            <div class="crow"><button class="primary" id="confirmyes">Submit</button><button class="btn" id="confirmno">Cancel</button></div>
+          </div>
+          <div class="subnote" id="subnote"></div>
+          <div class="flow" id="flow" hidden aria-live="polite"><div class="steps" id="steps"></div><div id="flowmsg"></div><div class="next" id="flownext"></div></div>
+          <button class="link" id="dlbtn" style="justify-self:start">Download marked-up PNG</button>
+          <div class="subnote" id="dlnote" hidden></div>
+        </div>
+        <div class="filters">
+          <select id="fscope" aria-label="Which pages"><option value="page">This page</option><option value="all">All pages</option></select>
+          <select id="fstatus" aria-label="Status"><option value="any">Any status</option><option value="open">Open</option><option value="review">Needs my review</option><option value="draft">Draft</option><option value="sent">With Claude</option><option value="closed">Accomplished</option><option value="superseded">Superseded</option></select>
+        </div>
+      </div>
+      <details class="log" id="log" hidden><summary id="logsum">Revision log</summary><div id="logbody"></div></details>
+      <div class="items" id="items"></div>
+    </aside>
+  </div>
+
+  <footer class="foot gut">
+    <a href="https://woodwerd.com" target="_blank" rel="noopener" aria-label="WOODWERD, woodwerd.com"><span class="badge" aria-hidden="true"></span><span class="tag">Think · Design · Style</span></a>
+  </footer>
+</div>
+<div class="dropveil" id="veil" hidden><div>Drop the image to open it</div></div>
+
+<script src="standards.js"></script>
+<script>
+/* ---------- constants ---------- */
+const VERSION="1.0";
+const TOOLS=[
+ {id:"select",name:"Select",key:"V",icon:'<path d="M4 2l12 7-5 1.5L8.5 16z" fill="currentColor"/>'},
+ {id:"pan",name:"Pan",key:"H",icon:'<path d="M9 2v14M2 9h14M9 2l-2 2M9 2l2 2M9 16l-2-2M9 16l2-2M2 9l2-2M2 9l2 2M16 9l-2-2M16 9l-2 2" stroke="currentColor" fill="none" stroke-width="1.5"/>'},
+ {id:"cloud",name:"Cloud",key:"C",icon:'<path d="M3 6a2 2 0 013-2 2 2 0 014 0 2 2 0 014 0 2 2 0 012 3 2 2 0 010 4 2 2 0 01-2 3 2 2 0 01-4 0 2 2 0 01-4 0 2 2 0 01-3-2 2 2 0 010-4z" stroke="currentColor" fill="none" stroke-width="1.4"/>'},
+ {id:"rect",name:"Box",key:"R",icon:'<rect x="2.5" y="4" width="13" height="10" stroke="currentColor" fill="none" stroke-width="1.6"/>'},
+ {id:"arrow",name:"Arrow",key:"A",icon:'<path d="M3 15L15 3M15 3h-6M15 3v6" stroke="currentColor" fill="none" stroke-width="1.6"/>'},
+ {id:"cl",name:"Centerline",key:"L",icon:'<path d="M2 16L16 2" stroke="currentColor" fill="none" stroke-width="1.4" stroke-dasharray="5 2 1.5 2"/>'},
+ {id:"dash",name:"Dashed",key:"D",icon:'<path d="M2 16L16 2" stroke="currentColor" fill="none" stroke-width="1.6" stroke-dasharray="3 2.5"/>'},
+ {id:"area",name:"Area",key:"F",icon:'<path d="M3 5l8-2 4 6-3 6-9-2z" stroke="currentColor" fill="none" stroke-width="1.4"/><path d="M4 12l6-6M6 14l6-6M9 14.5l4.5-4.5" stroke="currentColor" stroke-width="1" opacity=".7"/>'},
+ {id:"xout",name:"Remove",key:"X",icon:'<rect x="3" y="3" width="12" height="12" stroke="currentColor" fill="none" stroke-width="1.4"/><path d="M3 3l12 12M15 3L3 15" stroke="currentColor" stroke-width="1.4"/>'},
+ {id:"callout",name:"Callout",key:"T",icon:'<path d="M2 16l5-5" stroke="currentColor" stroke-width="1.6"/><rect x="7" y="2.5" width="9" height="7" stroke="currentColor" fill="none" stroke-width="1.6"/>'},
+ {id:"pen",name:"Pen",key:"P",icon:'<path d="M3 14c3-1 3-6 6-6s2 5 6 3" stroke="currentColor" fill="none" stroke-width="1.6"/>'},
+ {id:"hl",name:"Highlight",key:"I",icon:'<path d="M2 12h14" stroke="currentColor" stroke-width="5" stroke-opacity=".45"/>'},
+ {id:"measure",name:"Measure",key:"M",icon:'<path d="M2 12L12 2l4 4L6 16z M5 9l2 2M8 6l2 2M11 3l1 1" stroke="currentColor" fill="none" stroke-width="1.3"/>'},
+];
+/* Markup ink colours are drawing data, stored with each markup, not interface colour. */
+const INKS=[["#e0261b","Red"],["#1f6fd1","Blue"],["#1d9a4e","Green"],["#d98a00","Amber"],["#8a3fd1","Purple"]];
+const LABEL={cloud:"Cloud",rect:"Box",arrow:"Arrow",cl:"Centerline",dash:"Dashed line",area:"Area",xout:"Remove",callout:"Callout",pen:"Pen",hl:"Highlight",measure:"Measure"};
+const HINTS={select:"Click a markup to select it. Drag to move it. Delete removes it.",pan:"Drag to move around the page.",cloud:"Drag a box to cloud an area, then type your comment.",rect:"Drag to draw a box.",arrow:"Drag from tail to point. Hold Shift to snap to 45°.",cl:"Drag along the line that should be centered. Snaps to 45°; hold Alt to draw free.",xout:"Drag a box over what should be removed.",dash:"Drag a dashed line: hidden, beyond, or to be removed.",area:"Drag a box to hatch an area, or click corner by corner and double-click (or Enter) to close the shape. Esc cancels.",callout:"Drag from the point to where the note goes, then type the note.",pen:"Draw freehand.",hl:"Drag across text or lines to highlight.",measure:"Drag between two points. Press Set scale first so it reads in feet and inches. Hold Shift to snap to 45°."};
+const MAX_ASSET=20*1024*1024;
+
+const $=s=>document.querySelector(s);
+const el=(t,a={},...kids)=>{const e=document.createElement(t);for(const[k,v]of Object.entries(a)){if(v==null)continue;if(k==="text")e.textContent=v;else if(k.startsWith("on"))e.addEventListener(k.slice(2),v);else e.setAttribute(k,v)}kids.forEach(k=>k&&e.append(k));return e};
+const NS="http://www.w3.org/2000/svg";
+const sv=(t,a={})=>{const e=document.createElementNS(NS,t);for(const[k,v]of Object.entries(a))e.setAttribute(k,v);return e};
+const store={get(k){try{return localStorage.getItem(k)}catch{return null}},set(k,v){try{localStorage.setItem(k,v)}catch{}}};
+function uid(n=16){const a=crypto.getRandomValues(new Uint8Array(n));return[...a].map(b=>"abcdefghijklmnopqrstuvwxyz0123456789"[b%36]).join("")}
+function fmtTime(t){try{return new Date(t).toLocaleString([],{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch{return""}}
+function fmtMB(b){return(b/1048576).toFixed(1)+" MB"}
+
+/* ---------- state ---------- */
+const S={docs:new Map(),marks:new Map(),subs:new Map(),doc:null,page:1,pages:0,W:792,H:612,tool:"cloud",color:INKS[0][0],sel:null,me:null,names:{},dbReady:false};
+let db=null,userApi=null,comments=null,assets=null,colM=null,colD=null;
+const local=new Map(); /* docId -> {pdf, file|bytes} for this session */
+/* Public mode: served outside claude.ai (GitHub Pages). No account, nothing uploaded; work is kept in this browser. */
+const PUBLIC=!(window.claude&&typeof window.claude.use==="function");
+if(PUBLIC)document.title="Redline Ctrl";
+if(PUBLIC)document.documentElement.classList.add("public");
+const LS={docs:"ww-redline-docs",marks:id=>"ww-redline-marks-"+id};
+function lsGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch{return false}}
+function saveLocal(){if(!PUBLIC)return;const docs=[...S.docs.values()].map(({id,name,fp,pages,round,size,createdAt,touchedAt,gh})=>({id,name,fp,pages,round,size,createdAt,touchedAt,gh}));
+  let ok=lsSet(LS.docs,docs);for(const d of docs)ok=lsSet(LS.marks(d.id),[...S.marks.values()].filter(m=>m.doc===d.id).map(m=>{const{n,...r}=m;return r}))&&ok;
+  live(ok?"ok":"attention",ok?"Saved in this browser":"Couldn't save in this browser. Download your PDF before closing.")}
+let pdf=null,pageObj=null,baseR=1;
+
+/* ---------- theme ---------- */
+function applyTheme(t){const r=document.documentElement;if(t==="light"||t==="dark")r.setAttribute("data-theme",t);else r.removeAttribute("data-theme");
+  document.querySelectorAll("#theme button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.t===(t||"system"))))}
+document.querySelectorAll("#theme button").forEach(b=>b.addEventListener("click",()=>{store.set("ww-theme",b.dataset.t);applyTheme(b.dataset.t)}));
+applyTheme(store.get("ww-theme")||"system");
+/* close disclosures on outside click / Escape */
+document.addEventListener("click",e=>{document.querySelectorAll("details[open]:not(.grp):not(.log):not(.rnd)").forEach(d=>{if(!d.contains(e.target))d.open=false})});
+
+/* ---------- status line ---------- */
+function live(kind,text){const d=$("#livedot");d.className="sdot "+(kind||"")+(kind==="attention-pulse"?" attention pulse":"");if(kind==="attention-pulse")d.className="sdot attention pulse";$("#livetxt").textContent=text}
+
+/* ---------- pdf.js ---------- */
+function pdfLib(){return window.pdfjsLib||null}
+if(pdfLib()){pdfjsLib.GlobalWorkerOptions.workerSrc=new URL("vendor/pdf.worker.min.js",location.href).href}
+async function openPdfData(data){
+  const lib=pdfLib();if(!lib)throw new Error("The PDF reader did not load. Reload the page.");
+  return lib.getDocument({data,standardFontDataUrl:new URL("vendor/standard_fonts/",location.href).href,isEvalSupported:false}).promise;
+}
+
+/* ---------- routing ---------- */
+function route(){
+  const m=/^#d-([a-z0-9]+)(?:-p(\d+))?$/.exec(location.hash);
+  if(m)openDoc(m[1],m[2]?+m[2]:1);else showLibrary();
+}
+window.addEventListener("hashchange",route);
+function setHash(h){if(location.hash!==h)history.replaceState(null,"",h||location.pathname)}
+
+/* ---------- library ---------- */
+function showView(v){
+  const doc=v==="doc";$("#lib").hidden=doc;["#bar","#rail","#table","#list"].forEach(s=>$(s).hidden=!doc);
+}
+function showLibrary(){S.doc=null;pdf=null;pageObj=null;showView("lib");renderLibrary();if(location.hash)setHash("")}
+const isSup=m=>m.status==="superseded"||!!m.carriedTo;
+const isClosed=m=>isSup(m)||(m.status==="done"&&m.review==="accepted");
+const isOpen=m=>!isClosed(m);
+const needsReview=m=>!isSup(m)&&!!m.reply&&!m.review;
+/* revisions: Claude carries open markups onto the new revision's doc (copy.carriedFrom = old id, old.carriedTo = new id) */
+const docLabel=d=>d?(d.round||d.name||"earlier set"):"earlier set";
+function prevDocOf(doc){if(doc.prev&&S.docs.get(doc.prev))return S.docs.get(doc.prev);for(const m of S.marks.values())if(m.doc===doc.id&&m.carriedFrom){const o=S.marks.get(m.carriedFrom);if(o&&S.docs.get(o.doc))return S.docs.get(o.doc)}return null}
+function nextDocOf(doc){for(const d of S.docs.values())if(d.prev===doc.id)return d;for(const m of S.marks.values())if(m.doc===doc.id&&m.carriedTo){const n=S.marks.get(m.carriedTo);if(n&&S.docs.get(n.doc))return S.docs.get(n.doc)}return null}
+function openCount(id){let n=0;for(const m of S.marks.values())if(m.doc===id&&isOpen(m))n++;return n}
+function renderLibrary(){
+  const box=$("#docs");box.innerHTML="";
+  const docs=[...S.docs.values()].sort((a,b)=>(b.touchedAt||b.createdAt||0)-(a.touchedAt||a.createdAt||0));
+  $("#libstate").textContent=S.dbReady?`${docs.length} image${docs.length===1?"":"s"}`:(db?"Loading…":"");
+  if(!docs.length){box.append(el("div",{class:"empty",style:"padding:13px 21px"},el("b",{text:S.dbReady||!db?"No images yet.":"Loading documents…"}),document.createTextNode(S.dbReady||!db?"Paste a screen grab to start the first loop.":"")));return}
+  /* Loop: group the library by project; each set can link back to the chat that runs it */
+  const groups=new Map();for(const d of docs){const k=PUBLIC?"":(d.project||"").trim();if(!groups.has(k))groups.set(k,[]);groups.get(k).push(d)}
+  const keys=[...groups.keys()].sort((a,b)=>!a?1:!b?-1:a.localeCompare(b));
+  for(const k of keys){
+    if(!PUBLIC&&(keys.length>1||k))box.append(el("div",{class:"pgroup"},el("span",{class:"pn",text:k||"No project"}),el("span",{class:"pc",text:`${groups.get(k).length} set${groups.get(k).length>1?"s":""}`})));
+  for(const d of groups.get(k)){
+    const n=openCount(d.id);const tot=[...S.marks.values()].filter(m=>m.doc===d.id).length;
+    const stored=d.assetId?"Stored here":(local.has(d.id)?"This device only":"File not stored");
+    box.append(el("div",{class:"drow"},
+      libThumb(d),el("div",{style:"min-width:0"},el("div",{class:"nm",text:d.name||"Untitled image"}),el("div",{class:"sub",text:`${d.w&&d.h?d.w+" × "+d.h+" px":"Image"} · ${stored}${d.createdAt?" · added "+fmtTime(d.createdAt):""}`})),
+      el("div",{class:"rd"},el("span",{text:"Version"}),el("span",{text:d.round||"—"})),
+      el("div",{class:"rd"},el("span",{text:"Open"}),el("span",{text:`${n} of ${tot}`})),
+      el("div",{class:"dact"},
+        !PUBLIC&&d.chat?el("a",{class:"btn",href:d.chat,target:"_blank",rel:"noopener",title:"Open the chat working on this image"},document.createTextNode("Open chat ↗")):null,
+        el("button",{class:"btn",onclick:()=>{location.hash=`#d-${d.id}`},text:"Open"}),
+        PUBLIC?iconBtn("trash",`Remove ${d.name||"this PDF"} from this browser`,e=>askForget(e.currentTarget.closest(".drow"),[d])):iconBtn("edit",`Project and chat link for ${d.name||"this set"}`,e=>editDocMeta(e.currentTarget.closest(".drow"),d)))));
+  }}
+  if(PUBLIC&&docs.length>1)box.append(el("div",{class:"forgetall"},el("button",{class:"link",text:"Remove all from this browser",onclick:e=>askForget(e.currentTarget.parentNode,docs)})));
+}
+function editDocMeta(row,d){if(row.querySelector(".dmeta"))return;
+  const projects=[...new Set([...S.docs.values()].map(x=>(x.project||"").trim()).filter(Boolean))].sort();
+  const dl=el("datalist",{id:"projlist"});projects.forEach(p=>dl.append(el("option",{value:p})));
+  const pj=el("input",{type:"text",value:d.project||"",list:"projlist",placeholder:"e.g. Terlingua Concept"}),ch=el("input",{type:"url",value:d.chat||"",placeholder:"https://claude.ai/…"});
+  const err=el("span",{class:"err"});
+  const f=el("form",{class:"dmeta"},dl,el("label",{},document.createTextNode("Project"),pj),el("label",{},document.createTextNode("Chat link (paste the address of the chat working on this set)"),ch),err,
+    el("div",{class:"crow"},el("button",{class:"primary",type:"submit",text:"Save"}),el("button",{class:"btn",type:"button",text:"Cancel",onclick:()=>f.remove()})));
+  f.addEventListener("submit",async e=>{e.preventDefault();const project=pj.value.trim().slice(0,80),chat=ch.value.trim();
+    if(chat&&!/^https:\/\/claude\.ai\//.test(chat)){err.textContent="Paste a claude.ai link, starting with https://claude.ai/.";return}
+    d.project=project;d.chat=chat;if(colD){try{await colD.doc(d.id).update({project,chat});saved()}catch(er){failSave(er)}}renderLibrary()});
+  row.append(f);pj.focus()}
+/* public version: forget documents and their markups from this browser (the PDF files themselves are not touched) */
+function askForget(row,list){if(row.querySelector(".forget"))return;
+  const n=list.reduce((a,d)=>a+[...S.marks.values()].filter(m=>m.doc===d.id).length,0);
+  const what=list.length===1?`“${list[0].name||"this PDF"}”`:`all ${list.length} documents`;
+  const box=el("div",{class:"forget",role:"alert"},el("span",{text:`Remove ${what} and ${n} markup${n===1?"":"s"} from this browser? Download anything you want to keep first. Your PDF files aren't touched.`}),
+    el("div",{class:"crow"},el("button",{class:"primary danger",text:"Remove",onclick:()=>forgetDocs(list)}),el("button",{class:"btn",text:"Cancel",onclick:()=>box.remove()})));
+  row.append(box);box.querySelector(".danger").focus()}
+function forgetDocs(list){for(const d of list){S.docs.delete(d.id);local.delete(d.id);for(const [k,m] of [...S.marks])if(m.doc===d.id)S.marks.delete(k);
+    try{localStorage.removeItem(LS.marks(d.id));localStorage.removeItem("ww-scale-"+d.id)}catch{}}
+  saveLocal();renderLibrary()}
+$("#choose").addEventListener("click",e=>{e.preventDefault();$("#file").click()});
+$("#choose").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();$("#file").click()}});
+$("#file").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(f)handleFile(f);e.target.value=""});
+/* drag and drop anywhere */
+let dragDepth=0;
+window.addEventListener("dragenter",e=>{if(![...(e.dataTransfer?.types||[])].includes("Files"))return;e.preventDefault();dragDepth++;$("#veil").hidden=false});
+window.addEventListener("dragover",e=>{if([...(e.dataTransfer?.types||[])].includes("Files"))e.preventDefault()});
+window.addEventListener("dragleave",()=>{dragDepth=Math.max(0,dragDepth-1);if(!dragDepth)$("#veil").hidden=true});
+window.addEventListener("drop",e=>{e.preventDefault();dragDepth=0;$("#veil").hidden=true;const f=[...(e.dataTransfer?.files||[])].find(isImg);if(f)handleFile(f,S.doc?{prev:S.doc}:null);else if(e.dataTransfer?.files?.length)libMsg("That file isn't an image. Drop a PNG or JPG.",true)});
+
+function libMsg(t,err){const m=$("#loadmsg");if(!t){m.hidden=true;return}m.hidden=false;m.querySelector(".sdot").className="sdot "+(err?"fault":"attention pulse");$("#loadtxt").textContent=t}
+function guessRound(name){const m=/X\d+(?:\.\d+)+/i.exec(name)||/\b(?:rev|r)[\s._-]?\d+\b/i.exec(name);return m?m[0].toUpperCase():""}
+async function handleFile(file,meta){
+  if(S.doc)showLibrary();
+  libMsg(`Reading ${file.name} · ${fmtMB(file.size)}…`);
+  let doc;
+  try{doc=await openPdfData(new Uint8Array(await file.arrayBuffer()))}catch(err){libMsg(err&&err.name==="PasswordException"?"This PDF is password protected. Save an unlocked copy and drop that.":`Couldn't read that PDF: ${err&&err.message||"unknown error"}.`,true);return}
+  const fp=(doc.fingerprints&&doc.fingerprints[0])||"";
+  let row=[...S.docs.values()].find(d=>fp&&d.fp===fp);
+  if(!row){
+    const id=uid(16);
+    row={id,name:file.name.replace(/\.pdf$/i,""),fp,pages:doc.numPages,round:guessRound(file.name),size:file.size,createdAt:Date.now(),by:S.me||null,assetId:null};
+    S.docs.set(id,row);
+  }
+  if(meta&&meta.gh)row.gh=meta.gh;
+  local.set(row.id,{pdf:doc,file});
+  if(!row.assetId&&assets&&file.size<=MAX_ASSET){
+    libMsg(`Storing ${file.name} so Claude can open it…`);
+    try{const up=await assets.upload(file,{type:"application/pdf"});row.assetId=up.id}catch(err){libMsg(`Opened, but the file couldn't be stored (${err&&err.code||"error"}). Markups still save.`,true)}
+  }
+  if(colD){try{const {id,...rest}=row;await colD.doc(row.id).set({...rest,touchedAt:Date.now()})}catch(err){failSave(err)}}
+  saveLocal();libMsg("");
+  location.hash=`#d-${row.id}`;
+}
+
+/* ---------- open a document ---------- */
+let openTok=0;
+async function openDoc(id,page){
+  const tok=++openTok;
+  showView("doc");
+  const row=S.docs.get(id);
+  if(!row){
+    if(db&&!S.dbReady){tmsg("Loading the document list…");return}
+    tmsg("This document isn't in the library.",true);$("#dname").textContent="Not found";return;
+  }
+  S.doc=row;$("#dname").textContent=row.name||"Untitled image";$("#round").value=row.round||"";
+  if(!pdf||pdf._wwid!==id){
+    pdf=null;pageObj=null;$("#pages").innerHTML="";$("#layer").innerHTML="";clearCanvases();
+    const loc=local.get(id);
+    if(loc){pdf=loc.pdf}
+    else if(row.assetId){
+      tmsg(`Loading ${row.name||"PDF"}…`);
+      try{const r=await fetch("/_blob/"+row.assetId);if(!r.ok)throw new Error(r.status===404?"The stored file is missing.":"Couldn't fetch the file ("+r.status+").");
+        const data=new Uint8Array(await r.arrayBuffer());if(tok!==openTok)return;const keep=data.slice();pdf=await openPdfData(data);local.set(id,{pdf,bytes:keep})}
+      catch(err){if(tok!==openTok)return;tmsg(`${err&&err.message||"Couldn't load the PDF."} Drop the same file to reopen it.`,true);renderList();return}
+    }else if(PUBLIC&&row.gh&&GH.cfg&&GH.cfg.repo===row.gh.repo){
+      tmsg(`Loading ${row.name||"PDF"} from GitHub…`);
+      try{const data=new Uint8Array(await ghRaw(row.gh.path,row.gh.branch));if(tok!==openTok)return;const keep=data.slice();pdf=await openPdfData(data);local.set(id,{pdf,bytes:keep})}
+      catch(err){if(tok!==openTok)return;tmsg(`${err&&err.message||"Couldn't load the PDF from GitHub."}`,true);renderList();return}
+    }else{tmsg(PUBLIC?"Drop the same PDF here to pick up where you left off. Your markups are saved in this browser.":"This PDF isn't stored with the page yet. Drop the same file here to open it, and its markups come back.",true);renderList();return}
+    if(tok!==openTok)return;
+    pdf._wwid=id;S.pages=pdf.numPages;
+    if(colD&&!row.fp&&pdf.fingerprints){try{await colD.doc(id).update({fp:pdf.fingerprints[0],pages:pdf.numPages})}catch{}}
+    buildPages();
+  }
+  const sc=store.get("ww-scale-"+id);if(sc)$("#scale").value=sc;
+  await goPage(Math.min(Math.max(1,page||1),S.pages),false);
+}
+function tmsg(t,err){const m=$("#tmsg");m.hidden=!t;$("#tmsgin").innerHTML="";if(t){$("#tmsgin").append(el("span",{class:"sdot "+(err?"attention":"attention pulse")}),el("div",{text:t}));if(err)$("#tmsgin").append(el("button",{class:"btn",text:"Open an image",onclick:()=>$("#file").click()}))}}
+
+/* ---------- pages rail ---------- */
+let thumbObs=null;
+function buildPages(){
+  const box=$("#pages"),pick=$("#pagepick");box.innerHTML="";pick.innerHTML="";
+  if(thumbObs)thumbObs.disconnect();
+  thumbObs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){thumbObs.unobserve(e.target);thumb(e.target)}}),{root:box,rootMargin:"400px"});
+  for(let i=1;i<=S.pages;i++){
+    const c=el("canvas",{"data-p":String(i),width:"160",height:"107"});
+    const b=el("button",{class:"pg","data-p":String(i),"aria-current":"false",onclick:()=>goPage(i)},c,el("div",{class:"lbl"},el("b",{text:"p"+i}),el("span",{class:"cslot"})));
+    box.append(b);thumbObs.observe(c);
+    pick.append(el("option",{value:String(i),text:"Page "+i}));
+  }
+  $("#pgstate").textContent=`${S.pages}`;
+  updateCounts();
+}
+async function thumb(c){
+  if(!pdf)return;const wid=pdf._wwid;
+  try{const p=await pdf.getPage(+c.dataset.p);if(!pdf||pdf._wwid!==wid)return;const vp1=p.getViewport({scale:1});const w=320,s=w/vp1.width;const vp=p.getViewport({scale:s});
+    c.width=Math.round(vp.width);c.height=Math.round(vp.height);await p.render({canvasContext:c.getContext("2d"),viewport:vp}).promise}catch{}
+}
+function updateCounts(){
+  if(!S.doc)return;const per={};for(const m of S.marks.values())if(m.doc===S.doc.id&&isOpen(m))per[m.page]=(per[m.page]||0)+1;
+  document.querySelectorAll("#pages .pg").forEach(b=>{const n=per[b.dataset.p]||0;const slot=b.querySelector(".cslot");slot.innerHTML="";if(n)slot.append(el("span",{class:"count",text:String(n)}));b.setAttribute("aria-current",String(+b.dataset.p===S.page))});
+  const pick=$("#pagepick");[...pick.options].forEach(o=>{const n=per[o.value]||0;o.textContent=`Page ${o.value}${n?`  (${n} open)`:""}`});pick.value=String(S.page);
+}
+$("#pagepick").addEventListener("change",e=>goPage(+e.target.value));
+
+/* ---------- page render ---------- */
+let pageTok=0,baseTask=null,detailTask=null;
+function clearCanvases(){for(const id of["base","detail"]){const c=$("#"+id);c.width=1;c.height=1;c.style.display="none"}}
+async function goPage(n,keepView){
+  if(!pdf)return;const tok=++pageTok;
+  S.page=n;S.sel=null;
+  try{pageObj=await pdf.getPage(n)}catch(err){tmsg("Couldn't read page "+n+".",true);return}
+  if(tok!==pageTok)return;
+  const vp=pageObj.getViewport({scale:1});S.W=vp.width;S.H=vp.height;
+  const st=$("#stage");st.style.width=S.W+"px";st.style.height=S.H+"px";
+  const ink=$("#ink");ink.setAttribute("viewBox",`0 0 ${S.W} ${S.H}`);ink.setAttribute("width",S.W);ink.setAttribute("height",S.H);
+  $("#psize").textContent=`${fmtIn(S.W/72)} × ${fmtIn(S.H/72)} in · p${n} of ${S.pages}`;
+  setHash(`#d-${S.doc.id}${n>1?"-p"+n:""}`);
+  tmsg("");
+  if(!keepView)fit();
+  updateCounts();render();renderList();
+  renderBase(tok);
+}
+function fmtIn(v){return(Math.round(v*10)/10).toString()}
+async function renderBase(tok){
+  if(baseTask){try{baseTask.cancel()}catch{}}
+  const c=$("#base"),d=$("#detail");d.style.display="none";
+  baseR=Math.min(2,Math.sqrt(6e6/(S.W*S.H)));
+  const vp=pageObj.getViewport({scale:baseR});
+  const off=document.createElement("canvas");off.width=Math.ceil(vp.width);off.height=Math.ceil(vp.height);
+  const ctx=off.getContext("2d");ctx.fillStyle="#fff";ctx.fillRect(0,0,off.width,off.height);
+  baseTask=pageObj.render({canvasContext:ctx,viewport:vp});
+  try{await baseTask.promise}catch{return}
+  if(tok!==pageTok)return;
+  c.width=off.width;c.height=off.height;c.getContext("2d").drawImage(off,0,0);c.style.width=S.W+"px";c.style.height=S.H+"px";c.style.display="block";
+  scheduleDetail();
+}
+let detailTimer=null;
+function scheduleDetail(){clearTimeout(detailTimer);detailTimer=setTimeout(renderDetail,180)}
+async function renderDetail(){
+  if(!pageObj)return;const tok=pageTok;
+  const dpr=window.devicePixelRatio||1;let need=view.s*dpr;const d=$("#detail");
+  if(need<=baseR*1.15){d.style.display="none";return}
+  const r=$("#table").getBoundingClientRect();
+  const x0=Math.max(0,-view.x/view.s),y0=Math.max(0,-view.y/view.s),x1=Math.min(S.W,(r.width-view.x)/view.s),y1=Math.min(S.H,(r.height-view.y)/view.s);
+  const w=x1-x0,h=y1-y0;if(w<=1||h<=1){d.style.display="none";return}
+  if(w*h*need*need>16e6)need=Math.sqrt(16e6/(w*h));
+  if(detailTask){try{detailTask.cancel()}catch{}}
+  const off=document.createElement("canvas");off.width=Math.ceil(w*need);off.height=Math.ceil(h*need);
+  const ctx=off.getContext("2d");ctx.fillStyle="#fff";ctx.fillRect(0,0,off.width,off.height);
+  const vp=pageObj.getViewport({scale:need});
+  detailTask=pageObj.render({canvasContext:ctx,viewport:vp,transform:[1,0,0,1,-x0*need,-y0*need]});
+  try{await detailTask.promise}catch{return}
+  if(tok!==pageTok)return;
+  d.width=off.width;d.height=off.height;d.getContext("2d").drawImage(off,0,0);
+  Object.assign(d.style,{left:x0+"px",top:y0+"px",width:w+"px",height:h+"px",display:"block"});
+}
+
+/* ---------- tools ---------- */
+function buildTools(){
+  const t=$("#toolbar");
+  TOOLS.forEach(x=>{
+    const b=el("button",{"aria-pressed":String(x.id===S.tool),title:`${x.name} (${x.key})`,"aria-label":x.name,"data-tool":x.id,onclick:()=>setTool(x.id)});
+    b.innerHTML=`<svg viewBox="0 0 18 18" aria-hidden="true">${x.icon}</svg>`;b.append(el("span",{text:x.name}));t.append(b)});
+  const c=$("#colors");
+  INKS.forEach(([hex,name])=>{const b=el("button",{class:"sw","aria-pressed":String(hex===S.color),"aria-label":name+" ink",title:name,onclick:()=>{S.color=hex;[...c.children].forEach(x=>x.setAttribute("aria-pressed",String(x===b)));if(S.sel)patch(S.sel,{color:hex})}});b.style.background=hex;c.append(b)});
+}
+function setTool(id){if(typeof cancelPoly==="function")cancelPoly();S.tool=id;$("#table").dataset.tool=id;document.querySelectorAll("#toolbar button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tool===id)));$("#hint").textContent=HINTS[id]}
+$("#scale").addEventListener("change",e=>{if(S.doc)store.set("ww-scale-"+S.doc.id,e.target.value)});
+$("#back").onclick=()=>showLibrary();
+$("#round").addEventListener("change",async e=>{if(!S.doc)return;S.doc.round=e.target.value.trim();saveLocal();if(colD){try{await colD.doc(S.doc.id).update({round:S.doc.round});saved()}catch(err){failSave(err)}}});
+
+/* ---------- view ---------- */
+const T=$("#table");
+let view={s:.3,x:0,y:0},fitMode="page",lastBox=null;
+function applyView(){$("#stage").style.transform=`translate(${view.x}px,${view.y}px) scale(${view.s})`;$("#zlvl").value=Math.round(view.s*100)+"%";scheduleDetail()}
+function fit(mode){fitMode=mode||"page";const r=T.getBoundingClientRect();if(r.width<60||r.height<60)return;
+  const s=fitMode==="width"?(r.width-26)/S.W:Math.min((r.width-26)/S.W,(r.height-26)/S.H);
+  view={s,x:(r.width-S.W*s)/2,y:fitMode==="width"?13:(r.height-S.H*s)/2};applyView()}
+new ResizeObserver(()=>{const r=T.getBoundingClientRect();if(r.width<60||r.height<60)return;
+  if(fitMode)fit(fitMode);else if(lastBox){view.x+=(r.width-lastBox.width)/2;view.y+=(r.height-lastBox.height)/2;applyView()}
+  lastBox={width:r.width,height:r.height}}).observe(T);
+function zoomAt(f,cx,cy){fitMode=null;const ns=Math.min(12,Math.max(.03,view.s*f));const k=ns/view.s;view.x=cx-(cx-view.x)*k;view.y=cy-(cy-view.y)*k;view.s=ns;applyView()}
+function centerOn(px,py){fitMode=null;const r=T.getBoundingClientRect();const minS=Math.min(r.width/S.W,r.height/S.H)*2.2;if(view.s<minS)view.s=minS;view.x=r.width/2-px*view.s;view.y=r.height/2-py*view.s;applyView()}
+$("#zin").onclick=()=>{const r=T.getBoundingClientRect();zoomAt(1.25,r.width/2,r.height/2)};
+$("#zout").onclick=()=>{const r=T.getBoundingClientRect();zoomAt(.8,r.width/2,r.height/2)};
+$("#zfit").onclick=()=>fit("page");$("#zwidth").onclick=()=>fit("width");
+T.addEventListener("wheel",e=>{e.preventDefault();const r=T.getBoundingClientRect();
+  const mouseWheel=e.deltaMode!==0||(e.deltaX===0&&Math.abs(e.deltaY)>=50&&Number.isInteger(e.deltaY));
+  if(e.ctrlKey||e.metaKey||(mouseWheel&&!e.shiftKey)){const dy=e.deltaMode===1?e.deltaY*33:e.deltaY;zoomAt(Math.exp(-dy*(e.ctrlKey&&!mouseWheel?0.012:0.0018)),e.clientX-r.left,e.clientY-r.top)}
+  else{view.x-=e.deltaX;view.y-=e.deltaY;fitMode=null;applyView()}},{passive:false});
+let g0=null;
+T.addEventListener("gesturestart",e=>{e.preventDefault();g0=view.s});
+T.addEventListener("gesturechange",e=>{e.preventDefault();if(g0==null)return;const r=T.getBoundingClientRect();zoomAt((g0*e.scale)/view.s,e.clientX-r.left,e.clientY-r.top)});
+T.addEventListener("gestureend",e=>{e.preventDefault();g0=null});
+function toPage(e){const r=$("#stage").getBoundingClientRect();return[+((e.clientX-r.left)/r.width*S.W).toFixed(1),+((e.clientY-r.top)/r.height*S.H).toFixed(1)]}
+
+/* ---------- geometry and drawing (page points, 72 per inch) ---------- */
+function K(){return Math.max(S.W,S.H)/3600}
+function bbox(p){const xs=p.map(q=>q[0]),ys=p.map(q=>q[1]);return{x:Math.min(...xs),y:Math.min(...ys),w:Math.max(...xs)-Math.min(...xs),h:Math.max(...ys)-Math.min(...ys)}}
+function cloudPath(b){const k=K(),r=16*k,segs=len=>Math.max(1,Math.round(len/(r*2)));let d=`M${b.x},${b.y}`;
+  const edge=(dx,dy,len)=>{const n=segs(len),sx=dx*len/n,sy=dy*len/n;for(let i=0;i<n;i++)d+=` a${len/n/2},${len/n/2} 0 0 1 ${sx},${sy}`};
+  edge(1,0,b.w);edge(0,1,b.h);edge(-1,0,b.w);edge(0,-1,b.h);return d+"z"}
+function measureText(len,scale){const inches=len/72;
+  if(+scale>=12){return(Math.round(inches*16)/16).toFixed(2).replace(/\.?0+$/,"")+'"'}
+  const ft=inches/scale;let f=Math.floor(ft),i=Math.round((ft-f)*12);if(i===12){f++;i=0}return`${f}'-${i}"`}
+function wrap(t,n=34){const out=[];(t||"").split(/\n/).forEach(p=>{let line="";p.split(/\s+/).forEach(w=>{if((line+" "+w).trim().length>n){if(line)out.push(line);line=w}else line=(line+" "+w).trim()});out.push(line)});return out.slice(0,12)}
+/* the ℄ centerline symbol as strokes: a C with an L through it */
+function clGlyph(cx,cy,k){const r=15*k,arc=[];for(let j=0;j<=16;j++){const t=(45+270*j/16)*Math.PI/180;arc.push([+(cx+r*Math.cos(t)).toFixed(1),+(cy+r*Math.sin(t)).toFixed(1)])}
+  return[arc,[[cx-3*k,cy-20*k],[cx-3*k,cy+20*k],[cx+15*k,cy+20*k]]]}
+function draw(m,g){
+  const k=K(),c=m.color||INKS[0][0],p=m.pts||[],sw=5*k;
+  const hit={class:"hit",stroke:"transparent","stroke-width":Math.max(28*k,8),fill:"none"};
+  if(m.type==="cloud"||m.type==="rect"){const b=bbox(p);const d=m.type==="cloud"?cloudPath(b):`M${b.x},${b.y}h${b.w}v${b.h}h${-b.w}z`;
+    g.append(sv("path",{d,...hit}),sv("path",{d,stroke:c,"stroke-width":sw,fill:"none","stroke-linejoin":"round"}))}
+  else if(m.type==="arrow"){const[a,b]=p;g.append(sv("line",{x1:a[0],y1:a[1],x2:b[0],y2:b[1],...hit}),sv("line",{x1:a[0],y1:a[1],x2:b[0],y2:b[1],stroke:c,"stroke-width":sw,"marker-end":"url(#ah)"}))}
+  else if(m.type==="cl"||m.type==="dash"){const[a,b]=p;const da=m.type==="cl"?[70*k,16*k,14*k,16*k]:[24*k,14*k];
+    g.append(sv("line",{x1:a[0],y1:a[1],x2:b[0],y2:b[1],...hit}),sv("line",{x1:a[0],y1:a[1],x2:b[0],y2:b[1],stroke:c,"stroke-width":m.type==="cl"?3.5*k:4*k,"stroke-dasharray":da.join(" ")}));
+    if(m.type==="cl"){const L=Math.hypot(b[0]-a[0],b[1]-a[1])||1,ux=(b[0]-a[0])/L,uy=(b[1]-a[1])/L;
+      [[b,1],[a,-1]].forEach(([q,sg])=>{const cx=q[0]+sg*ux*34*k,cy=q[1]+sg*uy*34*k;g.append(sv("path",{d:clGlyph(cx,cy,k).map(l=>"M"+l.map(z=>z.join(",")).join(" L")).join(" "),stroke:c,"stroke-width":3.5*k,fill:"none","stroke-linecap":"round","stroke-linejoin":"round"}))})}}
+  else if(m.type==="xout"){const b=bbox(p),d=`M${b.x},${b.y}h${b.w}v${b.h}h${-b.w}z`;
+    g.append(sv("path",{d,...hit,fill:"transparent"}),sv("path",{d,fill:c,"fill-opacity":.08,stroke:c,"stroke-width":4*k}),sv("path",{d:`M${b.x},${b.y}L${b.x+b.w},${b.y+b.h}M${b.x+b.w},${b.y}L${b.x},${b.y+b.h}`,stroke:c,"stroke-width":4*k}))}
+  else if(m.type==="area"){const d="M"+p.map(q=>q.join(",")).join(" L")+(m.open?"":" Z");const pid="h"+(m.id||"draft");
+    const pat=sv("pattern",{id:pid,patternUnits:"userSpaceOnUse",width:18*k,height:18*k,patternTransform:"rotate(45)"});pat.append(sv("line",{x1:0,y1:0,x2:0,y2:18*k,stroke:c,"stroke-width":2.2*k}));
+    g.append(pat,sv("path",{d,fill:c,"fill-opacity":.08,stroke:"none"}),sv("path",{d,fill:`url(#${pid})`,"fill-opacity":.55,stroke:"none"}),sv("path",{d,...hit,fill:"transparent"}),sv("path",{d,stroke:c,"stroke-width":4*k,fill:"none","stroke-linejoin":"round"}))}
+  else if(m.type==="pen"||m.type==="hl"){const d="M"+p.map(q=>q.join(",")).join(" L");
+    g.append(sv("path",{d,...hit}),sv("path",{d,stroke:c,"stroke-width":m.type==="hl"?26*k:sw,"stroke-opacity":m.type==="hl"?.35:1,fill:"none","stroke-linecap":"round","stroke-linejoin":"round"}))}
+  else if(m.type==="measure"){const[a,b]=p;const len=Math.hypot(b[0]-a[0],b[1]-a[1]);
+    g.append(sv("line",{x1:a[0],y1:a[1],x2:b[0],y2:b[1],...hit}),sv("line",{x1:a[0],y1:a[1],x2:b[0],y2:b[1],stroke:c,"stroke-width":3*k,"marker-start":"url(#tick)","marker-end":"url(#tick)"}));
+    const t=sv("text",{x:(a[0]+b[0])/2,y:(a[1]+b[1])/2-12*k,fill:c,"font-size":30*k,"font-family":"JetBrains Mono, monospace","text-anchor":"middle","paint-order":"stroke",stroke:"#fff","stroke-width":8*k});
+    const ck=typeof stdCheck==="function"?stdCheck(m):null;t.textContent=measureText(len,m.scale||.25)+(ck?(ck.ok==="pass"?" \u2713":ck.ok==="warn"?" !":" \u2717"):"");g.append(t)}
+  else if(m.type==="callout"){const[a,b]=p;const lines=wrap(m.text||"Type the note in the list");
+    const fs=36*k,lh=44*k,bw=Math.max(...lines.map(l=>l.length))*fs*.56+28*k,bh=lines.length*lh+20*k;
+    const bx=b[0]-(b[0]<a[0]?bw:0),by=b[1]-bh/2;
+    g.append(sv("line",{x1:a[0],y1:a[1],x2:b[0],y2:b[1],stroke:c,"stroke-width":4*k,"marker-start":"url(#ah)"}));
+    g.append(sv("rect",{x:bx,y:by,width:bw,height:bh,fill:"#fffef8",stroke:c,"stroke-width":4*k}));
+    const t=sv("text",{x:bx+14*k,y:by+10*k,fill:c,"font-size":fs,"font-family":"Inter, sans-serif"});
+    lines.forEach((l,i)=>{const s=sv("tspan",{x:bx+14*k,dy:i?lh:lh-4*k});s.textContent=l;t.append(s)});g.append(t)}
+  if(m.n&&p.length){const b=bbox(p);const tg=sv("g");
+    tg.append(sv("circle",{cx:b.x-4*k,cy:b.y-4*k,r:22*k,fill:c}));const tx=sv("text",{x:b.x-4*k,y:b.y+6*k,fill:"#fff","font-size":26*k,"font-weight":600,"font-family":"JetBrains Mono, monospace","text-anchor":"middle"});tx.textContent=m.n;tg.append(tx);g.append(tg)}
+}
+function docMarks(){return S.doc?[...S.marks.values()].filter(m=>m.doc===S.doc.id).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0)):[]}
+function numberAll(){docMarks().forEach((m,i)=>m.n=i+1)}
+function render(){
+  const L=$("#layer");L.innerHTML="";if(!S.doc)return;numberAll();
+  for(const m of docMarks()){if(m.page!==S.page)continue;
+    const g=sv("g",{class:"mk"+(S.sel===m.id?" sel":""),"data-id":m.id});if(isClosed(m))g.setAttribute("opacity",".4");draw(m,g);L.append(g)}
+}
+
+/* ---------- pointer ---------- */
+let act=null,spaceDown=false;const pointers=new Map();
+T.addEventListener("pointerdown",e=>{
+  if(e.target.closest(".zoom,.hint,.tmsg"))return;
+  if(!pageObj)return;
+  T.setPointerCapture(e.pointerId);pointers.set(e.pointerId,[e.clientX,e.clientY]);
+  if(pointers.size===2){act={kind:"pinch",d:dist(),c:mid(),v:{...view}};$("#draft").innerHTML="";return}
+  if(S.tool==="pan"||spaceDown||e.button===1){act={kind:"pan",sx:e.clientX,sy:e.clientY,vx:view.x,vy:view.y};T.classList.add("panning");return}
+  const pt=toPage(e);
+  if(S.tool==="select"){const g=e.target.closest&&e.target.closest(".mk");
+    if(g){select(g.dataset.id,false);const m=S.marks.get(g.dataset.id);if(m)act={kind:"move",id:m.id,start:pt,orig:m.pts.map(q=>[...q])}}
+    else{select(null);act={kind:"pan",sx:e.clientX,sy:e.clientY,vx:view.x,vy:view.y}}return}
+  if(act&&act.kind==="poly"){const f=act.pts[0],tol=14*S.W/$("#stage").getBoundingClientRect().width;
+    if(act.pts.length>=3&&Math.hypot(pt[0]-f[0],pt[1]-f[1])<tol){finishPoly();return}
+    const l=act.pts[act.pts.length-1],now=Date.now();if(act.last&&now-act.last<450&&Math.hypot(pt[0]-l[0],pt[1]-l[1])<tol){finishPoly();return}
+    act.last=now;act.pts.push(pt);polyPreview(pt);return}
+  act={kind:"draw",type:S.tool,pts:[pt,pt]};
+});
+function snap45(type,a,b,e){if(!((type==="cl"&&!e.altKey)||((type==="arrow"||type==="measure"||type==="dash")&&e.shiftKey)))return b;
+  const dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy),ang=Math.round(Math.atan2(dy,dx)/(Math.PI/4))*(Math.PI/4);return[+(a[0]+L*Math.cos(ang)).toFixed(1),+(a[1]+L*Math.sin(ang)).toFixed(1)]}
+function polyPreview(cur){const d=$("#draft");d.innerHTML="";const g=sv("g");draw({type:"area",pts:cur?[...act.pts,cur]:act.pts,color:S.color,open:true},g);d.append(g)}
+function finishPoly(){if(!act||act.kind!=="poly")return;const pts=[];for(const q of act.pts){const l=pts[pts.length-1];if(!l||Math.hypot(q[0]-l[0],q[1]-l[1])>3*K())pts.push(q)}
+  act=null;$("#draft").innerHTML="";if(pts.length>=3)create({type:"area",pts,color:S.color,scale:+$("#scale").value})}
+function cancelPoly(){if(act&&act.kind==="poly"){act=null;$("#draft").innerHTML="";return true}return false}
+T.addEventListener("dblclick",e=>{if(act&&act.kind==="poly"){e.preventDefault();finishPoly()}});
+T.addEventListener("pointermove",e=>{if(act&&act.kind==="poly"&&!pointers.size)polyPreview(toPage(e))});
+T.addEventListener("pointermove",e=>{
+  if(!pointers.has(e.pointerId))return;pointers.set(e.pointerId,[e.clientX,e.clientY]);if(!act)return;
+  if(act.kind==="pinch"&&pointers.size===2){const r=T.getBoundingClientRect(),c=mid(),k=dist()/act.d;fitMode=null;view.s=Math.min(12,Math.max(.03,act.v.s*k));view.x=c[0]-r.left-(act.c[0]-r.left-act.v.x)*(view.s/act.v.s);view.y=c[1]-r.top-(act.c[1]-r.top-act.v.y)*(view.s/act.v.s);applyView();return}
+  if(act.kind==="pan"){fitMode=null;view.x=act.vx+e.clientX-act.sx;view.y=act.vy+e.clientY-act.sy;applyView();return}
+  const pt=toPage(e);
+  if(act.kind==="move"){const m=S.marks.get(act.id);const dx=pt[0]-act.start[0],dy=pt[1]-act.start[1];m.pts=act.orig.map(q=>[+(q[0]+dx).toFixed(1),+(q[1]+dy).toFixed(1)]);act.moved=true;render();return}
+  if(act.kind==="draw"){if(act.type==="pen"||act.type==="hl"){const l=act.pts[act.pts.length-1];if(Math.hypot(pt[0]-l[0],pt[1]-l[1])>6*K())act.pts.push(pt)}else act.pts[1]=snap45(act.type,act.pts[0],pt,e);
+    const d=$("#draft");d.innerHTML="";const g=sv("g");if(act.type==="area"){const b=bbox(act.pts);draw({type:"area",pts:[[b.x,b.y],[b.x+b.w,b.y],[b.x+b.w,b.y+b.h],[b.x,b.y+b.h]],color:S.color},g);d.append(g);return}draw({type:act.type,pts:act.pts,color:S.color,scale:+$("#scale").value,text:act.type==="callout"?"Note":""},g);d.append(g)}
+});
+const end=e=>{
+  pointers.delete(e.pointerId);T.classList.remove("panning");if(!act)return;
+  if(act.kind==="pinch"){if(pointers.size===0)act=null;return}
+  if(act.kind==="poly")return;
+  if(act.kind==="draw"&&act.type==="area"){const b=bbox(act.pts);$("#draft").innerHTML="";
+    if(b.w>8*K()&&b.h>8*K()){create({type:"area",pts:[[b.x,b.y],[b.x+b.w,b.y],[b.x+b.w,b.y+b.h],[b.x,b.y+b.h]],color:S.color,scale:+$("#scale").value});act=null;return}
+    act={kind:"poly",type:"area",pts:[act.pts[0]],last:Date.now()};polyPreview();return}
+  if(act.kind==="move"&&act.moved){const m=S.marks.get(act.id);patch(m.id,{pts:m.pts})}
+  if(act.kind==="draw"){$("#draft").innerHTML="";const p=act.pts;const b=bbox(p);if(b.w>8*K()||b.h>8*K())create({type:act.type,pts:p,color:S.color,scale:+$("#scale").value})}
+  act=null};
+T.addEventListener("pointerup",end);T.addEventListener("pointercancel",end);
+function dist(){const[a,b]=[...pointers.values()];return Math.hypot(a[0]-b[0],a[1]-b[1])||1}
+function mid(){const[a,b]=[...pointers.values()];return[(a[0]+b[0])/2,(a[1]+b[1])/2]}
+document.addEventListener("keydown",e=>{
+  if(e.target.closest("textarea,input,select"))return;
+  if(e.key==="Escape"){document.querySelectorAll("details[open]").forEach(d=>d.open=false)}
+  if(!S.doc||$("#table").hidden)return;
+  if(e.code==="Space"){spaceDown=true;e.preventDefault();return}
+  if((e.key==="Delete"||e.key==="Backspace")&&S.sel){remove(S.sel);return}
+  if(e.key==="Escape"){if(cancelPoly())return;select(null);return}
+  if(e.key==="Enter"&&act&&act.kind==="poly"){finishPoly();return}
+  if(e.key==="PageDown"&&S.page<S.pages){goPage(S.page+1);return}
+  if(e.key==="PageUp"&&S.page>1){goPage(S.page-1);return}
+  if(e.key==="0"&&(e.metaKey||e.ctrlKey)){e.preventDefault();fit("page");return}
+  if(e.metaKey||e.ctrlKey||e.altKey)return;
+  if(e.key==="="||e.key==="+"){e.preventDefault();$("#zin").click();return}
+  if(e.key==="-"||e.key==="_"){e.preventDefault();$("#zout").click();return}
+  if(e.key.toLowerCase()==="w"){fit("width");return}
+  const t=TOOLS.find(x=>x.key.toLowerCase()===e.key.toLowerCase());if(t)setTool(t.id);
+});
+document.addEventListener("keyup",e=>{if(e.code==="Space")spaceDown=false});
+
+/* ---------- data ---------- */
+function clean(m){const{n,id,...rest}=m;return rest}
+async function create(o){if(calHook(o))return;
+  const m={id:uid(20),doc:S.doc.id,page:S.page,round:S.doc.round||"",status:"open",text:"",createdAt:Date.now(),author:S.me||null,...o};
+  S.marks.set(m.id,m);S.sel=m.id;render();renderList(true);updateCounts();
+  if(colM){try{await colM.doc(m.id).set(clean(m));saved();touch()}catch(err){failSave(err)}}
+  saveLocal();
+}
+async function patch(id,o){const m=S.marks.get(id);if(!m)return;Object.assign(m,o,{updatedAt:Date.now()});render();saveLocal();
+  if(colM){try{await colM.doc(id).update({...o,updatedAt:m.updatedAt});saved()}catch(err){failSave(err)}}}
+async function remove(id){S.marks.delete(id);if(S.sel===id)S.sel=null;render();renderList();updateCounts();saveLocal();
+  if(colM){try{await colM.doc(id).delete();saved()}catch(err){failSave(err)}}}
+let touchT=0;function touch(){if(!colD||!S.doc||Date.now()-touchT<60000)return;touchT=Date.now();colD.doc(S.doc.id).update({touchedAt:touchT}).catch(()=>{})}
+function select(id,scroll=true){S.sel=id;render();renderList();if(id&&scroll){const m=S.marks.get(id);if(m){const b=bbox(m.pts);centerOn(b.x+b.w/2,b.y+b.h/2)}}}
+function saved(){live("ok","Saved · Claude can read these")}
+function failSave(err){live(err&&err.code==="permission_denied"?"attention":"fault",err&&err.code==="permission_denied"?"You can view but not add markups":"Couldn't save. Check your connection.")}
+
+/* ---------- markups list ---------- */
+function stateOf(m){if(m.carriedTo)return"carried";if(m.status==="superseded")return"superseded";if(isClosed(m))return"closed";if(needsReview(m))return m.status==="ask"?"ask":m.status==="done"?"done":"review";
+  if(m.review&&!m.answerSent)return m.review==="rework"?"rework":"approved";if(m.submissionId)return"sent";return"draft"}
+/* label, dot class, filter group */
+const ST={draft:["Draft","","draft"],sent:["With Claude","soft","sent"],review:["Your review","attention","review"],ask:["Question","attention","review"],done:["Done · review","attention","review"],
+  carried:["Carried forward","soft","superseded"],superseded:["Superseded","soft","superseded"],approved:["Approved · to send","soft","sent"],rework:["Rework · to send","soft","sent"],closed:["Closed","ok","closed"]};
+function setReview(m,review,answer){const f={review,answer:answer||"",answerAt:Date.now(),answerSent:false};Object.assign(m,f);patch(m.id,f);renderList();updateCounts()}
+function undoReview(m){Object.assign(m,{review:null,answer:"",answerSent:false});
+  if(colM)colM.doc(m.id).update({review:null,answer:"",answerSent:false,updatedAt:Date.now()}).then(saved,failSave);renderList();updateCounts()}
+function renderList(focusNew){
+  const box=$("#items");box.innerHTML="";if(!S.doc){updateSubmit();return}
+  const scope=$("#fscope").value,fs=$("#fstatus").value;numberAll();
+  const all=docMarks();
+  const rows=all.filter(m=>(scope==="all"||m.page===S.page)&&(fs==="any"||(fs==="open"?isOpen(m):ST[stateOf(m)][2]===fs)));
+  const open=all.filter(isOpen).length,rv=all.filter(needsReview).length;
+  $("#tally").textContent=PUBLIC?`${all.length} markup${all.length===1?"":"s"}`:`${open} open · ${rv} to review`;
+  updateSubmit();renderLog();
+  const active=document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.mid;
+  if(!rows.length){box.append(el("div",{class:"empty"},el("b",{text:scope==="page"?"No markups on this page yet.":"No markups yet."}),
+    document.createTextNode("Pick Cloud, Arrow or Callout and drag on the page. Each markup gets a number and a comment box here.")));return}
+  /* group like a commit: what needs Drew, what Claude has, drafts, then accomplished and superseded (collapsed) */
+  const G=PUBLIC?null:{review:["Your review",true],sent:["With Claude",true],draft:["Drafts",true],closed:["Accomplished",false],superseded:["Superseded",false]},gb={};
+  S.grpOpen=S.grpOpen||{};
+  if(G){const cnt={};rows.forEach(m=>{const k=ST[stateOf(m)][2];cnt[k]=(cnt[k]||0)+1});
+    for(const k of Object.keys(G)){if(!cnt[k])continue;const d=el("details",{class:"grp"});d.open=k in S.grpOpen?S.grpOpen[k]:G[k][1];
+      d.addEventListener("toggle",()=>{S.grpOpen[k]=d.open});d.append(el("summary",{},el("b",{text:G[k][0]}),document.createTextNode(` · ${cnt[k]}`)));gb[k]=d;box.append(d)}}
+  const groupBox=st=>G?gb[ST[st][2]]:box;
+  for(const m of rows){
+    const ta=el("textarea",{"data-mid":m.id,"aria-label":`Comment for markup ${m.n}`,placeholder:m.type==="callout"?"Note text (shows on the page)":"What should change here?"});
+    ta.value=m.text||"";
+    const fitTa=()=>{if(CSS.supports&&CSS.supports("field-sizing","content"))return;ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight+2,innerHeight*.4)+"px"};requestAnimationFrame(fitTa);
+    let tmr;ta.addEventListener("input",()=>{fitTa();m.text=ta.value;if(m.type==="callout")render();clearTimeout(tmr);tmr=setTimeout(()=>patch(m.id,{text:ta.value}),600)});
+    ta.addEventListener("focus",()=>{if(S.sel!==m.id){S.sel=m.id;render();box.querySelectorAll(".item").forEach(x=>x.classList.toggle("sel",x.dataset.id===m.id))}});
+    const s=stateOf(m);const[label,dotc]=ST[s];
+    const stb=el("span",{class:"st"},el("span",{class:"sdot "+(dotc==="soft"?"":dotc)}),document.createTextNode(label));
+    if(dotc==="soft")stb.firstChild.style.background="var(--ink-soft)",stb.firstChild.style.borderColor="var(--ink-soft)";
+    const who=m.author&&S.names[m.author]?S.names[m.author]:"";
+    const len=m.type==="measure"?" "+measureText(Math.hypot(m.pts[1][0]-m.pts[0][0],m.pts[1][1]-m.pts[0][1]),m.scale||.25):"";
+    const inkDot=el("span",{class:"ink"});inkDot.style.background=m.color;
+    const item=el("div",{class:"item"+(S.sel===m.id?" sel":""),"data-id":m.id},
+      el("div",{class:"top"},el("span",{class:"num",text:"#"+m.n}),inkDot,el("span",{class:"meta",text:`p${m.page} · ${LABEL[m.type]||m.type}${len}${who?" · "+who:""}${m.carriedFrom?" · from "+docLabel(S.docs.get((S.marks.get(m.carriedFrom)||{}).doc)):""}`}),stb),
+      ta,
+      m.reply?el("div",{class:"reply"+(m.status==="ask"?" ask":"")},el("b",{text:"Claude: "}),document.createTextNode(m.reply)):null,
+      m.review?el("div",{class:"answer"},el("b",{text:m.review==="rework"?"You, rework: ":"You: "}),document.createTextNode(m.answer||(m.status==="done"?"Accepted and closed.":"Plan approved.")),m.answerSent?null:el("span",{class:"pend",text:" Not sent yet."})):null,
+      mTags(m),
+      stdRow(m),
+      m.status==="superseded"&&m.supersededNote?el("div",{class:"snote",text:m.supersededNote}):null,
+      reviewRow(m),
+      m.carriedTo&&S.marks.get(m.carriedTo)?el("div",{class:"row"},el("button",{class:"link",text:"Continued on "+docLabel(S.docs.get(S.marks.get(m.carriedTo).doc))+" →",onclick:()=>{const n=S.marks.get(m.carriedTo);location.hash="#d-"+n.doc+"-p"+n.page}})):null,
+      el("div",{class:"row"},iconBtn("view",`Show #${m.n} on page ${m.page}`,()=>{if(m.page!==S.page)goPage(m.page,true).then(()=>select(m.id));else select(m.id)}),
+        iconBtn("trash",`Delete #${m.n}`,()=>remove(m.id))));
+    groupBox(s).append(item);
+    if((focusNew&&m.id===S.sel)||active===m.id){ta.focus();if(focusNew)item.scrollIntoView({block:"nearest"})}
+  }
+}
+function reviewRow(m){if(m.carriedTo)return null;
+  if(!m.reply)return null;const r=el("div",{class:"review"});
+  if(!m.review){const done=m.status==="done";
+    r.append(el("button",{class:"go",text:done?"Accept and close":"Approve plan",title:done?"Close this markup":"Tell Claude to go ahead",onclick:()=>setReview(m,"accepted")}),
+      el("button",{class:"btn",text:done?"Not right, rework":"Answer / change",onclick:()=>{
+        const t=el("textarea",{placeholder:"What should change, or your answer. Claude gets this when you submit.","aria-label":`Your answer for markup ${m.n}`});
+        const save=el("button",{class:"btn",text:"Save",onclick:()=>{if(t.value.trim())setReview(m,"rework",t.value.trim());else t.focus()}});
+        const cancel=el("button",{class:"link",text:"Cancel",onclick:()=>renderList()});
+        r.innerHTML="";r.append(t,save,cancel);t.focus()}}));
+  }else if(!m.answerSent)r.append(el("button",{class:"link",text:"Undo",onclick:()=>undoReview(m)}));
+  else return null;
+  return r}
+$("#fscope").onchange=()=>renderList();$("#fstatus").onchange=()=>renderList();
+
+function mTags(m){const t=[];
+  if(m.doneIn)t.push(el("span",{class:"mtag ok",text:"Done in "+m.doneIn}));
+  if(m.plannedFor&&!m.doneIn)t.push(el("span",{class:"mtag plan",text:"Planned for "+m.plannedFor}));
+  if(m.status==="superseded")t.push(el("span",{class:"mtag",text:"Superseded"+(m.supersededBy?" by "+m.supersededBy:"")}));
+  return t.length?el("div",{class:"mtags"},...t):null}
+/* ---------- standards: a markup can cite one item (m.std); a tagged measure is checked ---------- */
+const STD=window.WWSTD||null;
+function realInches(m){const[a,b]=m.pts;return Math.hypot(b[0]-a[0],b[1]-a[1])/72*12/(+m.scale||.25)}
+function stdCheck(m){return STD&&m.std&&m.type==="measure"?STD.check(m.std,realInches(m)):null}
+function stdRow(m){if(!STD)return null;const s=m.std&&STD.byId[m.std];
+  if(s){const rule=el("div",{class:"stdrule",text:s.rule});rule.hidden=!S.stdOpen||!S.stdOpen[m.id];
+    const ck=stdCheck(m);
+    const chip=el("div",{class:"stdchip"},el("button",{class:"sref",title:"Show the rule","aria-expanded":String(!rule.hidden),text:`${s.ref} \u00b7 ${s.name}`,onclick:e=>{rule.hidden=!rule.hidden;S.stdOpen=S.stdOpen||{};S.stdOpen[m.id]=!rule.hidden;e.currentTarget.setAttribute("aria-expanded",String(!rule.hidden))}}),
+      ck?el("span",{class:"chk "+ck.ok,text:(ck.ok==="pass"?"\u2713 ":ck.ok==="warn"?"! ":"\u2717 ")+ck.text}):null,
+      el("button",{class:"x",title:"Remove the standard","aria-label":`Remove ${s.ref} from #${m.n}`,text:"\u00d7",onclick:()=>{patch(m.id,{std:null});renderList()}}));
+    return el("div",{class:"stdrow"},chip,rule)}
+  const open=S.stdPick===m.id;
+  if(!open)return el("div",{class:"stdrow"},el("button",{class:"link",style:"justify-self:start",text:"Cite a standard",onclick:()=>{S.stdPick=m.id;renderList();const i=document.querySelector(`.stdpick input[data-mid="${m.id}"]`);if(i)i.focus()}}));
+  if(!document.getElementById("stdopts")){const dl=el("datalist",{id:"stdopts"});STD.ITEMS.forEach(x=>dl.append(el("option",{value:`${x.ref} \u00b7 ${x.name}`})));document.body.append(dl)}
+  const inp=el("input",{type:"text",list:"stdopts","data-mid":m.id,placeholder:"Type: aisle, K6, landing, revision…","aria-label":`Standard for #${m.n}`});
+  const pick=()=>{const v=inp.value.trim().toLowerCase();const x=STD.ITEMS.find(x=>`${x.ref} \u00b7 ${x.name}`.toLowerCase()===v)||STD.ITEMS.find(x=>x.ref.toLowerCase()===v||x.id.toLowerCase()===v);
+    if(x){S.stdPick=null;patch(m.id,{std:x.id});renderList()}};
+  inp.addEventListener("change",pick);inp.addEventListener("keydown",e=>{if(e.key==="Enter")pick();if(e.key==="Escape"){S.stdPick=null;renderList()}});
+  return el("div",{class:"stdrow"},el("div",{class:"stdpick"},inp,el("button",{class:"link",text:"Cancel",onclick:()=>{S.stdPick=null;renderList()}})))}
+function renderStdList(){if(!STD)return;const q=($("#stdq").value||"").trim().toLowerCase(),set=S.stdSet||"all",box=$("#stdlist");box.innerHTML="";
+  const sel=S.sel&&S.marks.get(S.sel);
+  const meta=STD.SETS.find(x=>x.id===set);if(meta)box.append(el("p",{class:"snote2",text:meta.full+". "+meta.note}));
+  const rows=STD.ITEMS.filter(x=>(set==="all"||x.set===set)&&(!q||(x.ref+" "+x.name+" "+x.rule).toLowerCase().includes(q)));
+  if(!rows.length)box.append(el("p",{class:"snote2",text:"Nothing matches."}));
+  for(const x of rows)box.append(el("div",{class:"sitem"},el("div",{},el("span",{class:"r",text:x.ref}),el("b",{text:x.name})),el("p",{text:x.rule}),
+    sel?el("button",{class:"link cite",text:`Cite on #${sel.n}`,onclick:()=>{patch(sel.id,{std:x.id});renderList();$("#stds").open=false}}):null))}
+if(STD){const f=$("#stdsets");[["all","All"],...STD.SETS.map(x=>[x.id,x.name])].forEach(([id,nm])=>f.append(el("button",{type:"button","aria-pressed":String(id==="all"),text:nm,onclick:e=>{S.stdSet=id;[...f.children].forEach(b=>b.setAttribute("aria-pressed",String(b===e.currentTarget)));renderStdList()}})));
+  $("#stdq").addEventListener("input",renderStdList);$("#stds").addEventListener("toggle",()=>{if($("#stds").open){renderStdList();$("#stdq").focus()}})}
+else $("#stds").hidden=true;
+const ICONS={view:'<path d="M3.5 2h9L16.5 6v12h-13z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M12.5 2v4h4" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M5.2 12c1.2-2.3 2.9-3.5 4.8-3.5s3.6 1.2 4.8 3.5c-1.2 2.3-2.9 3.5-4.8 3.5S6.4 14.3 5.2 12z" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="10" cy="12" r="1.6" fill="currentColor"/>',
+  edit:'<path d="M4 16l1-4 8.5-8.5 3 3L8 15z M11.5 5.5l3 3" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>',
+  trash:'<path d="M3.5 5.5h13M8 5.5V3.5h4v2M5.5 5.5l.8 11h7.4l.8-11M8.5 8.5v5.5M11.5 8.5v5.5" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>'};
+function iconBtn(kind,label,onclick){const b=el("button",{class:"ibtn "+kind,title:label,"aria-label":label,onclick});b.innerHTML=`<svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">${ICONS[kind]}</svg>`;return b}
+/* ---------- revision log: rounds/<round> {round, at, note, sheets[], items:[{id, outcome, note}]} written by Claude ---------- */
+function jumpTo(id){const m=S.marks.get(id);if(!m)return;if(m.doc!==S.doc.id){location.hash="#d-"+m.doc+"-p"+m.page;return}
+  if(m.page!==S.page)goPage(m.page,true).then(()=>select(m.id));else select(m.id)}
+function renderLog(){const lg=$("#log");if(PUBLIC||!S.doc){lg.hidden=true;return}
+  const chain=new Set([S.doc.id]);let d=S.doc;for(let i=0;i<20&&(d=prevDocOf(d));i++)chain.add(d.id);
+  const rs=[...(S.rounds||new Map()).values()].filter(r=>r.doc?chain.has(r.doc):(r.round&&r.round===S.doc.round)||(r.items||[]).some(i=>{const m=S.marks.get(i.id);return m&&chain.has(m.doc)}))
+    .sort((a,b)=>(b.at||0)-(a.at||0));
+  if(!rs.length){lg.hidden=true;return}lg.hidden=false;numberAll();
+  $("#logsum").textContent=`Revision log · ${rs.length} round${rs.length>1?"s":""}`;
+  const body=$("#logbody");const keep=new Set([...body.querySelectorAll("details[open]")].map(x=>x.dataset.r));body.innerHTML="";
+  rs.forEach((r,i)=>{const items=r.items||[],c={};items.forEach(x=>c[x.outcome]=(c[x.outcome]||0)+1);
+    const sum=["done","superseded","reworked","planned","ask"].filter(k=>c[k]).map(k=>`${c[k]} ${k}`).join(", ");
+    const det=el("details",{class:"rnd","data-r":r.id});det.open=keep.size?keep.has(r.id):i===0;
+    det.append(el("summary",{},el("b",{text:r.round||r.id}),document.createTextNode(` · ${r.at?fmtTime(r.at):""}${sum?" · "+sum:""}`)));
+    if(r.note)det.append(el("div",{class:"snote",text:r.note}));
+    if(r.sheets&&r.sheets.length)det.append(el("div",{class:"snote",text:"Sheets: "+r.sheets.join(", ")}));
+    const ul=el("ul");items.forEach(x=>{const m=S.marks.get(x.id);
+      ul.append(el("li",{},el("button",{onclick:()=>jumpTo(x.id),title:m?"Show this markup":"Markup not found"},el("span",{class:"oc "+(x.outcome||""),text:x.outcome||""}),
+        document.createTextNode(`${m&&m.doc===S.doc.id?"#"+m.n+" ":m?"#"+m.n+" ("+docLabel(S.docs.get(m.doc))+") ":""}${x.note||(m&&m.text)||""}`))))});
+    det.append(ul);body.append(det)})}
+
+/* ---------- submit for review ---------- */
+function drafts(){return docMarks().filter(m=>!m.submissionId&&!m.carriedFrom&&m.status==="open")}
+function responses(){return docMarks().filter(m=>m.review&&!m.answerSent)}
+function lastSubFor(id){let best=null;for(const s of S.subs.values())if(s.doc===id&&(!best||s.at>best.at))best=s;return best}
+function updateSubmit(){
+  const d=drafts(),r=responses(),b=$("#submitbtn"),c=$("#commitbtn");
+  b.textContent=d.length?`Submit ${d.length} edit${d.length>1?"s":""} to Claude`:"Submit edits";
+  b.disabled=!d.length||!colM;
+  const acc=r.filter(m=>m.review==="accepted").length,rw=r.length-acc;
+  c.textContent=r.length?`Commit changes: ${[acc?acc+" approved":"",rw?rw+" rework":""].filter(Boolean).join(", ")}`:"Commit changes";
+  c.disabled=!r.length||!colM;c.className=r.length&&!d.length?"primary":"btn";b.className=d.length||!r.length?"primary":"btn";
+  const n=$("#subnote"),last=S.doc&&lastSubFor(S.doc.id);
+  if(!colM)n.textContent="Markups are kept in this tab only. Open this page on claude.ai, signed in, to save and submit them.";
+  else if(last)n.textContent=`Last submitted ${fmtTime(last.at)}.${d.length||r.length?" New markups and your responses wait here until you submit.":""}`;
+  else n.textContent=d.length?"Markups stay drafts until you submit them. Claude works only submitted markups.":"Add markups, then submit them here.";
+  if(colM&&last)n.textContent=d.length||r.length?"New markups and your responses stay drafts until you submit them.":"";
+  renderFlow();
+}
+/* round status: submitted -> received -> replied, written by Claude into submissions/<id> (status, receivedAt, repliedAt, note, next) */
+/* Loop stages. Claude writes submissions/<id>.status (submitted -> received -> replied) and, on a commit or REV, revision {doc,name,round}.
+   kind: "edits" (markups -> response round), "commit" (responses -> next set), "rev" (build REV and save set). */
+const STAGES=[["review","Feedback","Waiting for design feedback: mark up the set"],["replying","Replies","Claude is writing the response round"],
+  ["commit","Commit","Waiting for your commit to the changes"],["drawing","Drawing","Claude is working on the changes"],
+  ["ready","Re-review","Next set ready for another review"],["revbuild","REV","Build REV and save set"]];
+function subKind(s){return s.kind||((s.count||0)>0?"edits":"commit")}
+function loopStage(){const last=lastSubFor(S.doc.id),newer=nextDocOf(S.doc);
+  const rev=last&&last.revision&&last.revision.doc?last.revision:(newer?{doc:newer.id,name:newer.name,round:newer.round}:null);
+  if(!last)return{key:newer?"ready":"review",last,rev};
+  const k=subKind(last),done=last.status==="replied";
+  if(k==="rev")return{key:done?"revsaved":"revbuild",last,rev};
+  if(k==="edits")return{key:done?(newer?"ready":"commit"):"replying",last,rev};
+  return{key:done?(rev?"ready":"commit"):"drawing",last,rev}}
+function suggestRev(r){const m=/^([A-Za-z]*)(\d+)\.(\d+)(?:\.(\d+))?/.exec(r||"");return m?`${m[1]}${m[2]}.${+m[3]+1}.0`:""}
+function revReady(L){/* Build REV shows once per delivery cycle: on the newest set, nothing in flight, nothing left to change */
+  if(!L||nextDocOf(S.doc)||!["review","commit","revsaved"].includes(L.key))return false;
+  if(L.key==="revsaved")return false;
+  return !drafts().length&&!responses().length&&!docMarks().some(m=>isOpen(m)||needsReview(m))}
+function updateRevBtn(L){const b=$("#revbtn");if(!b)return;const ok=!PUBLIC&&!!S.doc&&!!colM&&revReady(L);
+  b.hidden=!ok||!$("#confirm").hidden;b.dataset.ok=ok?"1":"";b.disabled=false;b.className=ok?"primary":"btn"}
+function renderFlow(){
+  const f=$("#flow");if(PUBLIC||!S.doc||!colM){f.hidden=true;updateRevBtn(null);return}
+  const L=loopStage(),all=docMarks(),rv=all.filter(needsReview).length,dr=drafts().length,rs=responses().length,last=L.last;
+  f.hidden=false;updateRevBtn(L);
+  const idx=STAGES.findIndex(s=>s[0]===L.key);
+  $("#steps").innerHTML="";STAGES.forEach((s,i)=>{const sp=el("span",{text:s[1],title:s[2]});
+    if(i<idx||(i===idx&&(L.key==="ready"||L.key==="revsaved")))sp.className="on";else if(i===idx)sp.className="now";$("#steps").append(sp)});
+  const m=$("#flowmsg");m.className="";m.innerHTML="";
+  const stageLine=t=>m.append(el("b",{text:"Stage: "+t+". "}));
+  const nx=$("#flownext");nx.innerHTML="";
+  const goDoc=id=>{location.hash="#d-"+id};
+  const showRv=()=>el("button",{class:"link",text:"Show them",onclick:()=>{$("#fscope").value="all";$("#fstatus").value="review";renderList()}});
+  const prev=prevDocOf(S.doc),age=last?Date.now()-(last.at||0):0;
+  switch(L.key){
+    case "review":
+      stageLine("waiting for design feedback");
+      m.append(document.createTextNode(prev?`This is Claude's revision of ${docLabel(prev)}. `:"")) ;
+      if(revReady(L))nx.append(el("b",{text:"No changes left. "}),document.createTextNode("Mark up anything still wrong and press Submit edits, or close out this delivery cycle with Build REV and save set."));
+      else nx.append(el("b",{text:"Your turn: "}),document.createTextNode(dr?`press Submit edits to send ${dr} markup${dr>1?"s":""}.`:"mark up anything that should change, then press Submit edits."));break;
+    case "replying":
+      stageLine("Claude is replying");
+      m.append(document.createTextNode(`Edits sent ${fmtTime(last.at)}. Claude is writing the response round${S.doc.round?" ("+S.doc.round+"r)":""}: a reply under each markup, no drawing yet.`));
+      if(last.status==="submitted"&&age>15*60e3){m.className="warnline";m.append(document.createTextNode(` Not picked up yet. Say "work the redlines on ${S.doc.name}" in the project chat.`))}
+      nx.append(el("b",{text:"Nothing needed from you "}),document.createTextNode("until the replies land."));break;
+    case "commit":
+      stageLine("waiting for your commit");
+      m.append(document.createTextNode(`Claude replied ${fmtTime(last.repliedAt||last.at)}${last.note?": "+last.note:"."}`));
+      if(rv){nx.append(el("b",{text:"Your turn: "}),document.createTextNode(`${rv} repl${rv>1?"ies":"y"} to approve or answer. `),showRv(),document.createTextNode(rs?` ${rs} ready to commit.`:""))}
+      else if(!rs&&revReady(L))nx.append(el("b",{text:"No changes left. "}),document.createTextNode("Every markup is closed, so this delivery cycle can go to Build REV and save set."));
+      else nx.append(el("b",{text:"Your turn: "}),document.createTextNode(rs?`press Commit changes to send ${rs} response${rs>1?"s":""} and start the next version.`:"press Commit changes."));
+      if(dr)nx.append(document.createTextNode(` ${dr} new markup${dr>1?"s":""} can go with Submit edits.`));break;
+    case "drawing":
+      stageLine("working on changes");
+      m.append(document.createTextNode(`Committed ${fmtTime(last.at)}. Claude is making the approved changes into the next version${last.status!=="submitted"&&last.note?": "+last.note:"."}`));
+      if(last.status==="submitted"&&age>15*60e3){m.className="warnline";m.append(document.createTextNode(` Not picked up yet. Say "draw the next version on ${S.doc.name}" in the project chat.`))}
+      nx.append(el("b",{text:"Nothing needed from you "}),document.createTextNode("while Claude draws."));break;
+    case "ready":
+      stageLine("ready for another review");
+      m.append(document.createTextNode(`The next version${L.rev&&L.rev.round?" "+L.rev.round:""} is issued.${last&&last.note?" "+last.note:""}`));
+      if(L.rev&&L.rev.doc)nx.append(el("b",{text:"Your turn: "}),document.createTextNode("review the new version. "),el("button",{class:"link",text:"Open it →",onclick:()=>goDoc(L.rev.doc)}));
+      if(rv)nx.append(document.createTextNode(` ${rv} repl${rv>1?"ies":"y"} still open here. `),showRv());break;
+    case "revbuild":
+      stageLine("building REV and saving set");
+      m.append(document.createTextNode(`Asked ${fmtTime(last.at)} for REV ${last.revTo||""}. Claude is assembling the full set and saving it.`));
+      nx.append(el("b",{text:"Nothing needed from you "}),document.createTextNode("while the REV is built."));break;
+    case "revsaved":
+      stageLine("REV built and set saved");
+      m.append(document.createTextNode(`REV ${last.revTo||""} saved ${fmtTime(last.repliedAt||last.at)}${last.note?": "+last.note:"."}`));
+      if(L.rev&&L.rev.doc)nx.append(el("button",{class:"link",text:"Open the REV set →",onclick:()=>goDoc(L.rev.doc)}));break;
+  }
+}
+setInterval(()=>{try{renderFlow()}catch{}},60000);
+/* Two actions: "edits" sends new markups (Claude answers with a response round, no drawing);
+   "commit" sends approvals and rework notes (Claude draws the approved changes into the next version). Both call Claude. */
+let SUBMODE="edits";
+function showSubBtns(on){$("#submitbtn").hidden=!on;$("#commitbtn").hidden=!on;$("#revbtn").hidden=!on||!$("#revbtn").dataset.ok}
+$("#submitbtn").onclick=()=>{const d=drafts();if(!d.length)return;const pg=[...new Set(d.map(m=>m.page))].sort((a,b)=>a-b);SUBMODE="edits";
+  $("#confirmtxt").textContent=`Send ${d.length} new markup${d.length>1?"s":""} on ${pg.length===1?"page":"pages"} ${pg.join(", ")} of “${S.doc.name}” to Claude? Claude replies under each one with the planned change or a question. Nothing is drawn yet.`;
+  $("#confirmyes").textContent="Submit edits";$("#confirm").hidden=false;showSubBtns(false)};
+$("#commitbtn").onclick=()=>{const r=responses();if(!r.length)return;SUBMODE="commit";
+  const acc=r.filter(m=>m.review==="accepted").length,rw=r.length-acc,left=docMarks().filter(needsReview).length,bits=[];
+  if(acc)bits.push(`${acc} approval${acc>1?"s":""}`);if(rw)bits.push(`${rw} rework note${rw>1?"s":""}`);
+  $("#confirmtxt").textContent=`Commit ${bits.join(" and ")} on “${S.doc.name}”? Claude makes the approved changes and sends the next version.${rw?" Rework notes get a fresh reply first if they change the plan.":""}${left?` ${left} repl${left>1?"ies are":"y is"} still unreviewed and will wait.`:""}`;
+  $("#confirmyes").textContent="Commit changes";$("#confirm").hidden=false;showSubBtns(false)};
+$("#revbtn").onclick=()=>{if(!$("#revbtn").dataset.ok)return;SUBMODE="rev";const sg=suggestRev(S.doc.round);
+  $("#confirmtxt").innerHTML="";const inp=el("input",{id:"revto",type:"text",value:sg,placeholder:"e.g. X1.1.0","aria-label":"New REV number",style:"border:1px solid var(--line-strong);border-radius:8px;background:var(--surface);padding:3px 8px;color:var(--ink);width:10ch"});
+  $("#confirmtxt").append(document.createTextNode(`Close out the review cycles on “${S.doc.name}”: Claude builds the full set as REV `),inp,
+    document.createTextNode(" with a clean title block and revision history, and saves it to the project's Drive sets folder."));
+  $("#confirmyes").textContent="Build REV";$("#confirm").hidden=false;showSubBtns(false);inp.focus()};
+$("#confirmno").onclick=()=>{$("#confirm").hidden=true;showSubBtns(true)};
+$("#confirmyes").onclick=async()=>{
+  const btn=$("#confirmyes");btn.disabled=true;
+  let anchor=null;try{if(comments)anchor=await comments.anchorFor($("#submitbox"))}catch{}
+  const mode=SUBMODE,revTo=mode==="rev"?(($("#revto")||{}).value||"").trim().slice(0,24):"";if(mode==="rev"&&!revTo){$("#revto").focus();btn.disabled=false;return}
+  const d=mode==="edits"?drafts():[],rs=mode==="commit"?responses():[],sid="s"+Date.now().toString(36),at=Date.now(),pages=[...new Set(d.map(m=>m.page))].sort((a,b)=>a-b),doc=S.doc;
+  try{
+    await db.collection("submissions").doc(sid).set({doc:doc.id,docName:doc.name||"",at,round:doc.round||"",kind:mode,...(revTo?{revTo}:{}),by:S.me||null,count:d.length,ids:d.map(m=>m.id),pages,status:"submitted",responses:rs.map(m=>({id:m.id,review:m.review,answer:m.answer||""}))});
+    for(const m of d){m.submissionId=sid;m.submittedAt=at;await colM.doc(m.id).update({submissionId:sid,submittedAt:at})}
+    for(const m of rs){m.answerSent=true;await colM.doc(m.id).update({answerSent:true,answerSubmission:sid})}
+  }catch(err){failSave(err);btn.disabled=false;return}
+  S.subs.set(sid,{id:sid,doc:doc.id,at,kind:mode,revTo,count:d.length,status:"submitted"});
+  let told=false,why="";const FLAT=await miniFlat(sid);
+  try{const can=comments&&anchor?await comments.canSendToClaude():"off";why=can;if(can==="available"){
+    const lines=d.map(m=>`#${m.n} p${m.page} ${LABEL[m.type]||m.type}${m.std&&STD?" ["+STD.label(m.std)+"]":""}: ${(m.text||"(no comment)").replace(/\s+/g," ").slice(0,140)}`);
+    const rl=rs.map(m=>`#${m.n} p${m.page}: ${m.review==="accepted"?(m.status==="done"?"ACCEPTED, closed":"PLAN APPROVED"):"REWORK: "+(m.answer||"").replace(/\s+/g," ").slice(0,140)}`);
+    let text=mode==="rev"?`Loop BUILD REV AND SAVE SET on "${doc.name}"${doc.round?" set "+doc.round:""} (doc ${doc.id}, submission ${sid}). Build the full set as REV ${revTo}, update the title blocks and revision history, save it to the Drive sets folder, and add it to the Loop.`:mode==="edits"?`Mini Loop SUBMIT EDITS on image "${doc.name}"${doc.round?" set "+doc.round:""} (doc ${doc.id}, submission ${sid}).`
+      :`Mini Loop COMMIT CHANGES on image "${doc.name}"${doc.round?" set "+doc.round:""} (doc ${doc.id}, submission ${sid}).`;
+    if(FLAT)text+=` Marked-up image: asset ${FLAT}.`;
+    if(d.length)text+=`\n${d.length} new markup${d.length>1?"s":""}. Post a response round${doc.round?" ("+doc.round+"r)":""}: reply under each one with the planned change or a question. No drawings yet.\n`+lines.join("\n");
+    if(rs.length)text+=`\nMy responses to your replies. Make the approved changes and deliver the next image version; reply first on any rework note that changes the plan.\n`+rl.join("\n");
+    if(new TextEncoder().encode(text).length>3900)text=text.slice(0,1300)+"\n… (full list in the markups data)";
+    await comments.sendToClaude({anchor,text});told=true}}catch(e){why=(e&&e.code)||"error"}
+  $("#confirm").hidden=true;showSubBtns(true);btn.disabled=false;renderList();
+  renderFlow();
+  $("#subnote").textContent=told?(mode==="edits"?"Sent. Claude has been called and will reply under each markup.":mode==="rev"?`Claude has been called to build REV ${revTo} and save the set.`:"Committed. Claude has been called and will send the next version."):`Saved, but Claude couldn't be called from here (${why}). Say "work the redlines on ${doc.name}" in the project chat.`;
+};
+
+/* ---------- GitHub (public version, optional): open PDFs from the user's own repo and save marked-up copies back ----------
+   The token lives only in this browser (sessionStorage, or localStorage when "Remember" is ticked) and is only sent to api.github.com. */
+const GH={cfg:null,key:"ww-redline-gh",
+  load(){for(const st of[sessionStorage,localStorage]){try{const v=JSON.parse(st.getItem(this.key)||"null");if(v&&v.token){this.cfg=v;return}}catch{}}},
+  set(c,remember){this.cfg=c;try{sessionStorage.removeItem(this.key);localStorage.removeItem(this.key);(remember?localStorage:sessionStorage).setItem(this.key,JSON.stringify(c))}catch{}},
+  clear(){this.cfg=null;try{sessionStorage.removeItem(this.key);localStorage.removeItem(this.key)}catch{}}};
+const encPath=p=>p.split("/").map(encodeURIComponent).join("/");
+async function gh(path,opts={}){const c=GH.cfg;
+  let r;try{r=await fetch("https://api.github.com"+path,{...opts,headers:{Authorization:"Bearer "+c.token,"X-GitHub-Api-Version":"2022-11-28",Accept:"application/vnd.github+json",...(opts.headers||{})}})}catch{throw new Error("Couldn't reach GitHub. Check your connection.")}
+  if(!r.ok&&!(opts.ok404&&r.status===404)){let m="";try{m=(await r.json()).message||""}catch{}
+    throw new Error(r.status===401?"GitHub didn't accept the token. Check it hasn't expired.":r.status===403?`The token can't do that on ${c.repo}${m?" ("+m+")":""}. It needs Contents: Read and write on this repository.`:r.status===404?`Not found on GitHub. Check the repository, branch and folder, and that the token can see ${c.repo}.`:`GitHub said ${r.status}${m?": "+m:""}.`)}
+  return r}
+async function ghRaw(path,branch){const r=await gh(`/repos/${GH.cfg.repo}/contents/${encPath(path)}?ref=${encodeURIComponent(branch||GH.cfg.branch)}`,{headers:{Accept:"application/vnd.github.raw"}});return r.arrayBuffer()}
+function b64(bytes){let s="";for(let i=0;i<bytes.length;i+=0x8000)s+=String.fromCharCode.apply(null,bytes.subarray(i,i+0x8000));return btoa(s)}
+async function ghPut(path,bytes,message,branch){const br=branch||GH.cfg.branch;
+  const cur=await gh(`/repos/${GH.cfg.repo}/contents/${encPath(path)}?ref=${encodeURIComponent(br)}`,{ok404:true});let sha;if(cur.ok){try{sha=(await cur.json()).sha}catch{}}
+  const r=await gh(`/repos/${GH.cfg.repo}/contents/${encPath(path)}`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({message,content:b64(bytes),branch:br,...(sha?{sha}:{})})});
+  const j=await r.json();return{html:j.content&&j.content.html_url||`https://github.com/${GH.cfg.repo}`}}
+function ghErr(t){const e=$("#gherr");e.hidden=!t;e.textContent=t||""}
+function ghRender(){const on=!!GH.cfg;$("#ghconnect").hidden=on;$("#ghrefresh").hidden=!on;$("#ghout").hidden=!on;$("#ghsave").hidden=!on;
+  $("#ghstate").textContent=on?`Connected to ${GH.cfg.repo} · ${GH.cfg.branch}${GH.cfg.dir?" · "+GH.cfg.dir+"/":""}`:"Optional. Open PDFs from your own private repo and save marked-up copies back to it.";
+  if(!on){$("#ghfiles").hidden=true;$("#ghfiles").innerHTML=""}}
+async function ghList(){const box=$("#ghfiles");ghErr("");box.hidden=false;box.innerHTML="";box.append(el("span",{text:"Listing PDFs…"}));
+  try{const c=GH.cfg;const r=await gh(`/repos/${c.repo}/git/trees/${encodeURIComponent(c.branch)}?recursive=1`);const j=await r.json();
+    const pre=c.dir?c.dir+"/":"";const files=(j.tree||[]).filter(t=>t.type==="blob"&&/\.pdf$/i.test(t.path)&&t.path.startsWith(pre)).sort((a,b)=>a.path.localeCompare(b.path)).slice(0,300);
+    box.innerHTML="";if(!files.length){box.append(el("span",{text:`No PDFs in ${c.repo}${c.dir?"/"+c.dir:""}.`}));return}
+    for(const f of files)box.append(el("button",{type:"button",title:"Open "+f.path,onclick:()=>ghOpen(f)},el("span",{text:f.path.slice(pre.length)}),el("span",{class:"sz",text:fmtMB(f.size||0)})));
+    if(j.truncated)box.append(el("span",{text:"The repository is large, so this list may be incomplete. Set a folder to narrow it."}))}
+  catch(err){box.hidden=true;ghErr(err.message)}}
+async function ghOpen(f){ghErr("");libMsg(`Downloading ${f.path} from GitHub…`);
+  try{const buf=await ghRaw(f.path);const file=new File([buf],f.path.split("/").pop(),{type:"application/pdf"});await handleFile(file,{gh:{repo:GH.cfg.repo,branch:GH.cfg.branch,path:f.path}})}
+  catch(err){libMsg("");ghErr(err.message)}}
+if(PUBLIC){GH.load();ghRender();if(GH.cfg)ghList();
+  $("#ghconnect").onclick=()=>{$("#ghform").hidden=false;$("#ghconnect").hidden=true;$("#ghrepo").focus()};
+  $("#ghcancel").onclick=()=>{$("#ghform").hidden=true;ghRender()};
+  $("#ghout").onclick=()=>{GH.clear();ghErr("");ghRender()};
+  $("#ghrefresh").onclick=()=>ghList();
+  $("#ghform").addEventListener("submit",async e=>{e.preventDefault();ghErr("");
+    const repo=$("#ghrepo").value.trim().replace(/^https?:\/\/github\.com\//i,"").replace(/\.git$/,"").replace(/\/+$/,"");
+    if(!/^[\w.-]+\/[\w.-]+$/.test(repo)){ghErr("Type the repository as owner/name, for example woodwerd/drawings.");return}
+    const cfg={repo,branch:$("#ghbranch").value.trim()||"",dir:$("#ghdir").value.trim().replace(/^\/+|\/+$/g,""),token:$("#ghtoken").value.trim()};
+    GH.cfg=cfg;try{const r=await gh(`/repos/${repo}`);const j=await r.json();if(!cfg.branch)cfg.branch=j.default_branch||"main";
+      if(j.permissions&&j.permissions.push===false)ghErr("Connected, but this token can't save to the repo. Opening PDFs still works.")}
+    catch(err){GH.cfg=null;ghErr(err.message);return}
+    GH.set(cfg,$("#ghremember").checked);$("#ghtoken").value="";$("#ghform").hidden=true;ghRender();ghList()});
+}
+/* ---------- boot ---------- */
+buildTools();setTool("cloud");
+
+if(PUBLIC){
+  for(const d of lsGet(LS.docs,[]))if(d&&d.id){S.docs.set(d.id,d);for(const m of lsGet(LS.marks(d.id),[]))if(m&&m.id&&Array.isArray(m.pts))S.marks.set(m.id,m)}
+  S.dbReady=true;live("ok","Saved in this browser · nothing uploaded");
+  const nm=store.get("ww-redline-name");if(nm)$("#rname").value=nm;
+}
+route();
+if(!PUBLIC)(async()=>{
+  const timer=setTimeout(()=>{if(!colM){live("attention","Not saving. Open this page on claude.ai, signed in.");S.dbReady=true;renderLibrary();if(S.doc===null&&/^#d-/.test(location.hash))route()}},10000);
+  try{
+    const C=window.claude;if(!C||!C.use)throw 0;
+    [db,userApi,comments,assets]=await Promise.all([C.use("db"),C.use("user"),C.use("comments"),C.use("assets")]);
+    if(userApi){try{S.me=await userApi.id()}catch{}}
+    if(!db)throw 0;
+    colM=db.collection("markups");colD=db.collection("docs");
+    db.collection("rounds").onSnapshot(sn=>{S.rounds=new Map(sn.docs.map(d=>[d.id,{...d.data(),id:d.id}]));renderLog()},()=>{});
+    db.collection("submissions").orderBy("at","desc").limit(100).onSnapshot(sn=>{S.subs=new Map(sn.docs.map(d=>[d.id,{...d.data(),id:d.id}]));updateSubmit()},()=>{});
+    let gotD=false,gotM=false;
+    colD.onSnapshot(sn=>{
+      clearTimeout(timer);
+      sn.docs.forEach(d=>{const v=d.data();if(!v)return;const cur=S.docs.get(d.id);S.docs.set(d.id,cur?Object.assign(cur,v):{...v,id:d.id})});
+      const ids=new Set(sn.docs.map(d=>d.id));for(const k of [...S.docs.keys()])if(!ids.has(k)&&!local.has(k))S.docs.delete(k);
+      gotD=true;S.dbReady=gotD&&gotM;
+      if(S.doc){const r=S.docs.get(S.doc.id);if(r){S.doc=r;$("#dname").textContent=r.name||"Untitled image";if(document.activeElement!==$("#round"))$("#round").value=r.round||""}}
+      else if(/^#d-/.test(location.hash)&&S.dbReady)route();
+      if(!S.doc)renderLibrary();
+    },err=>{clearTimeout(timer);failSave(err)});
+    colM.onSnapshot(snap=>{
+      clearTimeout(timer);
+      const editing=document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.mid;
+      const next=new Map();
+      snap.docs.forEach(d=>{const v=d.data();if(!v||!Array.isArray(v.pts))return;const cur=S.marks.get(d.id);const m={...v,id:d.id};if(cur&&editing===d.id)m.text=cur.text;if(cur&&act&&act.kind==="move"&&act.id===d.id)m.pts=cur.pts;next.set(d.id,m)});
+      S.marks=next;gotM=true;const was=S.dbReady;S.dbReady=gotD&&gotM;
+      if(S.doc){render();if(!editing)renderList();updateCounts()}else{renderLibrary();if(!was&&S.dbReady&&/^#d-/.test(location.hash))route()}
+      live(snap.metadata&&snap.metadata.hasPendingWrites?"attention-pulse":"ok",snap.metadata&&snap.metadata.hasPendingWrites?"Saving…":"Saved · Claude can read these");
+      resolveNames();
+    },err=>{clearTimeout(timer);failSave(err)});
+  }catch{clearTimeout(timer);live("attention","Not saving. Open this page on claude.ai, signed in.");S.dbReady=true;renderLibrary()}
+})();
+/* ---------- download marked-up PDF ---------- */
+async function downloadMarked(note,btn,mode){
+  if(!S.doc||!pdf){note.hidden=false;note.textContent="Open a PDF first.";return}
+  const marks=docMarks();if(!marks.length){note.hidden=false;note.textContent="Add a markup first.";return}
+  const author=(PUBLIC?$("#rname").value.trim():"")||(S.me&&S.names[S.me])||(PUBLIC?"Reviewer":"WOODWERD");
+  if(PUBLIC){if(!$("#rname").value.trim()){note.hidden=false;note.textContent="Type your name first, so whoever reads the PDF knows whose comments these are.";$("#rname").focus();return}store.set("ww-redline-name",author)}
+  btn.disabled=true;note.hidden=false;note.textContent="Writing your markups into the PDF…";
+  try{
+    const loc=local.get(S.doc.id)||{};let bytes=loc.bytes;if(!bytes&&loc.file)bytes=new Uint8Array(await loc.file.arrayBuffer());
+    if(!bytes)throw new Error("The original file isn't open in this tab. Drop it again.");
+    numberAll();const byPage=new Map(),viewports={};
+    for(const m of marks){if(!byPage.has(m.page))byPage.set(m.page,[]);byPage.get(m.page).push(m)}
+    for(const n of byPage.keys()){viewports[n]=(await pdf.getPage(n)).getViewport({scale:1})}
+    const out=await WWExport.exportPdf({bytes:bytes.slice(),byPage,viewports,author,k:n=>Math.max(viewports[n].width,viewports[n].height)/3600});
+    const d=new Date(),day=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+    const fname=`${(S.doc.name||"drawing").replace(/[\\/:*?"<>|]+/g,"-")} - redlines - ${author.replace(/[\\/:*?"<>|]+/g,"-")} - ${day}.pdf`;
+    const blob=new Blob([out.bytes],{type:"application/pdf"});
+    const cnt=`${out.count} comment${out.count===1?"":"s"}`;
+    if(PUBLIC&&mode==="github"){const src=S.doc.gh,dir=src?src.path.replace(/[^/]*$/,"").replace(/\/$/,""):GH.cfg.dir,path=(dir?dir+"/":"")+fname;
+      note.textContent=`Saving to ${GH.cfg.repo}…`;
+      const res=await ghPut(path,out.bytes,`Redlines: ${S.doc.name||"drawing"} (${cnt}) by ${author}`,src&&src.repo===GH.cfg.repo?src.branch:GH.cfg.branch);
+      note.textContent="";note.append(document.createTextNode(`Saved “${fname}” with ${cnt} to ${GH.cfg.repo}. `),el("a",{href:res.html,target:"_blank",rel:"noopener",text:"Open on GitHub"}))}
+    else if(PUBLIC&&mode==="share"){const file=new File([blob],fname,{type:"application/pdf"});
+      try{await navigator.share({files:[file],title:fname});note.textContent=`Shared “${fname}” with ${cnt}.`}catch(err){note.textContent=err&&err.name==="AbortError"?"Share cancelled.":"This browser couldn't share the file. Use Download instead."}}
+    else if(PUBLIC){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=fname;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000);
+      note.textContent=`Downloaded “${fname}” with ${cnt}. ${RET.to?"Send it back to "+RET.to+" however you like.":"Send it back however you like."}`}
+    else{const dl=await window.claude.use("downloads");if(!dl)throw new Error("Downloads aren't available in this view.");
+      try{await dl.save({filename:fname,data:blob});note.textContent=`Saved “${fname}” with ${out.count} comment${out.count===1?"":"s"}.`}catch(err){note.textContent=err&&err.code==="declined"?"Download cancelled.":`Couldn't save the file (${err&&err.code||"error"}).`}}
+  }catch(err){note.textContent=`Couldn't write the PDF: ${err&&err.message||"unknown error"}`}
+  btn.disabled=false;
+}
+$("#dlbtn2").onclick=()=>downloadMarked($("#dlnote2"),$("#dlbtn2"));
+$("#sharebtn").onclick=()=>downloadMarked($("#dlnote2"),$("#sharebtn"),"share");
+$("#ghsave").onclick=()=>downloadMarked($("#dlnote2"),$("#ghsave"),"github");
+
+
+/* optional link params for the public version: ?to=Name&email=address sets who the file goes back to */
+const RET=(()=>{const q=new URLSearchParams(location.search),c=v=>(v||"").trim().slice(0,80);return{to:c(q.get("to")),email:/^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(c(q.get("email")))?c(q.get("email")):""}})();
+if(PUBLIC){
+  try{if(navigator.canShare&&navigator.canShare({files:[new File([new Uint8Array(1)],"t.pdf",{type:"application/pdf"})]}))$("#sharebtn").hidden=false}catch{}
+  if(RET.to){$("#ppurpose").textContent=`Mark up this PDF, then send it back to ${RET.to}.`;$("#dlnote2").textContent=`Your file stays on this computer. Download it, then send it back to ${RET.to} however you like.`}
+  if(RET.email){const mb=$("#mailbtn");mb.hidden=false;mb.textContent=`Email ${RET.to||RET.email}`;
+    mb.onclick=()=>{const nm=S.doc&&S.doc.name||"the drawings";mb.href=`mailto:${RET.email}?subject=${encodeURIComponent("Redlines: "+nm)}&body=${encodeURIComponent("Marked-up PDF attached.\n\n(Attach the file you just downloaded.)")}`}}
+}
+$("#dlbtn").onclick=()=>downloadMarked($("#dlnote"),$("#dlbtn"));
+async function resolveNames(){if(!userApi||!userApi.profiles)return;const ids=[...new Set([...S.marks.values()].map(m=>m.author).filter(Boolean))].filter(i=>!(i in S.names));if(!ids.length)return;
+  try{const ps=await userApi.profiles(ids);let ch=false;ids.forEach(i=>{const n=ps&&ps[i]&&ps[i].name;S.names[i]=n||"";ch=ch||!!n});if(ch&&S.doc)renderList()}catch{}}
+/* ================= WOODWERD Mini Loop: image module =================
+   Appended to the end of the Loop page script by build-mini.py.
+   Function declarations here replace Loop's PDF versions of the same name (the later
+   declaration wins), so every other part of Loop (tools, standards, submit flow) runs unchanged.
+   An image is shown through a tiny stand-in for a pdf.js document: one page whose size is the
+   image's pixel size. Markup pts are image pixels, origin top left. */
+const isImg=f=>!!f&&(/^image\//.test(f.type||"")||/\.(png|jpe?g|webp|gif)$/i.test(f.name||""));
+function loadImg(blob){return new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error("That image couldn't be read."));i.src=typeof blob==="string"?blob:URL.createObjectURL(blob)})}
+function imgDoc(img){const w=img.naturalWidth,h=img.naturalHeight;
+  const page={getViewport:({scale})=>({width:w*scale,height:h*scale,scale}),
+    render:({canvasContext:ctx,viewport,transform})=>{let stop=false;
+      const promise=new Promise((res,rej)=>requestAnimationFrame(()=>{if(stop)return rej(new Error("cancelled"));
+        ctx.save();if(transform)ctx.setTransform(...transform);ctx.imageSmoothingEnabled=viewport.scale<3;ctx.imageSmoothingQuality="high";
+        ctx.drawImage(img,0,0,viewport.width,viewport.height);ctx.restore();res()}));
+      return{promise,cancel(){stop=true}}}};
+  return{numPages:1,getPage:async()=>page,_img:img}}
+async function sha(buf){try{const d=await crypto.subtle.digest("SHA-256",buf);return[...new Uint8Array(d)].slice(0,16).map(b=>b.toString(16).padStart(2,"0")).join("")}catch{return""}}
+function stamp(){const d=new Date(),p=n=>String(n).padStart(2,"0");return`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`}
+function nameOf(file,meta){const n=(file.name||"").replace(/\.(png|jpe?g|webp|gif)$/i,"").trim();
+  if(meta&&meta.prev)return meta.prev.name||"Screen grab";
+  return!n||/^(image|screenshot|clipboard|blob|pasted.*)$/i.test(n)?"Screen grab "+stamp():n}
+function bumpVer(r){const m=/^(.*?)(\d+)$/.exec(r||"");return m?m[1]+(+m[2]+1):(r?r+".1":"v2")}
+
+/* strokes sized for screen pixels rather than 36" sheets */
+function K(){return Math.max(.5,Math.max(S.W,S.H)/2000)}
+/* scale: -1 = not to scale (measures read in pixels); otherwise Loop's paper-inches-per-foot, set by calibration */
+function measureText(len,scale){if(!(+scale>0))return Math.round(len)+" px";const inches=len/72;
+  if(+scale>=12){return(Math.round(inches*16)/16).toFixed(2).replace(/\.?0+$/,"")+'"'}
+  const ft=inches/scale;let f=Math.floor(ft),i=Math.round((ft-f)*12);if(i===12){f++;i=0}return`${f}'-${i}"`}
+function realInches(m){const s=+m.scale;if(!(s>0))return NaN;const[a,b]=m.pts;return Math.hypot(b[0]-a[0],b[1]-a[1])/72*12/s}
+function stdCheck(m){if(!STD||!m.std||m.type!=="measure")return null;const r=realInches(m);return isFinite(r)?STD.check(m.std,r):null}
+/* Build REV is a drawing-set step; images go round by version instead */
+function revReady(){return false}
+
+/* ---------- open an image ---------- */
+async function handleFile(file,meta){
+  if(!isImg(file)){libMsg("That isn't an image. Paste a screen grab, or drop a PNG or JPG.",true);return}
+  const prev=meta&&meta.prev||null;
+  if(S.doc)showLibrary();
+  libMsg(`Reading ${prev?"the new version":file.name||"the image"} · ${fmtMB(file.size)}…`);
+  let img;try{img=await loadImg(file)}catch(err){libMsg(err.message,true);return}
+  const fp=await sha(await file.arrayBuffer());
+  let row=[...S.docs.values()].find(d=>fp&&d.fp===fp);
+  if(!row){
+    const id=uid(16);
+    row={id,kind:"image",name:nameOf(file,meta),fp,pages:1,w:img.naturalWidth,h:img.naturalHeight,mime:file.type||"image/png",round:prev?bumpVer(prev.round||"v1"):"v1",
+      size:file.size,createdAt:Date.now(),by:S.me||null,assetId:null,source:meta&&meta.pasted?"paste":"file"};
+    if(prev){row.prev=prev.id;if(prev.project)row.project=prev.project;if(prev.chat)row.chat=prev.chat;if(prev.scale)row.scale=prev.scale}
+    S.docs.set(id,row);
+  }
+  local.set(row.id,{pdf:imgDoc(img),file});
+  if(!row.assetId&&assets&&file.size<=MAX_ASSET){
+    libMsg("Storing the image so Claude can open it…");
+    try{const up=await assets.upload(file,{type:file.type||"image/png"});row.assetId=up.id}catch(err){libMsg(`Opened, but the image couldn't be stored (${err&&err.code||"error"}). Markups still save.`,true)}
+  }
+  if(colD){try{const{id,...rest}=row;await colD.doc(row.id).set({...rest,touchedAt:Date.now()})}catch(err){failSave(err)}}
+  saveLocal();libMsg("");
+  location.hash=`#d-${row.id}`;
+}
+function blobUrl(d){return d.assetUrl||(d.assetId?"/_blob/"+d.assetId:"")}
+function libThumb(d){const u=blobUrl(d);const b=el("div",{class:"lthumb","aria-hidden":"true"});
+  if(u&&!PUBLIC)b.append(el("img",{src:u,alt:"",loading:"lazy",decoding:"async",onerror:e=>e.target.remove()}));return b}
+async function openDoc(id,page){
+  const tok=++openTok;
+  showView("doc");
+  const row=S.docs.get(id);
+  if(!row){if(db&&!S.dbReady){tmsg("Loading the image list…");return}tmsg("This image isn't in the library.",true);$("#dname").textContent="Not found";return}
+  S.doc=row;$("#dname").textContent=row.name||"Untitled image";$("#round").value=row.round||"";
+  if(!pdf||pdf._wwid!==id){
+    pdf=null;pageObj=null;$("#pages").innerHTML="";$("#layer").innerHTML="";clearCanvases();
+    const loc=local.get(id);
+    if(loc)pdf=loc.pdf;
+    else if(blobUrl(row)){
+      tmsg(`Loading ${row.name||"the image"}…`);
+      try{const r=await fetch(blobUrl(row));if(!r.ok)throw new Error(r.status===404?"The stored image is missing.":"Couldn't fetch the image ("+r.status+").");
+        const blob=await r.blob();if(tok!==openTok)return;const img=await loadImg(blob);pdf=imgDoc(img);local.set(id,{pdf,file:blob})}
+      catch(err){if(tok!==openTok)return;tmsg(`${err&&err.message||"Couldn't load the image."} Paste or drop it again to reopen it.`,true);renderList();return}
+    }else{tmsg("This image isn't stored with the page yet. Paste or drop the same image to open it, and its markups come back.",true);renderList();return}
+    if(tok!==openTok)return;
+    pdf._wwid=id;S.pages=1;
+    const im=pdf._img;if(colD&&(!row.w||!row.h)){try{await colD.doc(id).update({w:im.naturalWidth,h:im.naturalHeight,pages:1})}catch{}}
+    buildPages();
+  }
+  applyScale(row);
+  await goPage(1,false);
+}
+async function goPage(n,keepView){
+  if(!pdf)return;const tok=++pageTok;
+  S.page=1;S.sel=null;
+  try{pageObj=await pdf.getPage(1)}catch(err){tmsg("Couldn't draw the image.",true);return}
+  if(tok!==pageTok)return;
+  const vp=pageObj.getViewport({scale:1});S.W=vp.width;S.H=vp.height;
+  const st=$("#stage");st.style.width=S.W+"px";st.style.height=S.H+"px";
+  const ink=$("#ink");ink.setAttribute("viewBox",`0 0 ${S.W} ${S.H}`);ink.setAttribute("width",S.W);ink.setAttribute("height",S.H);
+  $("#psize").textContent=`${S.W} × ${S.H} px`;
+  setHash(`#d-${S.doc.id}`);
+  tmsg("");
+  if(!keepView)fit();
+  updateCounts();render();renderList();
+  renderBase(tok);
+}
+
+/* ---------- paste ---------- */
+function pasteFile(f){handleFile(f,{pasted:true,prev:S.doc||null})}
+document.addEventListener("paste",e=>{
+  if(e.target&&e.target.closest&&e.target.closest("textarea,input"))return;
+  const f=[...(e.clipboardData&&e.clipboardData.files||[])].find(isImg)||
+    [...(e.clipboardData&&e.clipboardData.items||[])].filter(i=>i.kind==="file"&&/^image\//.test(i.type)).map(i=>i.getAsFile()).find(Boolean);
+  if(!f)return;e.preventDefault();pasteFile(f)});
+async function pasteButton(){
+  const mac=/Mac|iPhone|iPad/.test(navigator.platform||navigator.userAgent),key=mac?"⌘V":"Ctrl+V";
+  try{if(!navigator.clipboard||!navigator.clipboard.read)throw 0;
+    const items=await navigator.clipboard.read();
+    for(const it of items){const t=it.types.find(x=>/^image\//.test(x));if(t){const b=await it.getType(t);pasteFile(new File([b],"image."+(t.split("/")[1]||"png"),{type:t}));return}}
+    libMsg(`There's no image on the clipboard. Take a screen grab, then press ${key} here.`,true)}
+  catch{libMsg(`Press ${key} to paste. This browser doesn't let the button read the clipboard.`,true)}}
+for(const id of["#pastebtn"]){const b=$(id);if(!b)continue;
+  b.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();pasteButton()});
+  b.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();pasteButton()}})}
+
+/* ---------- scale calibration ---------- */
+let CAL=false;
+function applyScale(row){const sel=$("#scale");[...sel.options].forEach(o=>{if(o.value!=="-1")o.remove()});
+  const v=+(row&&row.scale)||+store.get("ww-scale-"+(row&&row.id))||0;
+  if(v>0){sel.append(el("option",{value:String(v),text:"Calibrated"}));sel.value=String(v)}else sel.value="-1"}
+function parseLen(t){t=(t||"").trim().toLowerCase().replace(/[’′]/g,"'").replace(/[”″]/g,'"');let m;
+  if((m=/^([\d.]+)\s*(mm|cm|m)$/.exec(t)))return+m[1]/({mm:25.4,cm:2.54,m:.0254})[m[2]];
+  if((m=/^(?:([\d.]+)\s*'\s*-?\s*)?(?:([\d.]+)(?:\s+(\d+)\/(\d+))?\s*"?)?$/.exec(t))&&(m[1]||m[2])){
+    if(m[1]&&!m[2]&&!/'/.test(t))return NaN;
+    return(+m[1]||0)*12+(+m[2]||0)+(m[3]?+m[3]/+m[4]:0)}
+  if((m=/^([\d.]+)\s*(ft|feet|')$/.exec(t)))return+m[1]*12;
+  return NaN}
+$("#calbtn").addEventListener("click",()=>{if(!S.doc)return;CAL=true;setTool("measure");
+  $("#hint").textContent="Set scale: drag along something whose real length you know, like a cabinet width or a wall. Esc cancels."});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&CAL){CAL=false;setTool("measure")}});
+function calHook(o){if(!CAL||o.type!=="measure")return false;CAL=false;
+  const[a,b]=o.pts,len=Math.hypot(b[0]-a[0],b[1]-a[1]);
+  const d=$("#draft");d.innerHTML="";const g=sv("g");draw({type:"measure",pts:o.pts,color:o.color,scale:-1},g);d.append(g);
+  const inp=el("input",{type:"text",placeholder:`36" or 3'-0" or 914mm`,"aria-label":"Real length of that line",style:"border:1px solid var(--line-strong);border-radius:8px;background:var(--surface);padding:4px 8px;color:var(--ink);width:16ch"});
+  const err=el("span",{class:"err"});
+  const done=()=>{d.innerHTML="";tmsg("");setTool("measure")};
+  const set=async()=>{const R=parseLen(inp.value);if(!(R>0)){err.textContent=" Type a length like 36\", 3'-0\" or 914mm.";inp.focus();return}
+    const v=+((len/72)*12/R).toFixed(6);S.doc.scale=v;store.set("ww-scale-"+S.doc.id,String(v));applyScale(S.doc);
+    for(const m of docMarks())if(m.type==="measure")patch(m.id,{scale:v});
+    if(colD){try{await colD.doc(S.doc.id).update({scale:v,scaleRef:{px:Math.round(len),inches:+R.toFixed(3)}});saved()}catch(er){failSave(er)}}
+    done();$("#hint").textContent=`Scale set: ${Math.round(len)} px = ${measureText(len,v)}. Measures now read in feet and inches.`};
+  const m=$("#tmsg");m.hidden=false;const box=$("#tmsgin");box.innerHTML="";
+  box.append(el("span",{class:"sdot attention pulse"}),el("div",{},document.createTextNode(`That line is ${Math.round(len)} px. How long is it really? `),inp,err),
+    el("button",{class:"primary",text:"Set scale",onclick:set}),el("button",{class:"btn",text:"Cancel",onclick:done}));
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();set()}if(e.key==="Escape")done()});
+  setTimeout(()=>inp.focus(),0);return true}
+
+/* ---------- flatten: the image with its markups drawn on, as a PNG ---------- */
+async function flatten(maxDim){
+  if(!S.doc||!pdf||!pdf._img)throw new Error("Open an image first.");
+  const s=Math.min(1,(maxDim||8192)/Math.max(S.W,S.H)),c=document.createElement("canvas");
+  c.width=Math.round(S.W*s);c.height=Math.round(S.H*s);const ctx=c.getContext("2d");ctx.drawImage(pdf._img,0,0,c.width,c.height);
+  numberAll();
+  const svg=sv("svg",{xmlns:NS,viewBox:`0 0 ${S.W} ${S.H}`,width:c.width,height:c.height}),defs=sv("defs"),g=sv("g"),made=new Set();
+  svg.append(defs,g);
+  for(const m of docMarks()){if(isSup(m))continue;const gg=sv("g");if(isClosed(m))gg.setAttribute("opacity",".4");draw(m,gg);g.append(gg)}
+  g.querySelectorAll(".hit").forEach(x=>x.remove());
+  /* markers coloured per ink (context-stroke isn't safe when the SVG is drawn as an image) */
+  g.querySelectorAll("[marker-start],[marker-end]").forEach(x=>{const col=x.getAttribute("stroke")||"#e0261b",key=col.replace(/[^a-z0-9]/gi,"");
+    for(const at of["marker-start","marker-end"]){const v=x.getAttribute(at);if(!v)continue;const base=/#(\w+)/.exec(v)[1],id=base+"-"+key;
+      if(!made.has(id)){made.add(id);const src=$("#ink #"+base);if(src){const mk=src.cloneNode(true);mk.id=id;mk.querySelectorAll("path").forEach(p=>{if(p.getAttribute("fill")==="context-stroke")p.setAttribute("fill",col);if(p.getAttribute("stroke")==="context-stroke")p.setAttribute("stroke",col)});defs.append(mk)}}
+      x.setAttribute(at,`url(#${id})`)}});
+  const xml=new XMLSerializer().serializeToString(svg);
+  const im=await loadImg("data:image/svg+xml;charset=utf-8,"+encodeURIComponent(xml));ctx.drawImage(im,0,0,c.width,c.height);
+  return new Promise((res,rej)=>c.toBlob(b=>b?res(b):rej(new Error("Couldn't make the PNG.")),"image/png"))}
+/* on Submit / Commit: store the marked-up image so Claude can look at exactly what was marked */
+async function miniFlat(sid){if(!assets||!db)return null;
+  try{const b=await flatten(2560);const up=await assets.upload(new File([b],`mini-loop-${sid}.png`,{type:"image/png"}),{type:"image/png"});
+    await db.collection("submissions").doc(sid).update({markedAssetId:up.id});return up.id}catch{return null}}
+async function downloadMarked(note,btn){
+  if(!S.doc||!pdf){note.hidden=false;note.textContent="Open an image first.";return}
+  btn.disabled=true;note.hidden=false;note.textContent="Drawing your markups onto the image…";
+  try{const blob=await flatten();const d=new Date(),day=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+    const fname=`${(S.doc.name||"image").replace(/[\\/:*?"<>|]+/g,"-")}${S.doc.round?" "+S.doc.round:""} - markups - ${day}.png`;
+    if(PUBLIC){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=fname;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000);note.textContent=`Downloaded “${fname}”.`}
+    else{const dl=await window.claude.use("downloads");if(!dl)throw new Error("Downloads aren't available in this view.");
+      try{await dl.save({filename:fname,data:blob});note.textContent=`Saved “${fname}”.`}catch(err){note.textContent=err&&err.code==="declined"?"Download cancelled.":`Couldn't save the file (${err&&err.code||"error"}).`}}}
+  catch(err){note.textContent=`Couldn't make the PNG: ${err&&err.message||"unknown error"}`}
+  btn.disabled=false}
+/* ================= end Mini Loop image module ================= */
+
+</script>
+
