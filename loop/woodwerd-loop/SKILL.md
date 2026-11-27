@@ -7,10 +7,10 @@ description: Run a WOODWERD Loop drawing review with Claude. Use when the user s
 
 WOODWERD Loop is a review cycle for drawing sets, run between a reviewer (the user) and Claude:
 
-1. The reviewer marks up revision N in the Loop page and presses **Submit**.
-2. Claude picks the submission up, works every markup in the source drawings, and replies under each one.
-3. Claude issues revision N+1 as a new document and tells the reviewer it is ready.
-4. The reviewer approves each reply or sends it back with a note, adds new markups, and submits again.
+1. The reviewer marks up revision N in the Loop page and presses **Submit edits**.
+2. Claude posts a response round: a reply under each markup with the planned change or a question. Nothing is drawn yet.
+3. The reviewer approves each reply or answers it, then presses **Commit changes**.
+4. Claude draws the approved changes and issues revision N+1. The reviewer marks it up and the loop repeats. **Build REV and save set** closes out the cycle with a full, clean set.
 
 The review is finished when every markup is accomplished or superseded.
 
@@ -23,7 +23,7 @@ List the user's artifacts (`Artifact` with `action: "list"`) and look for the ti
 ## Setup (once per Claude account)
 
 1. Download https://github.com/WOODWERD/REDLINE/archive/refs/heads/main.zip and unzip it into the scratchpad.
-2. Publish `redline.src.html` as a new artifact titled **WOODWERD Loop**, with these files beside it at the same paths: `redline-export.js`, everything in `vendor/`, `fonts/` and `img/`.
+2. Publish `redline.src.html` as a new artifact titled **WOODWERD Loop**, with these files beside it at the same paths: `redline-export.js`, `standards.js`, everything in `vendor/`, `fonts/` and `img/`.
 3. Declare these runtime capabilities: `db`, `user`, `comments` (so Submit can send Claude a comment), `assets` (stores the PDFs) and `downloads` (saves a marked-up PDF). Load the `artifact-capabilities` skill for the exact settings.
 4. Open the page once. The header shows **LOOP**, and the status reads "Saved · Claude can read these". If it says "Not saving", the account can't save artifact data, and the user should use the public Redline Ctrl page instead.
 5. Give the user the link and suggest they pin it.
@@ -42,22 +42,28 @@ To update the Loop page later, repeat steps 1 and 2 and publish to the same URL.
 
 ## Work a submission ("work the redlines", or a comment sent from the page)
 
+Each submission has a `kind`, set by the button the reviewer pressed:
+- `edits` (**Submit edits**): new markups. Post a **response round**: a reply under each markup with the planned change or a question. Don't draw yet.
+- `commit` (**Commit changes**): the reviewer's approvals and rework notes on your replies. Draw the approved changes and issue the next set.
+- `rev` (**Build REV and save set**): close out the cycle. Build the full set as REV `revTo` with clean title blocks and revision history, save it, and add it to Loop.
+
 1. **Acknowledge first.** `ArtifactData query` on `submissions`, newest first. Update the submission with `status: "received"`, `receivedAt` and a one-line `note` on what you're working on. The page then shows **Claude working**.
 2. Read the markups: query `markups` where `doc` is the submission's doc. Work only markups with a `submissionId`, because the rest are drafts.
-   Fields: `doc`, `page` (1-based), `type`, `pts` (PDF points, 72 per inch, origin at the top left of the rendered page), `color`, `text` (the reviewer's note), `status` (open, done, ask, superseded), `scale` (inches per foot; 12 = full size), `reply`, `submissionId`, `author`, `createdAt`. Markup numbers are their order by `createdAt` within the doc.
+   Fields: `doc`, `page` (1-based), `type`, `std` (cited standard, optional), `pts` (PDF points, 72 per inch, origin at the top left of the rendered page), `color`, `text` (the reviewer's note), `status` (open, done, ask, superseded), `scale` (inches per foot; 12 = full size), `reply`, `submissionId`, `author`, `createdAt`. Markup numbers are their order by `createdAt` within the doc.
    Types: `cloud`, `rect`, `arrow`, `cl` (centerline: keep it centered on this line), `dash` (hidden, beyond or remove), `area` (polygon `pts`, hatched: the zone to change), `xout` (remove what's in the box), `callout` (the note is on the sheet), `pen`, `hl`, `measure`.
 3. To see what a markup points at, render that page (for example `pdftoppm -f <p> -l <p> -r 100`) and crop it to `pts × 100/72`.
-4. Make the changes in the source drawings, following that project's own files and conventions.
-5. Reply under every markup with `ArtifactData update`, using `if_version`:
+4. **Check the standards.** If a markup cites one (`std`, an id from `standards.js` such as `K6`, `B8` or `N4`), answer against it. When a markup touches a kitchen or bath clearance, a landing area or a drafting convention and has no citation, check it against the matching item and set `std` on the markup yourself, so the reviewer sees the rule. A `measure` with `std` is checked on the page automatically. Name the standard in the reply when it decided the answer (for example "Aisle is 40 in; NKBA K6 wants 42, so the island moves 2 in west"). NKBA numbers are guidelines, not code; say so when they conflict with what the client wants.
+5. For an `edits` submission, stop drawing here: reply under each markup with the plan or a question (steps 6 and 8). For a `commit`, make the approved changes in the source drawings, following that project's own files and conventions.
+6. Reply under every markup with `ArtifactData update`, using `if_version`:
    - Done: `status: "done"`, a one-sentence `reply` naming what changed and where, and `doneIn: <new round>`.
    - Question: `status: "ask"`, with the question as the `reply`.
    - Planned for later: keep `status: "open"`, explain in the `reply`, and set `plannedFor: <round>`.
    - Replaced by another markup: `status: "superseded"`, with `supersededBy: "#n"` and a `supersededNote`.
-6. The reviewer's answers come back with their next Submit, as `responses: [{id, review, answer}]` on the submission:
+7. The reviewer's answers come back with **Commit changes**, as `responses: [{id, review, answer}]` on the submission:
    - `accepted` on an open markup means the plan is approved. Do the work, then set `done` with a new `reply`, and clear `review`, `answer` and `answerSent` (null, "", false).
    - `accepted` on a done markup means it's closed. Leave it alone.
    - `rework` means `answer` is their note. Act on it, write a new `reply`, and clear the same three fields.
-7. **Issue the revision.** Each round with drawing changes ends with a new set:
+8. **Close the round.** An `edits` round ends with `status: "replied"`, `repliedAt`, `note` and `next` on the submission, and no new set. A `commit` round ends with a new set:
    - Build the new PDF and start a review for it as above, with `prev` set to the old doc. Revisions start clean: markups stay on the revision they were made on, and the page links back to anything still open there.
    - Write the round record to `rounds/<round>`: `{round, doc, at, note, sheets: [...], items: [{id, outcome, note}]}`, where outcome is one of done, superseded, reworked, ask or planned. The page shows these entries as its Revision log.
    - Update the submission with `status: "replied"`, `repliedAt`, `note` (what was done), `next` (what to review) and `revision: {doc, name, round}`. The page shows **Revision ready** with a link.

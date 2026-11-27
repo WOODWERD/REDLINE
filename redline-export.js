@@ -97,7 +97,7 @@ async function exportPdf(opts){
       /* annotation dictionary */
       const [cr,cg,cb]=hexRgb(m.color);
       const what=(LABEL[m.type]||m.type)+(m.type==="measure"?" "+measureText(Math.hypot(m.pts[1][0]-m.pts[0][0],m.pts[1][1]-m.pts[0][1]),m.scale||.25):"");
-      const contents=`#${m.n} ${what}${m.text?": "+m.text.trim():""}`;
+      const sref=m.std&&window.WWSTD&&window.WWSTD.byId[m.std];const contents=`#${m.n} ${what}${m.text?": "+m.text.trim():""}${sref?` [${sref.ref} ${sref.name}]`:""}`;
       const d={Type:"Annot",Rect:[fmt(x1),fmt(y1),fmt(x2),fmt(y2)],C:[fmt(cr),fmt(cg),fmt(cb)],F:4,
         T:PDFHexString.fromText(opts.author||"Reviewer"),Contents:PDFHexString.fromText(contents),M:PDFString.of(pdfDate(m.updatedAt||m.createdAt||Date.now())),
         NM:PDFString.of("ww-"+m.id),Subj:PDFHexString.fromText("WOODWERD Redline "+(LABEL[m.type]||m.type)),AP:{N:apRef},BS:{W:fmt(5*k)}};

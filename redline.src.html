@@ -197,7 +197,7 @@ button:disabled{cursor:default;opacity:.45}
 .crow{display:flex;gap:var(--s8)}
 .subnote{font-size:var(--t-cap);color:var(--ink-soft)}
 .flow{border:1px solid var(--line-strong);border-radius:var(--r-ctl);padding:var(--s8);display:grid;gap:var(--s5);font-size:var(--t-cap);background:var(--surface)}
-.steps{display:flex;gap:var(--s3)}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s3)}
 .steps span{flex:1;text-align:center;padding:3px 2px;border-radius:6px;border:1px solid var(--line-strong);font-family:var(--mono);font-size:var(--t-micro);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft)}
 .steps span.on{color:var(--ok);border-color:var(--ok)}
 .steps span.now{color:var(--accent-text);border-color:var(--accent);background:var(--accent-tint);font-weight:600}
@@ -210,6 +210,28 @@ button:disabled{cursor:default;opacity:.45}
 .mtag{font-family:var(--mono);font-size:var(--t-micro);letter-spacing:.04em;border:1px solid var(--line-strong);border-radius:6px;padding:1px 5px;color:var(--ink-soft)}
 .mtag.ok{color:var(--ok);border-color:var(--ok)}.mtag.plan{color:var(--accent-text);border-color:var(--accent)}
 .snote{font-size:var(--t-cap);color:var(--ink-soft)}
+.stdrow{display:grid;gap:var(--s5);font-size:var(--t-cap)}
+.stdchip{display:flex;align-items:center;gap:var(--s5);flex-wrap:wrap}
+.stdchip .sref{all:unset;cursor:pointer;font-family:var(--mono);font-size:var(--t-micro);letter-spacing:.04em;border:1px solid var(--accent);color:var(--accent-text);border-radius:6px;padding:1px 6px;background:var(--accent-tint)}
+.stdchip .sref:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.stdchip .x{all:unset;cursor:pointer;color:var(--ink-soft);padding:0 4px;font-size:var(--b);line-height:1}
+.stdchip .x:hover{color:var(--fault)}
+.stdrule{color:var(--ink-soft);border-left:3px solid var(--accent);padding-left:var(--s8)}
+.chk{font-family:var(--mono);font-size:var(--t-micro);border-radius:6px;padding:1px 6px;border:1px solid}
+.chk.pass{color:var(--ok);border-color:var(--ok)}.chk.warn{color:var(--accent-text);border-color:var(--attention)}.chk.fail{color:var(--fault);border-color:var(--fault)}
+.stdpick{display:flex;gap:var(--s5);align-items:center}
+.stdpick input{flex:1;min-width:0;border:1px solid var(--line-strong);border-radius:var(--r-ctl);background:var(--surface);padding:3px var(--s8);font-size:var(--t-cap);color:var(--ink)}
+.stdpop{width:min(520px,calc(100vw - 32px))!important}
+.stdpop .sfil{display:flex;gap:var(--s5);flex-wrap:wrap;margin-bottom:var(--s8)}
+.stdpop .sfil button{border:1px solid var(--line-strong);background:var(--ground);border-radius:var(--r-ctl);padding:2px var(--s8);font-size:var(--t-micro)}
+.stdpop .sfil button[aria-pressed="true"]{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
+.stdpop input[type=search]{width:100%;border:1px solid var(--line-strong);border-radius:var(--r-ctl);background:var(--ground);padding:5px var(--s8);color:var(--ink);margin-bottom:var(--s8)}
+.stdpop .sitem{border-top:1px solid var(--line);padding:var(--s5) 0;display:grid;gap:2px}
+.stdpop .sitem b{font-weight:600}
+.stdpop .sitem .r{font-family:var(--mono);font-size:var(--t-micro);color:var(--accent-text);margin-right:var(--s5)}
+.stdpop .sitem p{margin:0;color:var(--ink-soft)}
+.stdpop .sitem .cite{justify-self:start}
+.stdpop .snote2{color:var(--ink-soft);font-size:var(--t-micro);margin:0 0 var(--s8)}
 .log{border:1px solid var(--line);border-radius:var(--r-ctl);background:var(--surface);font-size:var(--t-cap)}
 .log>summary{cursor:pointer;padding:var(--s5) var(--s8);font-weight:600}
 .log .rnd{border-top:1px solid var(--line);padding:var(--s5) var(--s8)}
@@ -350,17 +372,28 @@ button:disabled{cursor:default;opacity:.45}
           <kbd>M</kbd><span>Measure at the chosen scale</span>
           <kbd>W</kbd><span>Fit width · <kbd>Ctrl 0</kbd> fit page</span>
         </div>
+        <h3>Cite a standard</h3>
+        <p>Under any markup, press <b>Cite a standard</b> and type a word (aisle, landing, toilet, revision) to tag it with an NCS drafting convention or an NKBA kitchen or bath guideline. Tag a <b>Measure</b> and it is checked against the numbers: ✓ meets, ! meets the minimum but not the recommendation, ✗ fails. <b>Standards</b> at the top lists them all.</p>
         <p style="margin-top:8px">Measurements use the PDF's own sheet size, so a 36 × 24 sheet measures true at its printed scale. A set printed to a smaller sheet will not.</p>
         <h3 class="public-only">Send it back</h3>
         <p class="public-only">Type your name and press <b>Download marked-up PDF</b>. Send the file back however you like: email, text, a shared folder. Each markup is a real PDF comment, so it shows in Bluebeam, Acrobat, Preview or any PDF viewer.</p>
         <div class="claude-only">
         <h3>Send for review</h3>
-        <p>Markups stay drafts until you press <b>Submit</b>. Claude gets the batch, works each one, and replies under it here.</p>
+        <p>Markups stay drafts until you press <b>Submit edits</b>. Claude is called right away and posts a response round (for example X1.0.17r): a reply under every markup with the planned change or a question. No drawing happens yet.</p>
         <h3>Answer Claude</h3>
-        <p>Under each reply, press <b>Approve plan</b> (or <b>Accept and close</b> when it's done), or <b>Answer / change</b> to send a rework note. Your responses go out with the next <b>Submit</b>. Accepted, finished markups close and drop out of the open count. <b>Needs my review</b> in the filter shows what's waiting on you.</p>
+        <p>Under each reply, press <b>Approve plan</b> (or <b>Accept and close</b> when it's done), or <b>Answer / change</b> to send a rework note. When you have been through them, press <b>Commit changes</b>. Claude is called again, draws the approved changes and issues the next set (X1.0.18). Rework notes get a fresh reply first if they change the plan. Accepted, finished markups close and drop out of the open count. <b>Needs my review</b> in the filter shows what's waiting on you.</p>
         <h3>Send a PDF to someone</h3>
         <p><b>Download marked-up PDF</b> writes your markups into a copy of the PDF as real comments.</p>
         </div>
+      </div>
+    </details>
+    <details class="guide" id="stds">
+      <summary>Standards</summary>
+      <div class="pop stdpop">
+        <p class="snote2">Drafting conventions and kitchen and bath planning guidelines to check a set against. Select a markup, then press <b>Cite</b> to tag it. A tagged measurement is checked against the numbers.</p>
+        <input type="search" id="stdq" placeholder="Search: aisle, landing, toilet, revision…" aria-label="Search standards">
+        <div class="sfil" id="stdsets"></div>
+        <div id="stdlist"></div>
       </div>
     </details>
     <div class="seg" role="group" aria-label="Theme" id="theme">
@@ -415,7 +448,7 @@ button:disabled{cursor:default;opacity:.45}
             <ol>
               <li>Attach the PDF in any chat with Claude and say <b>“redline this”</b>.</li>
               <li>Claude adds it here and replies with a link straight to page one.</li>
-              <li>Mark it up, then press <b>Submit</b>. Claude works each markup and answers under it.</li>
+              <li>Mark it up and press <b>Submit edits</b>. Claude replies under each markup, then you approve or answer and press <b>Commit changes</b> for the next set.</li>
             </ol>
           </div>
         </div>
@@ -485,7 +518,9 @@ button:disabled{cursor:default;opacity:.45}
           <div class="subnote" id="dlnote2">Your file stays on this computer. Download it, then send it back however you like.</div>
         </div>
         <div class="submit claude-only" id="submitbox">
-          <button class="primary" id="submitbtn">Submit markups for review</button>
+          <button class="primary" id="submitbtn">Submit edits</button>
+          <button class="primary" id="commitbtn">Commit changes</button>
+          <button class="btn" id="revbtn">Build REV and save set</button>
           <div class="confirm" id="confirm" hidden>
             <span id="confirmtxt"></span>
             <div class="crow"><button class="primary" id="confirmyes">Submit</button><button class="btn" id="confirmno">Cancel</button></div>
@@ -512,6 +547,7 @@ button:disabled{cursor:default;opacity:.45}
 <div class="dropveil" id="veil" hidden><div>Drop the PDF to open it</div></div>
 
 <script src="vendor/pdf.min.js"></script>
+<script src="standards.js"></script>
 <script src="redline-export.js"></script>
 <script>
 /* ---------- constants ---------- */
@@ -870,7 +906,7 @@ function draw(m,g){
   else if(m.type==="measure"){const[a,b]=p;const len=Math.hypot(b[0]-a[0],b[1]-a[1]);
     g.append(sv("line",{x1:a[0],y1:a[1],x2:b[0],y2:b[1],...hit}),sv("line",{x1:a[0],y1:a[1],x2:b[0],y2:b[1],stroke:c,"stroke-width":3*k,"marker-start":"url(#tick)","marker-end":"url(#tick)"}));
     const t=sv("text",{x:(a[0]+b[0])/2,y:(a[1]+b[1])/2-12*k,fill:c,"font-size":30*k,"font-family":"JetBrains Mono, monospace","text-anchor":"middle","paint-order":"stroke",stroke:"#fff","stroke-width":8*k});
-    t.textContent=measureText(len,m.scale||.25);g.append(t)}
+    const ck=typeof stdCheck==="function"?stdCheck(m):null;t.textContent=measureText(len,m.scale||.25)+(ck?(ck.ok==="pass"?" \u2713":ck.ok==="warn"?" !":" \u2717"):"");g.append(t)}
   else if(m.type==="callout"){const[a,b]=p;const lines=wrap(m.text||"Type the note in the list");
     const fs=36*k,lh=44*k,bw=Math.max(...lines.map(l=>l.length))*fs*.56+28*k,bh=lines.length*lh+20*k;
     const bx=b[0]-(b[0]<a[0]?bw:0),by=b[1]-bh/2;
@@ -1018,6 +1054,7 @@ function renderList(focusNew){
       m.reply?el("div",{class:"reply"+(m.status==="ask"?" ask":"")},el("b",{text:"Claude: "}),document.createTextNode(m.reply)):null,
       m.review?el("div",{class:"answer"},el("b",{text:m.review==="rework"?"You, rework: ":"You: "}),document.createTextNode(m.answer||(m.status==="done"?"Accepted and closed.":"Plan approved.")),m.answerSent?null:el("span",{class:"pend",text:" Not sent yet."})):null,
       mTags(m),
+      stdRow(m),
       m.status==="superseded"&&m.supersededNote?el("div",{class:"snote",text:m.supersededNote}):null,
       reviewRow(m),
       m.carriedTo&&S.marks.get(m.carriedTo)?el("div",{class:"row"},el("button",{class:"link",text:"Continued on "+docLabel(S.docs.get(S.marks.get(m.carriedTo).doc))+" →",onclick:()=>{const n=S.marks.get(m.carriedTo);location.hash="#d-"+n.doc+"-p"+n.page}})):null,
@@ -1046,6 +1083,35 @@ function mTags(m){const t=[];
   if(m.plannedFor&&!m.doneIn)t.push(el("span",{class:"mtag plan",text:"Planned for "+m.plannedFor}));
   if(m.status==="superseded")t.push(el("span",{class:"mtag",text:"Superseded"+(m.supersededBy?" by "+m.supersededBy:"")}));
   return t.length?el("div",{class:"mtags"},...t):null}
+/* ---------- standards: a markup can cite one item (m.std); a tagged measure is checked ---------- */
+const STD=window.WWSTD||null;
+function realInches(m){const[a,b]=m.pts;return Math.hypot(b[0]-a[0],b[1]-a[1])/72*12/(+m.scale||.25)}
+function stdCheck(m){return STD&&m.std&&m.type==="measure"?STD.check(m.std,realInches(m)):null}
+function stdRow(m){if(!STD)return null;const s=m.std&&STD.byId[m.std];
+  if(s){const rule=el("div",{class:"stdrule",text:s.rule});rule.hidden=!S.stdOpen||!S.stdOpen[m.id];
+    const ck=stdCheck(m);
+    const chip=el("div",{class:"stdchip"},el("button",{class:"sref",title:"Show the rule","aria-expanded":String(!rule.hidden),text:`${s.ref} \u00b7 ${s.name}`,onclick:e=>{rule.hidden=!rule.hidden;S.stdOpen=S.stdOpen||{};S.stdOpen[m.id]=!rule.hidden;e.currentTarget.setAttribute("aria-expanded",String(!rule.hidden))}}),
+      ck?el("span",{class:"chk "+ck.ok,text:(ck.ok==="pass"?"\u2713 ":ck.ok==="warn"?"! ":"\u2717 ")+ck.text}):null,
+      el("button",{class:"x",title:"Remove the standard","aria-label":`Remove ${s.ref} from #${m.n}`,text:"\u00d7",onclick:()=>{patch(m.id,{std:null});renderList()}}));
+    return el("div",{class:"stdrow"},chip,rule)}
+  const open=S.stdPick===m.id;
+  if(!open)return el("div",{class:"stdrow"},el("button",{class:"link",style:"justify-self:start",text:"Cite a standard",onclick:()=>{S.stdPick=m.id;renderList();const i=document.querySelector(`.stdpick input[data-mid="${m.id}"]`);if(i)i.focus()}}));
+  if(!document.getElementById("stdopts")){const dl=el("datalist",{id:"stdopts"});STD.ITEMS.forEach(x=>dl.append(el("option",{value:`${x.ref} \u00b7 ${x.name}`})));document.body.append(dl)}
+  const inp=el("input",{type:"text",list:"stdopts","data-mid":m.id,placeholder:"Type: aisle, K6, landing, revision…","aria-label":`Standard for #${m.n}`});
+  const pick=()=>{const v=inp.value.trim().toLowerCase();const x=STD.ITEMS.find(x=>`${x.ref} \u00b7 ${x.name}`.toLowerCase()===v)||STD.ITEMS.find(x=>x.ref.toLowerCase()===v||x.id.toLowerCase()===v);
+    if(x){S.stdPick=null;patch(m.id,{std:x.id});renderList()}};
+  inp.addEventListener("change",pick);inp.addEventListener("keydown",e=>{if(e.key==="Enter")pick();if(e.key==="Escape"){S.stdPick=null;renderList()}});
+  return el("div",{class:"stdrow"},el("div",{class:"stdpick"},inp,el("button",{class:"link",text:"Cancel",onclick:()=>{S.stdPick=null;renderList()}})))}
+function renderStdList(){if(!STD)return;const q=($("#stdq").value||"").trim().toLowerCase(),set=S.stdSet||"all",box=$("#stdlist");box.innerHTML="";
+  const sel=S.sel&&S.marks.get(S.sel);
+  const meta=STD.SETS.find(x=>x.id===set);if(meta)box.append(el("p",{class:"snote2",text:meta.full+". "+meta.note}));
+  const rows=STD.ITEMS.filter(x=>(set==="all"||x.set===set)&&(!q||(x.ref+" "+x.name+" "+x.rule).toLowerCase().includes(q)));
+  if(!rows.length)box.append(el("p",{class:"snote2",text:"Nothing matches."}));
+  for(const x of rows)box.append(el("div",{class:"sitem"},el("div",{},el("span",{class:"r",text:x.ref}),el("b",{text:x.name})),el("p",{text:x.rule}),
+    sel?el("button",{class:"link cite",text:`Cite on #${sel.n}`,onclick:()=>{patch(sel.id,{std:x.id});renderList();$("#stds").open=false}}):null))}
+if(STD){const f=$("#stdsets");[["all","All"],...STD.SETS.map(x=>[x.id,x.name])].forEach(([id,nm])=>f.append(el("button",{type:"button","aria-pressed":String(id==="all"),text:nm,onclick:e=>{S.stdSet=id;[...f.children].forEach(b=>b.setAttribute("aria-pressed",String(b===e.currentTarget)));renderStdList()}})));
+  $("#stdq").addEventListener("input",renderStdList);$("#stds").addEventListener("toggle",()=>{if($("#stds").open){renderStdList();$("#stdq").focus()}})}
+else $("#stds").hidden=true;
 const ICONS={view:'<path d="M3.5 2h9L16.5 6v12h-13z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M12.5 2v4h4" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M5.2 12c1.2-2.3 2.9-3.5 4.8-3.5s3.6 1.2 4.8 3.5c-1.2 2.3-2.9 3.5-4.8 3.5S6.4 14.3 5.2 12z" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="10" cy="12" r="1.6" fill="currentColor"/>',
   edit:'<path d="M4 16l1-4 8.5-8.5 3 3L8 15z M11.5 5.5l3 3" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>',
   trash:'<path d="M3.5 5.5h13M8 5.5V3.5h4v2M5.5 5.5l.8 11h7.4l.8-11M8.5 8.5v5.5M11.5 8.5v5.5" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>'};
@@ -1076,10 +1142,12 @@ function drafts(){return docMarks().filter(m=>!m.submissionId&&!m.carriedFrom&&m
 function responses(){return docMarks().filter(m=>m.review&&!m.answerSent)}
 function lastSubFor(id){let best=null;for(const s of S.subs.values())if(s.doc===id&&(!best||s.at>best.at))best=s;return best}
 function updateSubmit(){
-  const d=drafts(),r=responses(),b=$("#submitbtn");
-  const parts=[];if(d.length)parts.push(`${d.length} markup${d.length>1?"s":""}`);if(r.length)parts.push(`${r.length} response${r.length>1?"s":""}`);
-  b.textContent=parts.length?`Submit ${parts.join(" + ")} to Claude`:"Submit markups for review";
-  b.disabled=!parts.length||!colM;
+  const d=drafts(),r=responses(),b=$("#submitbtn"),c=$("#commitbtn");
+  b.textContent=d.length?`Submit ${d.length} edit${d.length>1?"s":""} to Claude`:"Submit edits";
+  b.disabled=!d.length||!colM;
+  const acc=r.filter(m=>m.review==="accepted").length,rw=r.length-acc;
+  c.textContent=r.length?`Commit changes: ${[acc?acc+" approved":"",rw?rw+" rework":""].filter(Boolean).join(", ")}`:"Commit changes";
+  c.disabled=!r.length||!colM;c.className=r.length&&!d.length?"primary":"btn";b.className=d.length||!r.length?"primary":"btn";
   const n=$("#subnote"),last=S.doc&&lastSubFor(S.doc.id);
   if(!colM)n.textContent="Markups are kept in this tab only. Open this page on claude.ai, signed in, to save and submit them.";
   else if(last)n.textContent=`Last submitted ${fmtTime(last.at)}.${d.length||r.length?" New markups and your responses wait here until you submit.":""}`;
@@ -1088,68 +1156,120 @@ function updateSubmit(){
   renderFlow();
 }
 /* round status: submitted -> received -> replied, written by Claude into submissions/<id> (status, receivedAt, repliedAt, note, next) */
+/* Loop stages. Claude writes submissions/<id>.status (submitted -> received -> replied) and, on a commit or REV, revision {doc,name,round}.
+   kind: "edits" (markups -> response round), "commit" (responses -> next set), "rev" (build REV and save set). */
+const STAGES=[["review","Feedback","Waiting for design feedback: mark up the set"],["replying","Replies","Claude is writing the response round"],
+  ["commit","Commit","Waiting for your commit to the changes"],["drawing","Drawing","Claude is working on the changes"],
+  ["ready","Re-review","Next set ready for another review"],["revbuild","REV","Build REV and save set"]];
+function subKind(s){return s.kind||((s.count||0)>0?"edits":"commit")}
+function loopStage(){const last=lastSubFor(S.doc.id),newer=nextDocOf(S.doc);
+  const rev=last&&last.revision&&last.revision.doc?last.revision:(newer?{doc:newer.id,name:newer.name,round:newer.round}:null);
+  if(!last)return{key:newer?"ready":"review",last,rev};
+  const k=subKind(last),done=last.status==="replied";
+  if(k==="rev")return{key:done?"revsaved":"revbuild",last,rev};
+  if(k==="edits")return{key:done?(newer?"ready":"commit"):"replying",last,rev};
+  return{key:done?(rev?"ready":"commit"):"drawing",last,rev}}
+function suggestRev(r){const m=/^([A-Za-z]*)(\d+)\.(\d+)(?:\.(\d+))?/.exec(r||"");return m?`${m[1]}${m[2]}.${+m[3]+1}.0`:""}
+function revReady(L){/* Build REV shows once per delivery cycle: on the newest set, nothing in flight, nothing left to change */
+  if(!L||nextDocOf(S.doc)||!["review","commit","revsaved"].includes(L.key))return false;
+  if(L.key==="revsaved")return false;
+  return !drafts().length&&!responses().length&&!docMarks().some(m=>isOpen(m)||needsReview(m))}
+function updateRevBtn(L){const b=$("#revbtn");if(!b)return;const ok=!PUBLIC&&!!S.doc&&!!colM&&revReady(L);
+  b.hidden=!ok||!$("#confirm").hidden;b.dataset.ok=ok?"1":"";b.disabled=false;b.className=ok?"primary":"btn"}
 function renderFlow(){
-  const f=$("#flow");if(PUBLIC||!S.doc||!colM){f.hidden=true;return}
-  const all=docMarks(),rv=all.filter(needsReview).length,dr=drafts().length,rs=responses().length,last=lastSubFor(S.doc.id);
-  const prev=prevDocOf(S.doc),newer=nextDocOf(S.doc),prevRv=prev?[...S.marks.values()].filter(m=>m.doc===prev.id&&needsReview(m)).length:0,
-    prevOpen=prev?[...S.marks.values()].filter(m=>m.doc===prev.id&&isOpen(m)).length:0,carried=docMarks().some(m=>m.carriedFrom);
-  const revText=p=>carried?`This is Claude's revision of ${docLabel(p)}. Open markups came forward from it, tagged “from ${docLabel(p)}”.`:`This is Claude's revision of ${docLabel(p)}. Its markups stay on ${docLabel(p)}; this set starts clean.`;
-  const goDoc=id=>{location.hash="#d-"+id};
-  if(!last&&!rv&&!newer){if(!prev){f.hidden=true;return}
-    f.hidden=false;$("#steps").innerHTML="";$("#flowmsg").className="";$("#flowmsg").textContent=revText(prev)+" Review it, mark up anything still wrong, then submit.";
-    const nx=$("#flownext");nx.innerHTML="";
-    if(prevRv||(!carried&&prevOpen))nx.append(el("b",{text:"On "+docLabel(prev)+": "}),document.createTextNode(prevRv?`${prevRv} repl${prevRv>1?"ies":"y"} to approve or answer. `:`${prevOpen} markup${prevOpen>1?"s":""} still open. `),el("button",{class:"link",text:"Open "+docLabel(prev)+" →",onclick:()=>goDoc(prev.id)}));
-    return}
-  f.hidden=false;const rev=last&&last.revision&&last.revision.doc?last.revision:(newer?{doc:newer.id,name:newer.name,round:newer.round}:null);
-  const st=last?(last.status||"submitted"):"replied",order=["submitted","received","replied"],idx=st==="working"?1:Math.max(0,order.indexOf(st));
-  $("#steps").innerHTML="";["Sent","Claude working",rev?"Revision ready":"Replies ready"].forEach((t,i)=>{const sp=el("span",{text:t});if(i<idx||(i===idx&&st==="replied"))sp.className="on";else if(i===idx)sp.className="now";$("#steps").append(sp)});
-  const m=$("#flowmsg");m.className="";
-  if(last){const age=Date.now()-(last.at||0);
-    if(st==="submitted"){m.textContent=`Sent ${fmtTime(last.at)}. Waiting for Claude to pick it up (usually a minute or two).`;
-      if(age>15*60e3){m.className="warnline";m.textContent=`Sent ${fmtTime(last.at)} and not picked up yet. Say "work the redlines on ${S.doc.name}" in the project chat.`}}
-    else if(st==="received"||st==="working")m.textContent=`Claude picked it up ${fmtTime(last.receivedAt||last.at)}${last.note?": "+last.note:"."}`;
-    else m.textContent=`Claude replied ${fmtTime(last.repliedAt||last.at)}${last.note?": "+last.note:"."}`;
-  }else m.textContent=prev?revText(prev):"";
+  const f=$("#flow");if(PUBLIC||!S.doc||!colM){f.hidden=true;updateRevBtn(null);return}
+  const L=loopStage(),all=docMarks(),rv=all.filter(needsReview).length,dr=drafts().length,rs=responses().length,last=L.last;
+  f.hidden=false;updateRevBtn(L);
+  const idx=STAGES.findIndex(s=>s[0]===L.key);
+  $("#steps").innerHTML="";STAGES.forEach((s,i)=>{const sp=el("span",{text:s[1],title:s[2]});
+    if(i<idx||(i===idx&&(L.key==="ready"||L.key==="revsaved")))sp.className="on";else if(i===idx)sp.className="now";$("#steps").append(sp)});
+  const m=$("#flowmsg");m.className="";m.innerHTML="";
+  const stageLine=t=>m.append(el("b",{text:"Stage: "+t+". "}));
   const nx=$("#flownext");nx.innerHTML="";
-  if(rev&&st==="replied"){nx.append(el("b",{text:"Your turn: "}),document.createTextNode(`review revision ${rev.round||rev.name||""}. `),el("button",{class:"link",text:"Open it",onclick:()=>goDoc(rev.doc)}));
-    if(rv)nx.append(document.createTextNode(` ${rv} repl${rv>1?"ies":"y"} here to approve or answer too. `),el("button",{class:"link",text:"Show them",onclick:()=>{$("#fscope").value="all";$("#fstatus").value="review";renderList()}}));
-    else if(last&&last.next)nx.append(document.createTextNode(" "+last.next))}
-  else if(rv){nx.append(el("b",{text:"Your turn: "}),document.createTextNode(`${rv} repl${rv>1?"ies":"y"} to review. `),
-    el("button",{class:"link",text:"Show them",onclick:()=>{$("#fscope").value="all";$("#fstatus").value="review";renderList()}}),
-    document.createTextNode(" Approve or answer each, then press Submit to send your responses."))}
-  else if(dr||rs)nx.append(el("b",{text:"Your turn: "}),document.createTextNode("press Submit to send what you've added."));
-  else if(st==="replied")nx.append(el("b",{text:"Nothing waiting on you. "}),document.createTextNode(last&&last.next?last.next:"Add markups any time and submit them."));
-  else nx.append(el("b",{text:"Nothing needed from you "}),document.createTextNode("while Claude works. Replies appear under each markup."));
+  const goDoc=id=>{location.hash="#d-"+id};
+  const showRv=()=>el("button",{class:"link",text:"Show them",onclick:()=>{$("#fscope").value="all";$("#fstatus").value="review";renderList()}});
+  const prev=prevDocOf(S.doc),age=last?Date.now()-(last.at||0):0;
+  switch(L.key){
+    case "review":
+      stageLine("waiting for design feedback");
+      m.append(document.createTextNode(prev?`This is Claude's revision of ${docLabel(prev)}. `:"")) ;
+      if(revReady(L))nx.append(el("b",{text:"No changes left. "}),document.createTextNode("Mark up anything still wrong and press Submit edits, or close out this delivery cycle with Build REV and save set."));
+      else nx.append(el("b",{text:"Your turn: "}),document.createTextNode(dr?`press Submit edits to send ${dr} markup${dr>1?"s":""}.`:"mark up anything that should change, then press Submit edits."));break;
+    case "replying":
+      stageLine("Claude is replying");
+      m.append(document.createTextNode(`Edits sent ${fmtTime(last.at)}. Claude is writing the response round${S.doc.round?" ("+S.doc.round+"r)":""}: a reply under each markup, no drawing yet.`));
+      if(last.status==="submitted"&&age>15*60e3){m.className="warnline";m.append(document.createTextNode(` Not picked up yet. Say "work the redlines on ${S.doc.name}" in the project chat.`))}
+      nx.append(el("b",{text:"Nothing needed from you "}),document.createTextNode("until the replies land."));break;
+    case "commit":
+      stageLine("waiting for your commit");
+      m.append(document.createTextNode(`Claude replied ${fmtTime(last.repliedAt||last.at)}${last.note?": "+last.note:"."}`));
+      if(rv){nx.append(el("b",{text:"Your turn: "}),document.createTextNode(`${rv} repl${rv>1?"ies":"y"} to approve or answer. `),showRv(),document.createTextNode(rs?` ${rs} ready to commit.`:""))}
+      else if(!rs&&revReady(L))nx.append(el("b",{text:"No changes left. "}),document.createTextNode("Every markup is closed, so this delivery cycle can go to Build REV and save set."));
+      else nx.append(el("b",{text:"Your turn: "}),document.createTextNode(rs?`press Commit changes to send ${rs} response${rs>1?"s":""} and start the next set.`:"press Commit changes."));
+      if(dr)nx.append(document.createTextNode(` ${dr} new markup${dr>1?"s":""} can go with Submit edits.`));break;
+    case "drawing":
+      stageLine("working on changes");
+      m.append(document.createTextNode(`Committed ${fmtTime(last.at)}. Claude is drawing the approved changes into the next set${last.status!=="submitted"&&last.note?": "+last.note:"."}`));
+      if(last.status==="submitted"&&age>15*60e3){m.className="warnline";m.append(document.createTextNode(` Not picked up yet. Say "draw the next set on ${S.doc.name}" in the project chat.`))}
+      nx.append(el("b",{text:"Nothing needed from you "}),document.createTextNode("while Claude draws."));break;
+    case "ready":
+      stageLine("ready for another review");
+      m.append(document.createTextNode(`The next set${L.rev&&L.rev.round?" "+L.rev.round:""} is issued.${last&&last.note?" "+last.note:""}`));
+      if(L.rev&&L.rev.doc)nx.append(el("b",{text:"Your turn: "}),document.createTextNode("review the new set. "),el("button",{class:"link",text:"Open it →",onclick:()=>goDoc(L.rev.doc)}));
+      if(rv)nx.append(document.createTextNode(` ${rv} repl${rv>1?"ies":"y"} still open here. `),showRv());break;
+    case "revbuild":
+      stageLine("building REV and saving set");
+      m.append(document.createTextNode(`Asked ${fmtTime(last.at)} for REV ${last.revTo||""}. Claude is assembling the full set and saving it.`));
+      nx.append(el("b",{text:"Nothing needed from you "}),document.createTextNode("while the REV is built."));break;
+    case "revsaved":
+      stageLine("REV built and set saved");
+      m.append(document.createTextNode(`REV ${last.revTo||""} saved ${fmtTime(last.repliedAt||last.at)}${last.note?": "+last.note:"."}`));
+      if(L.rev&&L.rev.doc)nx.append(el("button",{class:"link",text:"Open the REV set →",onclick:()=>goDoc(L.rev.doc)}));break;
+  }
 }
 setInterval(()=>{try{renderFlow()}catch{}},60000);
-$("#submitbtn").onclick=()=>{const d=drafts(),r=responses();if(!d.length&&!r.length)return;const pg=[...new Set(d.map(m=>m.page))].sort((a,b)=>a-b);
-  const acc=r.filter(m=>m.review==="accepted").length,rw=r.length-acc,bits=[];
-  if(d.length)bits.push(`${d.length} new markup${d.length>1?"s":""} on ${pg.length===1?"page":"pages"} ${pg.join(", ")}`);if(acc)bits.push(`${acc} approval${acc>1?"s":""}`);if(rw)bits.push(`${rw} rework note${rw>1?"s":""}`);
-  $("#confirmtxt").textContent=`Send ${bits.join(", ")} on “${S.doc.name}” to Claude? You can keep working afterwards.`;
-  $("#confirm").hidden=false;$("#submitbtn").hidden=true};
-$("#confirmno").onclick=()=>{$("#confirm").hidden=true;$("#submitbtn").hidden=false};
+/* Two actions: "edits" sends new markups (Claude answers with a response round, no drawing);
+   "commit" sends approvals and rework notes (Claude draws the approved changes into the next set). Both call Claude. */
+let SUBMODE="edits";
+function showSubBtns(on){$("#submitbtn").hidden=!on;$("#commitbtn").hidden=!on;$("#revbtn").hidden=!on||!$("#revbtn").dataset.ok}
+$("#submitbtn").onclick=()=>{const d=drafts();if(!d.length)return;const pg=[...new Set(d.map(m=>m.page))].sort((a,b)=>a-b);SUBMODE="edits";
+  $("#confirmtxt").textContent=`Send ${d.length} new markup${d.length>1?"s":""} on ${pg.length===1?"page":"pages"} ${pg.join(", ")} of “${S.doc.name}” to Claude? Claude replies under each one with the planned change or a question. Nothing is drawn yet.`;
+  $("#confirmyes").textContent="Submit edits";$("#confirm").hidden=false;showSubBtns(false)};
+$("#commitbtn").onclick=()=>{const r=responses();if(!r.length)return;SUBMODE="commit";
+  const acc=r.filter(m=>m.review==="accepted").length,rw=r.length-acc,left=docMarks().filter(needsReview).length,bits=[];
+  if(acc)bits.push(`${acc} approval${acc>1?"s":""}`);if(rw)bits.push(`${rw} rework note${rw>1?"s":""}`);
+  $("#confirmtxt").textContent=`Commit ${bits.join(" and ")} on “${S.doc.name}”? Claude draws the approved changes and issues the next set.${rw?" Rework notes get a fresh reply first if they change the plan.":""}${left?` ${left} repl${left>1?"ies are":"y is"} still unreviewed and will wait.`:""}`;
+  $("#confirmyes").textContent="Commit changes";$("#confirm").hidden=false;showSubBtns(false)};
+$("#revbtn").onclick=()=>{if(!$("#revbtn").dataset.ok)return;SUBMODE="rev";const sg=suggestRev(S.doc.round);
+  $("#confirmtxt").innerHTML="";const inp=el("input",{id:"revto",type:"text",value:sg,placeholder:"e.g. X1.1.0","aria-label":"New REV number",style:"border:1px solid var(--line-strong);border-radius:8px;background:var(--surface);padding:3px 8px;color:var(--ink);width:10ch"});
+  $("#confirmtxt").append(document.createTextNode(`Close out the review cycles on “${S.doc.name}”: Claude builds the full set as REV `),inp,
+    document.createTextNode(" with a clean title block and revision history, and saves it to the project's Drive sets folder."));
+  $("#confirmyes").textContent="Build REV";$("#confirm").hidden=false;showSubBtns(false);inp.focus()};
+$("#confirmno").onclick=()=>{$("#confirm").hidden=true;showSubBtns(true)};
 $("#confirmyes").onclick=async()=>{
   const btn=$("#confirmyes");btn.disabled=true;
   let anchor=null;try{if(comments)anchor=await comments.anchorFor($("#submitbox"))}catch{}
-  const d=drafts(),rs=responses(),sid="s"+Date.now().toString(36),at=Date.now(),pages=[...new Set(d.map(m=>m.page))].sort((a,b)=>a-b),doc=S.doc;
+  const mode=SUBMODE,revTo=mode==="rev"?(($("#revto")||{}).value||"").trim().slice(0,24):"";if(mode==="rev"&&!revTo){$("#revto").focus();btn.disabled=false;return}
+  const d=mode==="edits"?drafts():[],rs=mode==="commit"?responses():[],sid="s"+Date.now().toString(36),at=Date.now(),pages=[...new Set(d.map(m=>m.page))].sort((a,b)=>a-b),doc=S.doc;
   try{
-    await db.collection("submissions").doc(sid).set({doc:doc.id,docName:doc.name||"",at,round:doc.round||"",by:S.me||null,count:d.length,ids:d.map(m=>m.id),pages,status:"submitted",responses:rs.map(m=>({id:m.id,review:m.review,answer:m.answer||""}))});
+    await db.collection("submissions").doc(sid).set({doc:doc.id,docName:doc.name||"",at,round:doc.round||"",kind:mode,...(revTo?{revTo}:{}),by:S.me||null,count:d.length,ids:d.map(m=>m.id),pages,status:"submitted",responses:rs.map(m=>({id:m.id,review:m.review,answer:m.answer||""}))});
     for(const m of d){m.submissionId=sid;m.submittedAt=at;await colM.doc(m.id).update({submissionId:sid,submittedAt:at})}
     for(const m of rs){m.answerSent=true;await colM.doc(m.id).update({answerSent:true,answerSubmission:sid})}
   }catch(err){failSave(err);btn.disabled=false;return}
-  S.subs.set(sid,{id:sid,doc:doc.id,at,count:d.length,status:"submitted"});
-  let told=false;
-  try{if(comments&&anchor&&(await comments.canSendToClaude())==="available"){
-    const lines=d.map(m=>`#${m.n} p${m.page} ${LABEL[m.type]||m.type}: ${(m.text||"(no comment)").replace(/\s+/g," ").slice(0,140)}`);
+  S.subs.set(sid,{id:sid,doc:doc.id,at,kind:mode,revTo,count:d.length,status:"submitted"});
+  let told=false,why="";
+  try{const can=comments&&anchor?await comments.canSendToClaude():"off";why=can;if(can==="available"){
+    const lines=d.map(m=>`#${m.n} p${m.page} ${LABEL[m.type]||m.type}${m.std&&STD?" ["+STD.label(m.std)+"]":""}: ${(m.text||"(no comment)").replace(/\s+/g," ").slice(0,140)}`);
     const rl=rs.map(m=>`#${m.n} p${m.page}: ${m.review==="accepted"?(m.status==="done"?"ACCEPTED, closed":"PLAN APPROVED"):"REWORK: "+(m.answer||"").replace(/\s+/g," ").slice(0,140)}`);
-    let text=`Loop submission on "${doc.name}"${doc.round?" set "+doc.round:""} (doc ${doc.id}, submission ${sid}).`;
-    if(d.length)text+=`\n${d.length} new markup${d.length>1?"s":""}. Please work them and reply under each one:\n`+lines.join("\n");
-    if(rs.length)text+=`\nMy responses to your replies:\n`+rl.join("\n");
+    let text=mode==="rev"?`Loop BUILD REV AND SAVE SET on "${doc.name}"${doc.round?" set "+doc.round:""} (doc ${doc.id}, submission ${sid}). Build the full set as REV ${revTo}, update the title blocks and revision history, save it to the Drive sets folder, and add it to the Loop.`:mode==="edits"?`Loop SUBMIT EDITS on "${doc.name}"${doc.round?" set "+doc.round:""} (doc ${doc.id}, submission ${sid}).`
+      :`Loop COMMIT CHANGES on "${doc.name}"${doc.round?" set "+doc.round:""} (doc ${doc.id}, submission ${sid}).`;
+    if(d.length)text+=`\n${d.length} new markup${d.length>1?"s":""}. Post a response round${doc.round?" ("+doc.round+"r)":""}: reply under each one with the planned change or a question. No drawings yet.\n`+lines.join("\n");
+    if(rs.length)text+=`\nMy responses to your replies. Draw the approved changes and issue the next set; reply first on any rework note that changes the plan.\n`+rl.join("\n");
     if(new TextEncoder().encode(text).length>3900)text=text.slice(0,1300)+"\n… (full list in the markups data)";
-    await comments.sendToClaude({anchor,text});told=true}}catch{}
-  $("#confirm").hidden=true;$("#submitbtn").hidden=false;btn.disabled=false;renderList();
+    await comments.sendToClaude({anchor,text});told=true}}catch(e){why=(e&&e.code)||"error"}
+  $("#confirm").hidden=true;showSubBtns(true);btn.disabled=false;renderList();
   renderFlow();
-  $("#subnote").textContent=told?"":`Claude wasn't told automatically, so say "work the redlines on ${doc.name}" in the project chat.`;
+  $("#subnote").textContent=told?(mode==="edits"?"Sent. Claude has been called and will reply under each markup.":mode==="rev"?`Claude has been called to build REV ${revTo} and save the set.`:"Committed. Claude has been called and will draw the next set."):`Saved, but Claude couldn't be called from here (${why}). Say "work the redlines on ${doc.name}" in the project chat.`;
 };
 
 /* ---------- GitHub (public version, optional): open PDFs from the user's own repo and save marked-up copies back ----------
@@ -1287,3 +1407,4 @@ $("#dlbtn").onclick=()=>downloadMarked($("#dlnote"),$("#dlbtn"));
 async function resolveNames(){if(!userApi||!userApi.profiles)return;const ids=[...new Set([...S.marks.values()].map(m=>m.author).filter(Boolean))].filter(i=>!(i in S.names));if(!ids.length)return;
   try{const ps=await userApi.profiles(ids);let ch=false;ids.forEach(i=>{const n=ps&&ps[i]&&ps[i].name;S.names[i]=n||"";ch=ch||!!n});if(ch&&S.doc)renderList()}catch{}}
 </script>
+
