@@ -6,6 +6,9 @@
 <title>WOODWERD Loop</title>
 <meta name="description" content="WOODWERD Loop: a drawing review cycle with Claude. Mark up, submit, get the next revision, repeat.">
 <meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="img/loop-icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="img/loop-icon-32.png">
+<link rel="apple-touch-icon" href="img/loop-icon-180.png">
 <style>
 @font-face{font-family:"Inter";font-weight:400;font-display:swap;src:url("../fonts/inter-latin-400-normal.woff2") format("woff2")}
 @font-face{font-family:"Inter";font-weight:500;font-display:swap;src:url("../fonts/inter-latin-500-normal.woff2") format("woff2")}
@@ -29,6 +32,9 @@ a{color:var(--accent-text);text-decoration-thickness:1px;text-underline-offset:3
 .strip{border-bottom:1px solid var(--line);font-size:var(--t-cap);padding-block:var(--s8)}
 .kit{font-size:var(--t-micro);letter-spacing:.22em;text-transform:uppercase;color:var(--accent-text);font-weight:600;display:flex;align-items:center;gap:var(--s8)}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block}
+.appicon{width:89px;height:89px;flex:none;display:block}
+.herohd{display:flex;align-items:center;gap:var(--s21)}
+@media (max-width:560px){.appicon{width:55px;height:55px}.herohd{gap:var(--s13)}}
 header.hero{border-bottom:2px solid var(--accent);padding-block:var(--s34) var(--s21)}
 h1{font-size:var(--t-h1);letter-spacing:.14em;font-weight:500;margin:0;line-height:1.1}
 .lede{font-size:var(--t-h3);color:var(--ink-soft);margin:var(--s13) 0 0;max-width:40ch}
@@ -85,8 +91,8 @@ footer{padding-block:var(--s34);font-size:var(--t-cap);color:var(--ink-soft);dis
 <body>
 <div class="strip gut"><div class="wrap"><span class="kit"><span class="dot" aria-hidden="true"></span>Ctrl · a WOODWERD toolkit</span></div></div>
 <header class="hero gut"><div class="wrap">
-  <h1>LOOP</h1>
-  <p class="lede">A drawing review cycle with Claude. You mark up a set, Claude does the work and sends the next revision, and you review it again.</p>
+  <div class="herohd"><img class="appicon" src="img/loop-icon.svg" alt="" width="89" height="89"><div><h1>LOOP</h1>
+  <p class="lede">A drawing review cycle with Claude. You mark up a set, Claude does the work and sends the next revision, and you review it again.</p></div></div>
 </div></header>
 <main class="gut"><div class="wrap">
 
