@@ -112,7 +112,10 @@ rep("async function create(o){", "async function create(o){if(calHook(o))return;
 # ---------- what Claude is told on Submit / Commit ----------
 rep('Loop SUBMIT EDITS on "', 'Mini Loop SUBMIT EDITS on image "', 1)
 rep('Loop COMMIT CHANGES on "', 'Mini Loop COMMIT CHANGES on image "', 1)
-rep('let told=false,why="";', 'let told=false,why="";const FLAT=await miniFlat(sid);', 1)
+rep('let told=false,why="";\n  try{const can=comments&&anchor?',
+    'let told=false,why="";const FLAT=await miniFlat(sid);\n  try{const can=comments&&anchor?', 1)
+# Loop v20+ Inputs (fillable PDF fields): images have none, so drop the panel and its guide text
+rex(r'<h3>Fill in inputs</h3>\s*<p>.*?</p>\s*', '', required=False)
 rep('    if(d.length)text+=`\\n${d.length} new markup',
     '    if(FLAT)text+=` Marked-up image: asset ${FLAT}.`;\n    if(d.length)text+=`\\n${d.length} new markup', 1)
 rep("Draw the approved changes and issue the next set;",

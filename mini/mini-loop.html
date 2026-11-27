@@ -277,6 +277,20 @@ button:disabled{cursor:default;opacity:.45}
 .empty{color:var(--ink-soft);padding:var(--s13) var(--s8);font-size:var(--t-cap)}
 .empty b{color:var(--ink);display:block;margin-bottom:var(--s5)}
 
+/* inputs: fillable PDF form fields */
+.intab{width:100%;border-collapse:collapse;margin:var(--s5) 0 var(--s8);font-size:var(--t-cap)}
+.intab th,.intab td{border:1px solid var(--line);padding:2px var(--s5);text-align:left;font-weight:400}
+.intab thead th{font-family:var(--mono);font-size:var(--t-micro);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+.intab tbody th{white-space:nowrap}
+.intab td{padding:1px}
+.intab input{width:100%;min-width:5ch;border:0;background:var(--accent-tint);color:var(--ink);padding:3px var(--s5);font-family:var(--mono);font-size:var(--t-cap);border-radius:4px}
+.intab input:focus{outline:2px solid var(--accent);outline-offset:0}
+#inbody{padding:var(--s5) var(--s8) var(--s8)}
+.inrow{display:grid;gap:var(--s5);justify-items:start}
+.intab .loc{all:unset;cursor:pointer;text-decoration:underline;text-decoration-color:var(--line-strong);text-underline-offset:3px}
+.intab .loc:hover,.intab .loc:focus-visible{text-decoration-color:var(--accent);color:var(--accent-text)}
+.fieldhl{fill:#C4944A;fill-opacity:.18;stroke:#C4944A;stroke-width:1.5;pointer-events:none}
+
 /* library */
 .lib{grid-column:1/-1;grid-row:1/-1;overflow:auto;min-height:0;padding-block:var(--s34)}
 .lib-in{max-width:1040px;margin:0 auto;display:grid;gap:var(--s21)}
@@ -347,6 +361,7 @@ button:disabled{cursor:default;opacity:.45}
 .bar-meta{position:relative}
 #copybtn{min-height:30px;padding:3px 13px}
 @media (max-width:900px){.drow{grid-template-columns:auto 56px minmax(0,1fr) auto}}
+#inputs{display:none!important}
 
 </style>
 
@@ -545,6 +560,7 @@ button:disabled{cursor:default;opacity:.45}
           <select id="fstatus" aria-label="Status"><option value="any">Any status</option><option value="open">Open</option><option value="review">Needs my review</option><option value="draft">Draft</option><option value="sent">With Claude</option><option value="closed">Accomplished</option><option value="superseded">Superseded</option></select>
         </div>
       </div>
+      <details class="log claude-only" id="inputs" hidden open><summary id="insum">Inputs</summary><div id="inbody"></div></details>
       <details class="log" id="log" hidden><summary id="logsum">Revision log</summary><div id="logbody"></div></details>
       <div class="items" id="items"></div>
     </aside>
@@ -755,7 +771,7 @@ async function openDoc(id,page){
     if(tok!==openTok)return;
     pdf._wwid=id;S.pages=pdf.numPages;
     if(colD&&!row.fp&&pdf.fingerprints){try{await colD.doc(id).update({fp:pdf.fingerprints[0],pages:pdf.numPages})}catch{}}
-    buildPages();
+    buildPages();loadInputs();
   }
   const sc=store.get("ww-scale-"+id);if(sc)$("#scale").value=sc;
   await goPage(Math.min(Math.max(1,page||1),S.pages),false);
@@ -1145,6 +1161,53 @@ function renderLog(){const lg=$("#log");if(PUBLIC||!S.doc){lg.hidden=true;return
         document.createTextNode(`${m&&m.doc===S.doc.id?"#"+m.n+" ":m?"#"+m.n+" ("+docLabel(S.docs.get(m.doc))+") ":""}${x.note||(m&&m.text)||""}`))))});
     det.append(ul);body.append(det)})}
 
+/* ---------- inputs: fillable PDF text fields (tinted cells) are typed here; values save to inputs/<docId> {doc, values:{fieldName:value}, updatedAt, by, sentAt} for Claude ---------- */
+S.inputs=new Map();let INF={id:null,fields:[]},inTmr=null;
+async function loadInputs(){const box=$("#inputs");box.hidden=true;INF={id:null,fields:[]};if(PUBLIC||!pdf||!S.doc)return;
+  const id=S.doc.id,doc=pdf,fields=[];
+  try{for(let i=1;i<=doc.numPages;i++){const p=await doc.getPage(i);const an=await p.getAnnotations();if(pdf!==doc)return;
+    for(const a of an)if(a.subtype==="Widget"&&a.fieldType==="Tx"&&a.fieldName)fields.push({name:a.fieldName,label:String(a.alternativeText||a.fieldName).trim(),page:i,rect:a.rect,pdfVal:typeof a.fieldValue==="string"?a.fieldValue:""})}}catch{return}
+  if(pdf!==doc||!S.doc||S.doc.id!==id)return;
+  INF={id,fields};renderInputs()}
+function inVals(){return(S.inputs.get(INF.id)||{}).values||{}}
+function inCount(vals){return INF.fields.filter(x=>String(vals[x.name]??x.pdfVal??"").trim()!=="").length}
+function renderInputs(){const box=$("#inputs");if(PUBLIC||!INF.fields.length||!S.doc||S.doc.id!==INF.id){box.hidden=true;return}
+  box.hidden=false;const vals=inVals(),body=$("#inbody");
+  $("#insum").textContent=`Inputs · ${inCount(vals)} of ${INF.fields.length} filled`;
+  const f=document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.fname;if(f)return;
+  body.innerHTML="";
+  const esc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),tables=new Map(),loose=[];
+  for(const x of INF.fields){const m=/^([A-Za-z]+)(\d+)_(.+)$/.exec(x.name);if(!m){loose.push(x);continue}
+    const t=m[1],r=m[2],c=m[3];if(!tables.has(t))tables.set(t,{cols:[],rows:new Map()});const T0=tables.get(t);if(!T0.cols.includes(c))T0.cols.push(c);
+    if(!T0.rows.has(r))T0.rows.set(r,{label:x.label.replace(new RegExp("\\s*"+esc(c)+"$","i"),"")||("Row "+r),cells:{}});T0.rows.get(r).cells[c]=x}
+  const inp=x=>{const i=el("input",{type:"text","data-fname":x.name,"aria-label":x.label,title:x.label,autocomplete:"off"});i.value=vals[x.name]??x.pdfVal??"";
+    i.addEventListener("input",()=>saveInput(x.name,i.value));i.addEventListener("focus",()=>markField(x));i.addEventListener("blur",()=>{markField(null);setTimeout(renderInputs,0)});return i};
+  const loc=(label,x)=>x?el("button",{class:"loc",type:"button",title:"Find on the sheet",text:label,onclick:()=>showField(x)}):document.createTextNode(label);
+  for(const[,T0]of tables){const tb=el("table",{class:"intab"}),hr=el("tr",{},el("th",{text:""}));T0.cols.forEach(c=>hr.append(el("th",{text:c})));tb.append(el("thead",{},hr));
+    const bd=el("tbody");for(const[,row]of T0.rows){const first=T0.cols.map(c=>row.cells[c]).find(Boolean);const tr=el("tr",{},el("th",{scope:"row"},loc(row.label,first)));T0.cols.forEach(c=>tr.append(el("td",{},row.cells[c]?inp(row.cells[c]):null)));bd.append(tr)}
+    tb.append(bd);body.append(tb)}
+  if(loose.length){const tb=el("table",{class:"intab"}),bd=el("tbody");loose.forEach(x=>bd.append(el("tr",{},el("th",{scope:"row"},loc(x.label,x)),el("td",{},inp(x)))));tb.append(bd);body.append(tb)}
+  const sent=(S.inputs.get(INF.id)||{}).sentAt;
+  body.append(el("div",{class:"inrow"},el("button",{class:"btn",type:"button",text:"Send inputs to Claude",onclick:sendInputs}),el("span",{class:"subnote",id:"innote",text:sent?`Values save as you type. Last sent ${fmtTime(sent)}.`:"Values save as you type. Click a row name to find it on the sheet."})))}
+function saveInput(name,v){const id=INF.id;if(!id)return;const cur=S.inputs.get(id)||{doc:id,values:{}};cur.values={...(cur.values||{}),[name]:v};cur.updatedAt=Date.now();cur.by=S.me||null;S.inputs.set(id,cur);
+  $("#insum").textContent=`Inputs · ${inCount(cur.values)} of ${INF.fields.length} filled`;
+  clearTimeout(inTmr);inTmr=setTimeout(async()=>{if(!db)return;try{await db.collection("inputs").doc(id).set({doc:id,values:cur.values,updatedAt:cur.updatedAt,by:cur.by,...(cur.sentAt?{sentAt:cur.sentAt}:{})});saved()}catch(err){failSave(err)}},600)}
+function fieldBox(x){const vp=pageObj&&pageObj.getViewport({scale:1});if(!vp||!x.rect)return null;const[x0,y0,x1,y1]=x.rect;const a=vp.convertToViewportPoint(x0,y0),b=vp.convertToViewportPoint(x1,y1);return{x:Math.min(a[0],b[0]),y:Math.min(a[1],b[1]),w:Math.abs(b[0]-a[0]),h:Math.abs(b[1]-a[1])}}
+function markField(x){document.querySelectorAll("#ink .fieldhl").forEach(n=>n.remove());if(!x||x.page!==S.page)return;const b=fieldBox(x);if(b)$("#ink").append(sv("rect",{class:"fieldhl",x:b.x,y:b.y,width:b.w,height:b.h,rx:2}))}
+function showField(x){if(!S.doc||!x.rect)return;const[x0,y0,x1,y1]=x.rect;
+  const go=()=>{const vp=pageObj&&pageObj.getViewport({scale:1});if(!vp)return;const pt=vp.convertToViewportPoint((x0+x1)/2,(y0+y1)/2);centerOn(pt[0],pt[1]);markField(x);setTimeout(()=>markField(null),1600)};
+  if(x.page!==S.page)goPage(x.page,true).then(go);else go()}
+async function sendInputs(){const note=$("#innote"),doc=S.doc;if(!doc||!db)return;clearTimeout(inTmr);const id=INF.id,vals=inVals(),at=Date.now();
+  try{await db.collection("inputs").doc(id).set({doc:id,values:vals,updatedAt:at,by:S.me||null,sentAt:at})}catch(err){failSave(err);return}
+  const cur=S.inputs.get(id)||{};cur.sentAt=at;S.inputs.set(id,cur);
+  const filled=INF.fields.filter(x=>String(vals[x.name]??"").trim()!=="");
+  let told=false,why="";
+  try{const anchor=comments?await comments.anchorFor($("#inputs")):null;const can=comments&&anchor?await comments.canSendToClaude():"off";why=can;
+    if(can==="available"){let text=`Loop INPUTS on "${doc.name}"${doc.round?" set "+doc.round:""} (doc ${doc.id}). ${filled.length} of ${INF.fields.length} filled; values in inputs/${doc.id}.\n`+filled.map(x=>`${x.label}: ${vals[x.name]}`).join("\n");
+      if(new TextEncoder().encode(text).length>3900)text=text.slice(0,3700)+"\n… (full list in inputs/"+doc.id+")";
+      await comments.sendToClaude({anchor,text});told=true}}catch(e){why=(e&&e.code)||"error"}
+  const n=$("#innote");if(n)n.textContent=told?"Sent. Claude has been called with these values.":`Saved, but Claude couldn't be called from here (${why}). Say "read the inputs on ${doc.name}" in the project chat.`}
+
 /* ---------- submit for review ---------- */
 function drafts(){return docMarks().filter(m=>!m.submissionId&&!m.carriedFrom&&m.status==="open")}
 function responses(){return docMarks().filter(m=>m.review&&!m.answerSent)}
@@ -1345,6 +1408,7 @@ if(!PUBLIC)(async()=>{
     if(!db)throw 0;
     colM=db.collection("markups");colD=db.collection("docs");
     db.collection("rounds").onSnapshot(sn=>{S.rounds=new Map(sn.docs.map(d=>[d.id,{...d.data(),id:d.id}]));renderLog()},()=>{});
+    db.collection("inputs").onSnapshot(sn=>{S.inputs=new Map(sn.docs.map(d=>[d.id,d.data()||{}]));renderInputs()},()=>{});
     db.collection("submissions").orderBy("at","desc").limit(100).onSnapshot(sn=>{S.subs=new Map(sn.docs.map(d=>[d.id,{...d.data(),id:d.id}]));updateSubmit()},()=>{});
     let gotD=false,gotM=false;
     colD.onSnapshot(sn=>{
@@ -1656,4 +1720,3 @@ document.addEventListener("keydown",e=>{if((e.metaKey||e.ctrlKey)&&e.shiftKey&&e
 /* ================= end Mini Loop image module ================= */
 
 </script>
-

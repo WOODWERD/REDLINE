@@ -22,3 +22,4 @@
 .bar-meta{position:relative}
 #copybtn{min-height:30px;padding:3px 13px}
 @media (max-width:900px){.drow{grid-template-columns:auto 56px minmax(0,1fr) auto}}
+#inputs{display:none!important}
