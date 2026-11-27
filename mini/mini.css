@@ -10,3 +10,15 @@
 #tmsgin .err{color:var(--fault);font-size:var(--t-cap)}
 @media (max-width:900px){.drow{grid-template-columns:56px minmax(0,1fr) auto}.lthumb{width:56px;height:40px}}
 .bar-meta .field #calbtn{font-size:var(--t-cap)}
+.drow{grid-template-columns:auto 72px minmax(0,1fr) auto auto auto}
+.pickw{display:grid;place-items:center;padding:4px;cursor:pointer}
+.pickw input{width:16px;height:16px;accent-color:var(--ink)}
+.cleanbar{display:flex;align-items:center;gap:var(--s13);flex-wrap:wrap;padding:var(--s8) var(--s13);border-top:1px solid var(--line);font-size:var(--t-cap)}
+.cleanbar .cbt{font-weight:600}
+.cleanbar .sp{flex:1}
+.cleanbar .forget{flex-basis:100%;border:1px solid var(--fault);border-radius:var(--r-ctl);padding:var(--s8) var(--s13);display:grid;gap:var(--s8);background:var(--surface)}
+.danger-btn:not(:disabled){color:var(--fault);border-color:var(--fault)}
+.copynote{position:absolute;right:16px;top:100%;margin-top:6px;z-index:5;background:var(--ink);color:var(--on-ink);padding:6px 10px;border-radius:var(--r-ctl);font-size:var(--t-cap);max-width:44ch;white-space:normal}
+.bar-meta{position:relative}
+#copybtn{min-height:30px;padding:3px 13px}
+@media (max-width:900px){.drow{grid-template-columns:auto 56px minmax(0,1fr) auto}}

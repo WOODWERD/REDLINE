@@ -17,5 +17,7 @@ Private claude.ai artifact: https://claude.ai/artifact/E55RJ7TZaXtxHcXYYqtWGJ (n
 - **Paste**: Ctrl+V / ⌘V anywhere, or Paste from clipboard. Pasting or dropping while an image is open adds it as the next version (`prev` set, round v1 → v2, project, chat and scale copied).
 - **Units**: markup `pts` are image pixels, origin top left. `scale` is -1 (not to scale, measures read in px) until **Set scale** calibrates it from a known length; then it is Loop's paper-inches-per-foot value and measures read in feet and inches. The doc row keeps `scale` and `scaleRef {px, inches}`.
 - **Submit / Commit** also uploads the marked-up image as a PNG and stores its asset id as `markedAssetId` on the submission. The message to Claude says "Mini Loop SUBMIT EDITS on image …" and names that asset.
+- **Copy image** (top bar, or Ctrl/⌘+Shift+C) puts the marked-up image on the clipboard to paste straight into a chat; if the view blocks the clipboard it saves the PNG instead.
+- **Clean up**: a trash can on each image, checkboxes, Select all / Select older than a week, and Delete selected. Deleting removes the doc row, its markups, its submissions, the stored image and the marked-up submission PNGs.
 - **Download** saves a marked-up PNG. Build REV is hidden.
 - Doc rows: `{name, kind: "image", round, assetId, pages: 1, w, h, mime, size, createdAt, touchedAt, source, project, chat, prev, scale}`.

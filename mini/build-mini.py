@@ -136,6 +136,11 @@ rex(r'<p style="margin-top:8px">Measurements use the PDF.*?</p>',
 rex(r'<p><b>Download marked-up PNG</b> writes your markups into a copy of the PDF as real comments.</p>',
     '<p><b>Download marked-up PNG</b> saves the image with your markups drawn on it.</p>', required=False)
 
+# copy button in the top bar (fast turn: mark up, copy, paste into any chat)
+rep('<span class="readout" id="psize"></span>',
+    '<button class="primary" id="copybtn" type="button" title="Copy the image with its markups (Ctrl/⌘+Shift+C), then paste it into any chat">Copy image</button>'
+    '<span class="copynote" id="copynote" role="status" hidden></span><span class="readout" id="psize"></span>', 1)
+
 OUT.write_text(s, encoding="utf-8")
 left = [w for w in ("pdfjsLib.getDocument", "WWExport.exportPdf") if w in s]
 print(f"wrote {OUT} ({len(s):,} bytes) from {SRC.name}; inert PDF code left: {left}")

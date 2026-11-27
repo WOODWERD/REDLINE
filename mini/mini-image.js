@@ -58,7 +58,7 @@ async function handleFile(file,meta){
   location.hash=`#d-${row.id}`;
 }
 function blobUrl(d){return d.assetUrl||(d.assetId?"/_blob/"+d.assetId:"")}
-function libThumb(d){const u=blobUrl(d);const b=el("div",{class:"lthumb","aria-hidden":"true"});
+function libThumb(d){const u=blobUrl(d);const b=el("div",{class:"lthumb","data-id":d.id});
   if(u&&!PUBLIC)b.append(el("img",{src:u,alt:"",loading:"lazy",decoding:"async",onerror:e=>e.target.remove()}));return b}
 async function openDoc(id,page){
   const tok=++openTok;
@@ -182,4 +182,58 @@ async function downloadMarked(note,btn){
       try{await dl.save({filename:fname,data:blob});note.textContent=`Saved “${fname}”.`}catch(err){note.textContent=err&&err.code==="declined"?"Download cancelled.":`Couldn't save the file (${err&&err.code||"error"}).`}}}
   catch(err){note.textContent=`Couldn't make the PNG: ${err&&err.message||"unknown error"}`}
   btn.disabled=false}
+/* ---------- clean up: trash per image, select several, delete older ones ---------- */
+const PICK=new Set();
+const _renderLibrary=renderLibrary;
+renderLibrary=function(){_renderLibrary();if(PUBLIC||!colD)return;
+  for(const k of[...PICK])if(!S.docs.has(k))PICK.delete(k);
+  document.querySelectorAll("#docs .drow").forEach(row=>{const th=row.querySelector(".lthumb");const d=th&&S.docs.get(th.dataset.id);if(!d)return;
+    const cb=el("input",{type:"checkbox",class:"pick","aria-label":`Select ${d.name||"image"}`});cb.checked=PICK.has(d.id);
+    cb.addEventListener("change",()=>{cb.checked?PICK.add(d.id):PICK.delete(d.id);cleanBar()});
+    row.insertBefore(el("label",{class:"pickw"},cb),row.firstChild);
+    const act=row.querySelector(".dact");if(act)act.append(iconBtn("trash",`Delete ${d.name||"this image"}`,()=>askDelete(row,[d])))});
+  cleanBar()};
+function cleanBar(){let bar=$("#cleanbar");const docs=[...S.docs.values()];
+  if(!docs.length){if(bar)bar.remove();return}
+  if(!bar){bar=el("div",{id:"cleanbar",class:"cleanbar"});$("#docs").before(bar)}
+  bar.innerHTML="";const n=PICK.size,week=Date.now()-7*864e5;
+  const old=docs.filter(d=>(d.touchedAt||d.createdAt||0)<week);
+  bar.append(el("span",{class:"cbt",text:n?`${n} selected`:"Clean up"}),
+    el("button",{class:"link",type:"button",text:"Select all",onclick:()=>{docs.forEach(d=>PICK.add(d.id));renderLibrary()}}),
+    el("button",{class:"link",type:"button",text:`Select older than a week (${old.length})`,disabled:old.length?null:"",onclick:()=>{old.forEach(d=>PICK.add(d.id));renderLibrary()}}),
+    n?el("button",{class:"link",type:"button",text:"Clear",onclick:()=>{PICK.clear();renderLibrary()}}):"",
+    el("span",{class:"sp"}),
+    el("button",{class:"btn danger-btn",type:"button",text:n?`Delete ${n} image${n>1?"s":""}`:"Delete selected",disabled:n?null:"",onclick:()=>askDelete(bar,docs.filter(d=>PICK.has(d.id)))}))}
+function askDelete(host,list){if(!list.length||host.querySelector(".forget"))return;
+  const n=list.reduce((a,d)=>a+[...S.marks.values()].filter(m=>m.doc===d.id).length,0);
+  const what=list.length===1?`“${list[0].name||"this image"}” ${list[0].round||""}`.trim():`${list.length} images`;
+  const box=el("div",{class:"forget",role:"alert"},el("span",{text:`Delete ${what}, ${n} markup${n===1?"":"s"} and their review history for good? This can't be undone.`}),
+    el("div",{class:"crow"},el("button",{class:"primary danger",text:"Delete",onclick:async e=>{e.currentTarget.disabled=true;await deleteDocs(list,box)}}),el("button",{class:"btn",text:"Cancel",onclick:()=>box.remove()})));
+  host.append(box);box.querySelector(".danger").focus()}
+async function deleteDocs(list,box){
+  const ids=new Set(list.map(d=>d.id)),keepAssets=new Set([...S.docs.values()].filter(d=>!ids.has(d.id)).map(d=>d.assetId).filter(Boolean));
+  let done=0,fail=0;const say=t=>{const s=box&&box.querySelector("span");if(s)s.textContent=t};
+  for(const d of list){say(`Deleting ${++done} of ${list.length}…`);
+    try{for(const m of[...S.marks.values()].filter(m=>m.doc===d.id)){await colM.doc(m.id).delete();S.marks.delete(m.id)}
+      for(const sb of[...S.subs.values()].filter(x=>x.doc===d.id)){if(assets&&sb.markedAssetId){try{await assets.delete(sb.markedAssetId)}catch{}}await db.collection("submissions").doc(sb.id).delete();S.subs.delete(sb.id)}
+      if(assets&&d.assetId&&!keepAssets.has(d.assetId)){try{await assets.delete(d.assetId)}catch{}}
+      await colD.doc(d.id).delete();S.docs.delete(d.id);local.delete(d.id);PICK.delete(d.id);try{localStorage.removeItem("ww-scale-"+d.id)}catch{}}
+    catch(err){fail++}}
+  libMsg(fail?`Deleted ${list.length-fail} of ${list.length}. ${fail} couldn't be deleted (you may not have edit access).`:`Deleted ${list.length} image${list.length>1?"s":""}.`,!!fail);
+  setTimeout(()=>libMsg(""),fail?8000:3000);renderLibrary()}
+
+/* ---------- copy: the marked-up image to the clipboard, to paste straight into a chat ---------- */
+async function copyImage(btn){const note=$("#copynote");const show=t=>{note.textContent=t;note.hidden=!t;clearTimeout(copyImage.t);copyImage.t=setTimeout(()=>{note.hidden=true},4000)};
+  if(!S.doc||!pdf){show("Open an image first.");return}
+  btn.disabled=true;const p=flatten();
+  try{if(!navigator.clipboard||!window.ClipboardItem)throw new Error("no clipboard");
+    await navigator.clipboard.write([new ClipboardItem({"image/png":p})]);
+    show(`Copied. Paste it into any chat with ${/Mac|iPhone|iPad/.test(navigator.platform||navigator.userAgent)?"⌘V":"Ctrl+V"}.`)}
+  catch{try{const blob=await p;const dl=await window.claude.use("downloads");
+      if(!dl)throw 0;const fname=`${(S.doc.name||"image").replace(/[\\/:*?"<>|]+/g,"-")} ${S.doc.round||""} marked.png`.replace(/\s+/g," ");
+      await dl.save({filename:fname,data:blob});show("This view won't let the page use the clipboard, so it saved the PNG instead. Drag it into the chat.")}
+    catch{show("Couldn't copy here. Use Download marked-up PNG.")}}
+  btn.disabled=false}
+$("#copybtn").addEventListener("click",e=>copyImage(e.currentTarget));
+document.addEventListener("keydown",e=>{if((e.metaKey||e.ctrlKey)&&e.shiftKey&&e.key.toLowerCase()==="c"&&S.doc&&!$("#table").hidden){e.preventDefault();copyImage($("#copybtn"))}});
 /* ================= end Mini Loop image module ================= */
