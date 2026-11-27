@@ -64,6 +64,7 @@ button:disabled{cursor:default;opacity:.45}
 /* product header */
 .head{display:flex;align-items:center;gap:var(--s13) var(--s21);flex-wrap:wrap;padding-block:var(--s8);background:var(--surface);border-bottom:2px solid var(--accent)}
 .prod{display:flex;align-items:baseline;gap:var(--s13);min-width:0;flex-wrap:wrap}
+.prod .appicon{width:34px;height:34px;flex:none;align-self:center;display:block}
 .prod h1{margin:0;font-size:var(--t-h2);letter-spacing:.14em;font-weight:600;line-height:1}
 .prod .purpose{color:var(--ink-soft);font-size:var(--t-cap)}
 .prod .ver{font-family:var(--mono);font-size:var(--t-micro);color:var(--ink-soft);border:1px solid var(--line-strong);border-radius:var(--r-ctl);padding:0 var(--s5)}
@@ -386,7 +387,7 @@ button:disabled{cursor:default;opacity:.45}
 
   <header class="head gut">
     <div class="prod">
-      <h1><span class="claude-only">MINI LOOP</span><span class="public-only">REDLINE CTRL</span></h1>
+      <img class="appicon claude-only" src="img/loop-icon.svg" alt="" width="34" height="34"><h1><span class="claude-only">MINI LOOP</span><span class="public-only">REDLINE CTRL</span></h1>
       <span class="purpose claude-only">Paste a screen grab, mark it up, and send the markups to Claude.</span><span class="purpose public-only" id="ppurpose">Mark up a PDF, then download it or share it back.</span>
       <span class="ver">v1.0</span>
     </div>
@@ -1181,8 +1182,8 @@ function renderInputs(){const box=$("#inputs");if(PUBLIC||!INF.fields.length||!S
     const t=m[1],r=m[2],c=m[3];if(!tables.has(t))tables.set(t,{cols:[],rows:new Map()});const T0=tables.get(t);if(!T0.cols.includes(c))T0.cols.push(c);
     if(!T0.rows.has(r))T0.rows.set(r,{label:x.label.replace(new RegExp("\\s*"+esc(c)+"$","i"),"")||("Row "+r),cells:{}});T0.rows.get(r).cells[c]=x}
   const inp=x=>{const i=el("input",{type:"text","data-fname":x.name,"aria-label":x.label,title:x.label,autocomplete:"off"});i.value=vals[x.name]??x.pdfVal??"";
-    i.addEventListener("input",()=>saveInput(x.name,i.value));i.addEventListener("focus",()=>markField(x));i.addEventListener("blur",()=>{markField(null);setTimeout(renderInputs,0)});return i};
-  const loc=(label,x)=>x?el("button",{class:"loc",type:"button",title:"Find on the sheet",text:label,onclick:()=>showField(x)}):document.createTextNode(label);
+    i.addEventListener("input",()=>saveInput(x.name,i.value));i.addEventListener("focus",()=>markField(x));i.addEventListener("blur",()=>{markField(null);setTimeout(()=>{if(!$("#inputs").contains(document.activeElement))renderInputs()},0)});return i};
+  const loc=(label,x)=>x?el("button",{class:"loc",type:"button",tabindex:"-1",title:"Find on the sheet",text:label,onclick:()=>showField(x)}):document.createTextNode(label);
   for(const[,T0]of tables){const tb=el("table",{class:"intab"}),hr=el("tr",{},el("th",{text:""}));T0.cols.forEach(c=>hr.append(el("th",{text:c})));tb.append(el("thead",{},hr));
     const bd=el("tbody");for(const[,row]of T0.rows){const first=T0.cols.map(c=>row.cells[c]).find(Boolean);const tr=el("tr",{},el("th",{scope:"row"},loc(row.label,first)));T0.cols.forEach(c=>tr.append(el("td",{},row.cells[c]?inp(row.cells[c]):null)));bd.append(tr)}
     tb.append(bd);body.append(tb)}
@@ -1408,7 +1409,7 @@ if(!PUBLIC)(async()=>{
     if(!db)throw 0;
     colM=db.collection("markups");colD=db.collection("docs");
     db.collection("rounds").onSnapshot(sn=>{S.rounds=new Map(sn.docs.map(d=>[d.id,{...d.data(),id:d.id}]));renderLog()},()=>{});
-    db.collection("inputs").onSnapshot(sn=>{S.inputs=new Map(sn.docs.map(d=>[d.id,d.data()||{}]));renderInputs()},()=>{});
+    db.collection("inputs").onSnapshot(sn=>{const prev=S.inputs;S.inputs=new Map(sn.docs.map(d=>{const v=d.data()||{},mine=prev.get(d.id);return[d.id,mine&&(mine.updatedAt||0)>(v.updatedAt||0)?{...v,values:{...(v.values||{}),...(mine.values||{})},updatedAt:mine.updatedAt}:v]}));for(const[k,v]of prev)if(!S.inputs.has(k))S.inputs.set(k,v);renderInputs()},()=>{});
     db.collection("submissions").orderBy("at","desc").limit(100).onSnapshot(sn=>{S.subs=new Map(sn.docs.map(d=>[d.id,{...d.data(),id:d.id}]));updateSubmit()},()=>{});
     let gotD=false,gotM=false;
     colD.onSnapshot(sn=>{
