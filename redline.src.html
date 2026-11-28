@@ -64,6 +64,7 @@ button:disabled{cursor:default;opacity:.45}
 /* product header */
 .head{display:flex;align-items:center;gap:var(--s13) var(--s21);flex-wrap:wrap;padding-block:var(--s8);background:var(--surface);border-bottom:2px solid var(--accent)}
 .prod{display:flex;align-items:baseline;gap:var(--s13);min-width:0;flex-wrap:wrap}
+.prod .appicon{width:34px;height:34px;flex:none;align-self:center;display:block}
 .prod h1{margin:0;font-size:var(--t-h2);letter-spacing:.14em;font-weight:600;line-height:1}
 .prod .purpose{color:var(--ink-soft);font-size:var(--t-cap)}
 .prod .ver{font-family:var(--mono);font-size:var(--t-micro);color:var(--ink-soft);border:1px solid var(--line-strong);border-radius:var(--r-ctl);padding:0 var(--s5)}
@@ -262,7 +263,15 @@ button:disabled{cursor:default;opacity:.45}
 .gh a{color:var(--accent-text)}
 .dact{display:flex;align-items:center;gap:var(--s5);flex-wrap:wrap;justify-content:flex-end}
 .dact a.btn{text-decoration:none;color:var(--ink)}
-.pgroup{display:flex;align-items:baseline;gap:var(--s8);padding:var(--s13) var(--s13) var(--s5);border-top:1px solid var(--line)}
+.pgroup{display:flex;align-items:center;gap:var(--s8);padding:var(--s8) var(--s13);border-top:1px solid var(--line);flex-wrap:wrap}
+.pgroup .pfold{all:unset;cursor:pointer;display:flex;align-items:baseline;gap:var(--s8);flex:1;min-width:0;padding-block:var(--s5)}
+.pgroup .pfold:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.pgroup .chev{display:inline-block;width:1em;color:var(--ink-soft);transition:transform .15s}
+.pgroup.shut .chev{transform:rotate(-90deg)}
+.pgroup .forget{flex-basis:100%}
+.olderrow{padding:var(--s5) var(--s13) var(--s8);border-top:1px dashed var(--line)}
+.olderrow .link{font-size:var(--t-cap)}
+.drow.old{opacity:.72}
 .pgroup .pn{font-size:var(--t-micro);letter-spacing:.22em;text-transform:uppercase;color:var(--accent-text);font-weight:600}
 .pgroup .pc{font-family:var(--mono);font-size:var(--t-micro);color:var(--ink-soft)}
 .drow .dmeta{grid-column:1/-1;border:1px solid var(--line-strong);border-radius:var(--r-ctl);padding:var(--s8) var(--s13);display:grid;gap:var(--s8);font-size:var(--t-cap);background:var(--surface)}
@@ -276,6 +285,21 @@ button:disabled{cursor:default;opacity:.45}
 .retrow{display:flex;gap:var(--s5);flex-wrap:wrap;align-items:center}
 .empty{color:var(--ink-soft);padding:var(--s13) var(--s8);font-size:var(--t-cap)}
 .empty b{color:var(--ink);display:block;margin-bottom:var(--s5)}
+
+/* inputs: fillable PDF form fields */
+.intab{width:100%;border-collapse:collapse;margin:var(--s5) 0 var(--s8);font-size:var(--t-cap)}
+.intab th,.intab td{border:1px solid var(--line);padding:2px var(--s5);text-align:left;font-weight:400}
+.intab thead th{font-family:var(--mono);font-size:var(--t-micro);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+.intab tbody th{white-space:nowrap}
+.intab td{padding:1px}
+.intab input{width:100%;min-width:5ch;border:0;background:var(--accent-tint);color:var(--ink);padding:3px var(--s5);font-family:var(--mono);font-size:var(--t-cap);border-radius:4px}
+.intab input:focus{outline:2px solid var(--accent);outline-offset:0}
+#inbody{padding:var(--s5) var(--s8) var(--s8)}
+.inrow{display:grid;gap:var(--s5);justify-items:start}
+.intab .loc{all:unset;cursor:pointer;text-decoration:underline;text-decoration-color:var(--line-strong);text-underline-offset:3px}
+.intab .loc:hover,.intab .loc:focus-visible{text-decoration-color:var(--accent);color:var(--accent-text)}
+.fieldhl{fill:#C4944A;fill-opacity:.18;stroke:#C4944A;stroke-width:1.5;pointer-events:none}
+.fieldval{fill:#1747c2;font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600;pointer-events:none}
 
 /* library */
 .lib{grid-column:1/-1;grid-row:1/-1;overflow:auto;min-height:0;padding-block:var(--s34)}
@@ -346,9 +370,9 @@ button:disabled{cursor:default;opacity:.45}
 
   <header class="head gut">
     <div class="prod">
-      <h1><span class="claude-only">LOOP</span><span class="public-only">REDLINE CTRL</span></h1>
+      <img class="appicon claude-only" src="img/loop-icon.svg" alt="" width="34" height="34"><h1><span class="claude-only">LOOP</span><span class="public-only">REDLINE CTRL</span></h1>
       <span class="purpose claude-only">Mark up a drawing set and send the markups to Claude.</span><span class="purpose public-only" id="ppurpose">Mark up a PDF, then download it or share it back.</span>
-      <span class="ver">v1.0</span>
+      <span class="ver" title="Loop release 28, Nov 27, 2026">v28</span>
     </div>
     <div class="sp"></div>
     <span class="live" id="live"><span class="sdot pulse attention" id="livedot"></span><span id="livetxt">Connecting…</span></span>
@@ -373,7 +397,7 @@ button:disabled{cursor:default;opacity:.45}
           <kbd>W</kbd><span>Fit width · <kbd>Ctrl 0</kbd> fit page</span>
         </div>
         <h3>Cite a standard</h3>
-        <p>Under any markup, press <b>Cite a standard</b> and type a word (aisle, landing, toilet, revision) to tag it with an NCS drafting convention or an NKBA kitchen or bath guideline. Tag a <b>Measure</b> and it is checked against the numbers: ✓ meets, ! meets the minimum but not the recommendation, ✗ fails. <b>Standards</b> at the top lists them all.</p>
+        <p>Under any markup, press <b>Cite a standard</b> and type a word (aisle, landing, toilet, revision) to tag it with an NCS drafting convention, an NKBA kitchen or bath guideline, or an ICON 3D-printed wall rule. Tag a <b>Measure</b> and it is checked against the numbers: ✓ meets, ! meets the minimum but not the recommendation, ✗ fails. <b>Standards</b> at the top lists them all.</p>
         <p style="margin-top:8px">Measurements use the PDF's own sheet size, so a 36 × 24 sheet measures true at its printed scale. A set printed to a smaller sheet will not.</p>
         <h3 class="public-only">Send it back</h3>
         <p class="public-only">Type your name and press <b>Download marked-up PDF</b>. Send the file back however you like: email, text, a shared folder. Each markup is a real PDF comment, so it shows in Bluebeam, Acrobat, Preview or any PDF viewer.</p>
@@ -382,6 +406,8 @@ button:disabled{cursor:default;opacity:.45}
         <p>Markups stay drafts until you press <b>Submit edits</b>. Claude is called right away and posts a response round (for example X1.0.17r): a reply under every markup with the planned change or a question. No drawing happens yet.</p>
         <h3>Answer Claude</h3>
         <p>Under each reply, press <b>Approve plan</b> (or <b>Accept and close</b> when it's done), or <b>Answer / change</b> to send a rework note. When you have been through them, press <b>Commit changes</b>. Claude is called again, draws the approved changes and issues the next set (X1.0.18). Rework notes get a fresh reply first if they change the plan. Accepted, finished markups close and drop out of the open count. <b>Needs my review</b> in the filter shows what's waiting on you.</p>
+        <h3>Fill in inputs</h3>
+        <p>When a set has fillable tables (tinted cells, such as a measurement sheet), they appear under <b>Inputs</b> beside the markups. Type the values there; they save as you type and the sheet stays where you left it. Each value is written into its cell on the sheet in blue, and <b>Download marked-up PDF</b> fills the PDF's own fields with them. Click a row name to find that row on the sheet. Press <b>Send inputs to Claude</b> when you're done; for a set that belongs to another chat, the values are copied so you can paste them there.</p>
         <h3>Send a PDF to someone</h3>
         <p><b>Download marked-up PDF</b> writes your markups into a copy of the PDF as real comments.</p>
         </div>
@@ -390,8 +416,8 @@ button:disabled{cursor:default;opacity:.45}
     <details class="guide" id="stds">
       <summary>Standards</summary>
       <div class="pop stdpop">
-        <p class="snote2">Drafting conventions and kitchen and bath planning guidelines to check a set against. Select a markup, then press <b>Cite</b> to tag it. A tagged measurement is checked against the numbers.</p>
-        <input type="search" id="stdq" placeholder="Search: aisle, landing, toilet, revision…" aria-label="Search standards">
+        <p class="snote2">Drafting conventions, kitchen and bath planning guidelines, and ICON 3D-printed wall rules to check a set against. Select a markup, then press <b>Cite</b> to tag it. A tagged measurement is checked against the numbers.</p>
+        <input type="search" id="stdq" placeholder="Search: aisle, landing, toilet, core, revision…" aria-label="Search standards">
         <div class="sfil" id="stdsets"></div>
         <div id="stdlist"></div>
       </div>
@@ -535,6 +561,7 @@ button:disabled{cursor:default;opacity:.45}
           <select id="fstatus" aria-label="Status"><option value="any">Any status</option><option value="open">Open</option><option value="review">Needs my review</option><option value="draft">Draft</option><option value="sent">With Claude</option><option value="closed">Accomplished</option><option value="superseded">Superseded</option></select>
         </div>
       </div>
+      <details class="log claude-only" id="inputs" hidden open><summary id="insum">Inputs</summary><div id="inbody"></div></details>
       <details class="log" id="log" hidden><summary id="logsum">Revision log</summary><div id="logbody"></div></details>
       <div class="items" id="items"></div>
     </aside>
@@ -560,6 +587,8 @@ const TOOLS=[
  {id:"arrow",name:"Arrow",key:"A",icon:'<path d="M3 15L15 3M15 3h-6M15 3v6" stroke="currentColor" fill="none" stroke-width="1.6"/>'},
  {id:"cl",name:"Centerline",key:"L",icon:'<path d="M2 16L16 2" stroke="currentColor" fill="none" stroke-width="1.4" stroke-dasharray="5 2 1.5 2"/>'},
  {id:"dash",name:"Dashed",key:"D",icon:'<path d="M2 16L16 2" stroke="currentColor" fill="none" stroke-width="1.6" stroke-dasharray="3 2.5"/>'},
+ {id:"pline",name:"Multi-line",key:"N",icon:'<path d="M2 14l4-8 5 6 5-9" stroke="currentColor" fill="none" stroke-width="1.6" stroke-linejoin="round"/><circle cx="6" cy="6" r="1.3" fill="currentColor"/><circle cx="11" cy="12" r="1.3" fill="currentColor"/>'},
+ {id:"shape",name:"Shape",key:"G",icon:'<path d="M3 6l7-3 5 5-2 7-9-1z" stroke="currentColor" fill="currentColor" fill-opacity=".3" stroke-width="1.4" stroke-linejoin="round"/>'},
  {id:"area",name:"Area",key:"F",icon:'<path d="M3 5l8-2 4 6-3 6-9-2z" stroke="currentColor" fill="none" stroke-width="1.4"/><path d="M4 12l6-6M6 14l6-6M9 14.5l4.5-4.5" stroke="currentColor" stroke-width="1" opacity=".7"/>'},
  {id:"xout",name:"Remove",key:"X",icon:'<rect x="3" y="3" width="12" height="12" stroke="currentColor" fill="none" stroke-width="1.4"/><path d="M3 3l12 12M15 3L3 15" stroke="currentColor" stroke-width="1.4"/>'},
  {id:"callout",name:"Callout",key:"T",icon:'<path d="M2 16l5-5" stroke="currentColor" stroke-width="1.6"/><rect x="7" y="2.5" width="9" height="7" stroke="currentColor" fill="none" stroke-width="1.6"/>'},
@@ -569,8 +598,8 @@ const TOOLS=[
 ];
 /* Markup ink colours are drawing data, stored with each markup, not interface colour. */
 const INKS=[["#e0261b","Red"],["#1f6fd1","Blue"],["#1d9a4e","Green"],["#d98a00","Amber"],["#8a3fd1","Purple"]];
-const LABEL={cloud:"Cloud",rect:"Box",arrow:"Arrow",cl:"Centerline",dash:"Dashed line",area:"Area",xout:"Remove",callout:"Callout",pen:"Pen",hl:"Highlight",measure:"Measure"};
-const HINTS={select:"Click a markup to select it. Drag to move it. Delete removes it.",pan:"Drag to move around the page.",cloud:"Drag a box to cloud an area, then type your comment.",rect:"Drag to draw a box.",arrow:"Drag from tail to point. Hold Shift to snap to 45°.",cl:"Drag along the line that should be centered. Snaps to 45°; hold Alt to draw free.",xout:"Drag a box over what should be removed.",dash:"Drag a dashed line: hidden, beyond, or to be removed.",area:"Drag a box to hatch an area, or click corner by corner and double-click (or Enter) to close the shape. Esc cancels.",callout:"Drag from the point to where the note goes, then type the note.",pen:"Draw freehand.",hl:"Drag across text or lines to highlight.",measure:"Drag between two points. Set the drawing scale first. Hold Shift to snap to 45°."};
+const LABEL={cloud:"Cloud",rect:"Box",arrow:"Arrow",cl:"Centerline",dash:"Dashed line",pline:"Multi-line",shape:"Shape",area:"Area",xout:"Remove",callout:"Callout",pen:"Pen",hl:"Highlight",measure:"Measure"};
+const HINTS={pline:"Click each point of the line. Double-click or press Enter to finish. Shift keeps a segment to 45°.",shape:"Click each corner. Click the first point, double-click or press Enter to close the shape. It fills in the ink colour.",select:"Click a markup to select it. Drag to move it. Delete removes it.",pan:"Drag to move around the page.",cloud:"Drag a box to cloud an area, then type your comment.",rect:"Drag to draw a box.",arrow:"Drag from tail to point. Hold Shift to snap to 45°.",cl:"Drag along the line that should be centered. Snaps to 45°; hold Alt to draw free.",xout:"Drag a box over what should be removed.",dash:"Drag a dashed line: hidden, beyond, or to be removed.",area:"Drag a box to hatch an area, or click corner by corner and double-click (or Enter) to close the shape. Esc cancels.",callout:"Drag from the point to where the note goes, then type the note.",pen:"Draw freehand.",hl:"Drag across text or lines to highlight.",measure:"Drag between two points. Set the drawing scale first. Hold Shift to snap to 45°."};
 const MAX_ASSET=20*1024*1024;
 
 const $=s=>document.querySelector(s);
@@ -644,25 +673,56 @@ function renderLibrary(){
   const docs=[...S.docs.values()].sort((a,b)=>(b.touchedAt||b.createdAt||0)-(a.touchedAt||a.createdAt||0));
   $("#libstate").textContent=S.dbReady?`${docs.length} document${docs.length===1?"":"s"}`:(db?"Loading…":"");
   if(!docs.length){box.append(el("div",{class:"empty",style:"padding:13px 21px"},el("b",{text:S.dbReady||!db?"No documents yet.":"Loading documents…"}),document.createTextNode(S.dbReady||!db?"Drop a PDF above to start the first review.":"")));return}
-  /* Loop: group the library by project; each set can link back to the chat that runs it */
+  /* Loop: group the library by project; each group folds, shows its newest set, and tucks older versions under a toggle with a purge button */
   const groups=new Map();for(const d of docs){const k=PUBLIC?"":(d.project||"").trim();if(!groups.has(k))groups.set(k,[]);groups.get(k).push(d)}
   const keys=[...groups.keys()].sort((a,b)=>!a?1:!b?-1:a.localeCompare(b));
-  for(const k of keys){
-    if(!PUBLIC&&(keys.length>1||k))box.append(el("div",{class:"pgroup"},el("span",{class:"pn",text:k||"No project"}),el("span",{class:"pc",text:`${groups.get(k).length} set${groups.get(k).length>1?"s":""}`})));
-  for(const d of groups.get(k)){
-    const n=openCount(d.id);const tot=[...S.marks.values()].filter(m=>m.doc===d.id).length;
+  const row=d=>{const n=openCount(d.id);const tot=[...S.marks.values()].filter(m=>m.doc===d.id).length;
     const stored=d.assetId?"Stored here":(local.has(d.id)?"This device only":"File not stored");
-    box.append(el("div",{class:"drow"},
+    return el("div",{class:"drow"},
       el("div",{style:"min-width:0"},el("div",{class:"nm",text:d.name||"Untitled PDF"}),el("div",{class:"sub",text:`${d.pages||"?"} page${d.pages===1?"":"s"} · ${stored}${d.createdAt?" · added "+fmtTime(d.createdAt):""}`})),
       el("div",{class:"rd"},el("span",{text:"Set"}),el("span",{text:d.round||"—"})),
       el("div",{class:"rd"},el("span",{text:"Open"}),el("span",{text:`${n} of ${tot}`})),
       el("div",{class:"dact"},
         !PUBLIC&&d.chat?el("a",{class:"btn",href:d.chat,target:"_blank",rel:"noopener",title:"Open the chat working on this set"},document.createTextNode("Open chat ↗")):null,
         el("button",{class:"btn",onclick:()=>{location.hash=`#d-${d.id}`},text:PUBLIC?"Open":"Open set"}),
-        PUBLIC?iconBtn("trash",`Remove ${d.name||"this PDF"} from this browser`,e=>askForget(e.currentTarget.closest(".drow"),[d])):iconBtn("edit",`Project and chat link for ${d.name||"this set"}`,e=>editDocMeta(e.currentTarget.closest(".drow"),d)))));
-  }}
+        PUBLIC?iconBtn("trash",`Remove ${d.name||"this PDF"} from this browser`,e=>askForget(e.currentTarget.closest(".drow"),[d])):iconBtn("edit",`Project and chat link for ${d.name||"this set"}`,e=>editDocMeta(e.currentTarget.closest(".drow"),d))))};
+  for(const k of keys){const list=groups.get(k);
+    if(PUBLIC||!(keys.length>1||k)){list.forEach(d=>box.append(row(d)));continue}
+    const shut=libFold(k),byNew=[...list].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)),latest=byNew[0],older=k?byNew.slice(1):[];
+    const hd=el("div",{class:"pgroup"+(shut?" shut":"")},
+      el("button",{class:"pfold",type:"button","aria-expanded":String(!shut),onclick:()=>{libFold(k,!shut);renderLibrary()}},
+        el("span",{class:"chev","aria-hidden":"true",text:"▾"}),el("span",{class:"pn",text:k||"No project"}),
+        el("span",{class:"pc",text:`${list.length} set${list.length>1?"s":""}${shut?" · latest "+(latest.round||latest.name||""):""}`})),
+      older.length?el("button",{class:"link",type:"button",title:`Delete the ${older.length} older version${older.length>1?"s":""} and keep ${latest.round||"the newest"}`,text:`Purge ${older.length} older`,onclick:e=>askPurge(e.currentTarget.closest(".pgroup"),k,latest,older)}):null);
+    box.append(hd);if(shut)continue;
+    if(!k){list.forEach(d=>box.append(row(d)));continue}
+    box.append(row(latest));
+    if(older.length){const showing=LIBOLD.has(k);
+      box.append(el("div",{class:"olderrow"},el("button",{class:"link",type:"button","aria-expanded":String(showing),text:showing?`Hide ${older.length} older version${older.length>1?"s":""}`:`Show ${older.length} older version${older.length>1?"s":""}`,onclick:()=>{showing?LIBOLD.delete(k):LIBOLD.add(k);renderLibrary()}})));
+      if(showing)older.forEach(d=>{const r=row(d);r.classList.add("old");box.append(r)})}
+  }
   if(PUBLIC&&docs.length>1)box.append(el("div",{class:"forgetall"},el("button",{class:"link",text:"Remove all from this browser",onclick:e=>askForget(e.currentTarget.parentNode,docs)})));
 }
+/* library folding: groups remember open/shut in this browser; older versions stay tucked unless shown */
+const LIBOLD=new Set();
+function libFold(k,v){const key="ww-lib-shut-"+k;if(v===undefined){try{return localStorage.getItem(key)==="1"}catch{return false}}try{v?localStorage.setItem(key,"1"):localStorage.removeItem(key)}catch{}}
+/* purge: delete every older version in a project group, keeping the newest set. Removes their markups, submissions, inputs and stored files. */
+function askPurge(hd,k,latest,older){if(hd.querySelector(".forget"))return;
+  const marks=older.reduce((a,d)=>a+[...S.marks.values()].filter(m=>m.doc===d.id).length,0),open=older.reduce((a,d)=>a+openCount(d.id),0);
+  const box=el("div",{class:"forget",role:"alert"},el("span",{text:`Delete ${older.length} older version${older.length>1?"s":""} of ${k} (${older.map(d=>d.round||d.name).join(", ")}) and their ${marks} markup${marks===1?"":"s"}? ${latest.round||latest.name} stays.${open?` ${open} of ${open===1?"them is":"them are"} still open.`:""} This can't be undone.`}),
+    el("div",{class:"crow"},el("button",{class:"primary danger",type:"button",text:`Delete ${older.length}`,onclick:()=>purgeDocs(older,box)}),el("button",{class:"btn",type:"button",text:"Cancel",onclick:()=>box.remove()})));
+  hd.append(box);box.querySelector(".danger").focus()}
+async function purgeDocs(list,box){if(!db||!colD)return;
+  const ids=new Set(list.map(d=>d.id)),keepAssets=new Set([...S.docs.values()].filter(d=>!ids.has(d.id)).map(d=>d.assetId).filter(Boolean));
+  let done=0,fail=0;const say=t=>{const s=box&&box.querySelector("span");if(s)s.textContent=t};box.querySelectorAll("button").forEach(b=>b.disabled=true);
+  for(const d of list){say(`Deleting ${++done} of ${list.length}…`);
+    try{for(const m of[...S.marks.values()].filter(m=>m.doc===d.id)){await colM.doc(m.id).delete();S.marks.delete(m.id)}
+      for(const sb of[...S.subs.values()].filter(x=>x.doc===d.id)){await db.collection("submissions").doc(sb.id).delete();S.subs.delete(sb.id)}
+      if(S.inputs.has(d.id)){try{await db.collection("inputs").doc(d.id).delete()}catch{}S.inputs.delete(d.id)}
+      if(assets&&d.assetId&&!keepAssets.has(d.assetId)){try{await assets.delete(d.assetId)}catch{}}
+      await colD.doc(d.id).delete();S.docs.delete(d.id);local.delete(d.id);try{localStorage.removeItem("ww-scale-"+d.id)}catch{}}
+    catch(err){fail++}}
+  if(fail){say(`Deleted ${list.length-fail} of ${list.length}. ${fail} couldn't be deleted.`);setTimeout(renderLibrary,6000)}else renderLibrary()}
 function editDocMeta(row,d){if(row.querySelector(".dmeta"))return;
   const projects=[...new Set([...S.docs.values()].map(x=>(x.project||"").trim()).filter(Boolean))].sort();
   const dl=el("datalist",{id:"projlist"});projects.forEach(p=>dl.append(el("option",{value:p})));
@@ -747,7 +807,7 @@ async function openDoc(id,page){
     if(tok!==openTok)return;
     pdf._wwid=id;S.pages=pdf.numPages;
     if(colD&&!row.fp&&pdf.fingerprints){try{await colD.doc(id).update({fp:pdf.fingerprints[0],pages:pdf.numPages})}catch{}}
-    buildPages();
+    buildPages();loadInputs();
   }
   const sc=store.get("ww-scale-"+id);if(sc)$("#scale").value=sc;
   await goPage(Math.min(Math.max(1,page||1),S.pages),false);
@@ -901,6 +961,10 @@ function draw(m,g){
   else if(m.type==="area"){const d="M"+p.map(q=>q.join(",")).join(" L")+(m.open?"":" Z");const pid="h"+(m.id||"draft");
     const pat=sv("pattern",{id:pid,patternUnits:"userSpaceOnUse",width:18*k,height:18*k,patternTransform:"rotate(45)"});pat.append(sv("line",{x1:0,y1:0,x2:0,y2:18*k,stroke:c,"stroke-width":2.2*k}));
     g.append(pat,sv("path",{d,fill:c,"fill-opacity":.08,stroke:"none"}),sv("path",{d,fill:`url(#${pid})`,"fill-opacity":.55,stroke:"none"}),sv("path",{d,...hit,fill:"transparent"}),sv("path",{d,stroke:c,"stroke-width":4*k,fill:"none","stroke-linejoin":"round"}))}
+  else if(m.type==="pline"){const d="M"+p.map(q=>q.join(",")).join(" L");
+    g.append(sv("path",{d,...hit}),sv("path",{d,stroke:c,"stroke-width":sw,fill:"none","stroke-linecap":"round","stroke-linejoin":"round"}))}
+  else if(m.type==="shape"){const d="M"+p.map(q=>q.join(",")).join(" L")+(m.open?"":" Z");
+    g.append(sv("path",{d,fill:c,"fill-opacity":.2,stroke:"none"}),sv("path",{d,...hit,fill:"transparent"}),sv("path",{d,stroke:c,"stroke-width":4*k,fill:"none","stroke-linejoin":"round"}))}
   else if(m.type==="pen"||m.type==="hl"){const d="M"+p.map(q=>q.join(",")).join(" L");
     g.append(sv("path",{d,...hit}),sv("path",{d,stroke:c,"stroke-width":m.type==="hl"?26*k:sw,"stroke-opacity":m.type==="hl"?.35:1,fill:"none","stroke-linecap":"round","stroke-linejoin":"round"}))}
   else if(m.type==="measure"){const[a,b]=p;const len=Math.hypot(b[0]-a[0],b[1]-a[1]);
@@ -923,7 +987,7 @@ function render(){
   const L=$("#layer");L.innerHTML="";if(!S.doc)return;numberAll();
   for(const m of docMarks()){if(m.page!==S.page)continue;
     const g=sv("g",{class:"mk"+(S.sel===m.id?" sel":""),"data-id":m.id});if(isClosed(m))g.setAttribute("opacity",".4");draw(m,g);L.append(g)}
-}
+  drawInputs()}
 
 /* ---------- pointer ---------- */
 let act=null,spaceDown=false;const pointers=new Map();
@@ -938,16 +1002,19 @@ T.addEventListener("pointerdown",e=>{
     if(g){select(g.dataset.id,false);const m=S.marks.get(g.dataset.id);if(m)act={kind:"move",id:m.id,start:pt,orig:m.pts.map(q=>[...q])}}
     else{select(null);act={kind:"pan",sx:e.clientX,sy:e.clientY,vx:view.x,vy:view.y}}return}
   if(act&&act.kind==="poly"){const f=act.pts[0],tol=14*S.W/$("#stage").getBoundingClientRect().width;
-    if(act.pts.length>=3&&Math.hypot(pt[0]-f[0],pt[1]-f[1])<tol){finishPoly();return}
+    if(act.pts.length>=3&&Math.hypot(pt[0]-f[0],pt[1]-f[1])<tol){if(act.type==="pline")act.pts.push([...f]);finishPoly();return}
     const l=act.pts[act.pts.length-1],now=Date.now();if(act.last&&now-act.last<450&&Math.hypot(pt[0]-l[0],pt[1]-l[1])<tol){finishPoly();return}
-    act.last=now;act.pts.push(pt);polyPreview(pt);return}
+    act.last=now;act.pts.push(e.shiftKey?snap45("cl",l,pt,{}):pt);polyPreview(pt);return}
   act={kind:"draw",type:S.tool,pts:[pt,pt]};
 });
 function snap45(type,a,b,e){if(!((type==="cl"&&!e.altKey)||((type==="arrow"||type==="measure"||type==="dash")&&e.shiftKey)))return b;
   const dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy),ang=Math.round(Math.atan2(dy,dx)/(Math.PI/4))*(Math.PI/4);return[+(a[0]+L*Math.cos(ang)).toFixed(1),+(a[1]+L*Math.sin(ang)).toFixed(1)]}
-function polyPreview(cur){const d=$("#draft");d.innerHTML="";const g=sv("g");draw({type:"area",pts:cur?[...act.pts,cur]:act.pts,color:S.color,open:true},g);d.append(g)}
-function finishPoly(){if(!act||act.kind!=="poly")return;const pts=[];for(const q of act.pts){const l=pts[pts.length-1];if(!l||Math.hypot(q[0]-l[0],q[1]-l[1])>3*K())pts.push(q)}
-  act=null;$("#draft").innerHTML="";if(pts.length>=3)create({type:"area",pts,color:S.color,scale:+$("#scale").value})}
+/* click-by-click tools: Area (hatched), Shape (transparent fill) and Multi-line (one markup, many segments).
+   Click each corner; finish by clicking the first point, double-clicking, or pressing Enter. Shift keeps a segment to 45°. */
+const POLY={area:3,shape:3,pline:2};
+function polyPreview(cur){const d=$("#draft");d.innerHTML="";const g=sv("g");draw({type:act.type||"area",pts:cur?[...act.pts,cur]:act.pts,color:S.color,open:true},g);d.append(g)}
+function finishPoly(){if(!act||act.kind!=="poly")return;const type=act.type||"area";const pts=[];for(const q of act.pts){const l=pts[pts.length-1];if(!l||Math.hypot(q[0]-l[0],q[1]-l[1])>3*K())pts.push(q)}
+  act=null;$("#draft").innerHTML="";if(pts.length>=POLY[type])create({type,pts,color:S.color,scale:+$("#scale").value})}
 function cancelPoly(){if(act&&act.kind==="poly"){act=null;$("#draft").innerHTML="";return true}return false}
 T.addEventListener("dblclick",e=>{if(act&&act.kind==="poly"){e.preventDefault();finishPoly()}});
 T.addEventListener("pointermove",e=>{if(act&&act.kind==="poly"&&!pointers.size)polyPreview(toPage(e))});
@@ -964,6 +1031,9 @@ const end=e=>{
   pointers.delete(e.pointerId);T.classList.remove("panning");if(!act)return;
   if(act.kind==="pinch"){if(pointers.size===0)act=null;return}
   if(act.kind==="poly")return;
+  if(act.kind==="draw"&&(act.type==="pline"||act.type==="shape")){$("#draft").innerHTML="";const[a,b]=act.pts;
+    if(act.type==="pline"&&Math.hypot(b[0]-a[0],b[1]-a[1])>8*K()){act={kind:"poly",type:"pline",pts:[a,b],last:0};polyPreview();return}
+    act={kind:"poly",type:act.type,pts:[a],last:Date.now()};polyPreview();return}
   if(act.kind==="draw"&&act.type==="area"){const b=bbox(act.pts);$("#draft").innerHTML="";
     if(b.w>8*K()&&b.h>8*K()){create({type:"area",pts:[[b.x,b.y],[b.x+b.w,b.y],[b.x+b.w,b.y+b.h],[b.x,b.y+b.h]],color:S.color,scale:+$("#scale").value});act=null;return}
     act={kind:"poly",type:"area",pts:[act.pts[0]],last:Date.now()};polyPreview();return}
@@ -1136,6 +1206,71 @@ function renderLog(){const lg=$("#log");if(PUBLIC||!S.doc){lg.hidden=true;return
       ul.append(el("li",{},el("button",{onclick:()=>jumpTo(x.id),title:m?"Show this markup":"Markup not found"},el("span",{class:"oc "+(x.outcome||""),text:x.outcome||""}),
         document.createTextNode(`${m&&m.doc===S.doc.id?"#"+m.n+" ":m?"#"+m.n+" ("+docLabel(S.docs.get(m.doc))+") ":""}${x.note||(m&&m.text)||""}`))))});
     det.append(ul);body.append(det)})}
+
+/* ---------- inputs: fillable PDF text fields (tinted cells) are typed here; values save to inputs/<docId> {doc, values:{fieldName:value}, updatedAt, by, sentAt} for Claude ---------- */
+S.inputs=new Map();let INF={id:null,fields:[]},inTmr=null;
+async function loadInputs(){const box=$("#inputs");box.hidden=true;INF={id:null,fields:[]};if(PUBLIC||!pdf||!S.doc)return;
+  const id=S.doc.id,doc=pdf,fields=[];
+  try{for(let i=1;i<=doc.numPages;i++){const p=await doc.getPage(i);const an=await p.getAnnotations();if(pdf!==doc)return;
+    for(const a of an)if(a.subtype==="Widget"&&a.fieldType==="Tx"&&a.fieldName)fields.push({name:a.fieldName,label:String(a.alternativeText||a.fieldName).trim(),page:i,rect:a.rect,pdfVal:typeof a.fieldValue==="string"?a.fieldValue:""})}}catch{return}
+  if(pdf!==doc||!S.doc||S.doc.id!==id)return;
+  INF={id,fields};renderInputs();drawInputs()}
+/* INV is this tab's copy of the values. Typed values win until they are saved; the server copy is adopted only when nothing here is unsaved. */
+let INV={id:null,values:{}},inDirty=false;
+function inVals(){if(INV.id!==INF.id){INV={id:INF.id,values:{...((S.inputs.get(INF.id)||{}).values||{})}};inDirty=false}return INV.values}
+function inAdopt(){const s=S.inputs.get(INF.id);if(!s||inDirty||INV.id!==INF.id)return;INV.values={...(s.values||{})}}
+function inFromDom(){document.querySelectorAll("#inbody input[data-fname]").forEach(i=>{INV.values[i.dataset.fname]=i.value})}
+function inWrite(extra){const id=INF.id;if(!id||!db)return Promise.resolve();const values={...INV.values},s=S.inputs.get(id)||{};
+  return db.collection("inputs").doc(id).set({doc:id,values,updatedAt:Date.now(),by:S.me||null,...(s.sentAt?{sentAt:s.sentAt}:{}),...extra}).then(()=>{if(JSON.stringify(values)===JSON.stringify(INV.values))inDirty=false;saved()})}
+function inCount(vals){return INF.fields.filter(x=>String(vals[x.name]??x.pdfVal??"").trim()!=="").length}
+function renderInputs(){const box=$("#inputs");if(PUBLIC||!INF.fields.length||!S.doc||S.doc.id!==INF.id){box.hidden=true;return}
+  box.hidden=false;inVals();inAdopt();const vals=INV.values,body=$("#inbody");
+  $("#insum").textContent=`Inputs · ${inCount(vals)} of ${INF.fields.length} filled`;
+  const f=document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.fname;if(f)return;
+  body.innerHTML="";
+  const esc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),tables=new Map(),loose=[];
+  for(const x of INF.fields){const m=/^([A-Za-z]+)(\d+)_(.+)$/.exec(x.name);if(!m){loose.push(x);continue}
+    const t=m[1],r=m[2],c=m[3];if(!tables.has(t))tables.set(t,{cols:[],rows:new Map()});const T0=tables.get(t);if(!T0.cols.includes(c))T0.cols.push(c);
+    if(!T0.rows.has(r))T0.rows.set(r,{label:x.label.replace(new RegExp("\\s*"+esc(c)+"$","i"),"")||("Row "+r),cells:{}});T0.rows.get(r).cells[c]=x}
+  const inp=x=>{const i=el("input",{type:"text","data-fname":x.name,"aria-label":x.label,title:x.label,autocomplete:"off"});i.value=vals[x.name]??x.pdfVal??"";
+    i.addEventListener("input",()=>saveInput(x.name,i.value));i.addEventListener("focus",()=>markField(x));i.addEventListener("blur",()=>{markField(null);setTimeout(()=>{if(!$("#inputs").contains(document.activeElement))renderInputs()},0)});return i};
+  const loc=(label,x)=>x?el("button",{class:"loc",type:"button",tabindex:"-1",title:"Find on the sheet",text:label,onclick:()=>showField(x)}):document.createTextNode(label);
+  for(const[,T0]of tables){const tb=el("table",{class:"intab"}),hr=el("tr",{},el("th",{text:""}));T0.cols.forEach(c=>hr.append(el("th",{text:c})));tb.append(el("thead",{},hr));
+    const bd=el("tbody");for(const[,row]of T0.rows){const first=T0.cols.map(c=>row.cells[c]).find(Boolean);const tr=el("tr",{},el("th",{scope:"row"},loc(row.label,first)));T0.cols.forEach(c=>tr.append(el("td",{},row.cells[c]?inp(row.cells[c]):null)));bd.append(tr)}
+    tb.append(bd);body.append(tb)}
+  if(loose.length){const tb=el("table",{class:"intab"}),bd=el("tbody");loose.forEach(x=>bd.append(el("tr",{},el("th",{scope:"row"},loc(x.label,x)),el("td",{},inp(x)))));tb.append(bd);body.append(tb)}
+  const sent=(S.inputs.get(INF.id)||{}).sentAt;
+  body.append(el("div",{class:"inrow"},el("button",{class:"btn",type:"button",text:"Send inputs to Claude",onclick:sendInputs}),el("span",{class:"subnote",id:"innote",text:sent?`Values save as you type. Last sent ${fmtTime(sent)}.`:"Values save as you type. Click a row name to find it on the sheet."})))}
+function saveInput(name,v){if(!INF.id)return;inVals();INV.values[name]=v;inDirty=true;drawInputs();
+  $("#insum").textContent=`Inputs · ${inCount(INV.values)} of ${INF.fields.length} filled`;
+  clearTimeout(inTmr);inTmr=setTimeout(()=>{inWrite({}).catch(failSave)},600)}
+function fieldBox(x){const vp=pageObj&&pageObj.getViewport({scale:1});if(!vp||!x.rect)return null;const[x0,y0,x1,y1]=x.rect;const a=vp.convertToViewportPoint(x0,y0),b=vp.convertToViewportPoint(x1,y1);return{x:Math.min(a[0],b[0]),y:Math.min(a[1],b[1]),w:Math.abs(b[0]-a[0]),h:Math.abs(b[1]-a[1])}}
+/* typed Inputs values are written into their cells on the sheet (blue, like a filled form) */
+function inValsFor(){if(!INF.id||!S.doc||INF.id!==S.doc.id)return null;inVals();return INV.values}
+function drawInputs(){document.querySelectorAll("#ink .fieldvals").forEach(n=>n.remove());const vals=inValsFor();if(!vals||PUBLIC)return;
+  const g=sv("g",{class:"fieldvals"});
+  for(const x of INF.fields){if(x.page!==S.page)continue;const v=String(vals[x.name]??"").trim();if(!v||v===String(x.pdfVal||"").trim()&&x.pdfVal)continue;const b=fieldBox(x);if(!b)continue;
+    const fs=Math.max(4,Math.min(b.h*.6,b.w/Math.max(1,v.length)*1.5));const t=sv("text",{class:"fieldval",x:b.x+Math.min(3,b.w*.08),y:b.y+b.h/2+fs*.36,"font-size":fs});t.textContent=v;g.append(t)}
+  if(g.childNodes.length)$("#ink").append(g)}
+function markField(x){document.querySelectorAll("#ink .fieldhl").forEach(n=>n.remove());if(!x||x.page!==S.page)return;const b=fieldBox(x);if(b)$("#ink").append(sv("rect",{class:"fieldhl",x:b.x,y:b.y,width:b.w,height:b.h,rx:2}))}
+function showField(x){if(!S.doc||!x.rect)return;const[x0,y0,x1,y1]=x.rect;
+  const go=()=>{const vp=pageObj&&pageObj.getViewport({scale:1});if(!vp)return;const pt=vp.convertToViewportPoint((x0+x1)/2,(y0+y1)/2);centerOn(pt[0],pt[1]);markField(x);setTimeout(()=>markField(null),1600)};
+  if(x.page!==S.page)goPage(x.page,true).then(go);else go()}
+/* Send inputs: save every cell, then get the values to Claude. A doc that belongs to another chat (doc.chat) can't be reached from here,
+   so the values are copied for pasting there; otherwise Claude is called with an artifact comment. Values are also written into the exported PDF. */
+function inSummary(doc){const filled=INF.fields.filter(x=>String(INV.values[x.name]??"").trim()!=="");
+  return{filled,text:`Loop INPUTS on "${doc.name}"${doc.round?" set "+doc.round:""} (doc ${doc.id}). ${filled.length} of ${INF.fields.length} filled; values in inputs/${doc.id}.\n`+filled.map(x=>`${x.label}: ${INV.values[x.name]}`).join("\n")}}
+async function sendInputs(){const doc=S.doc;if(!doc||!db)return;clearTimeout(inTmr);inVals();inFromDom();inDirty=true;drawInputs();const at=Date.now();
+  const n=()=>$("#innote");if(n())n().textContent="Saving…";
+  try{await inWrite({sentAt:at})}catch(err){failSave(err);return}
+  let{filled,text}=inSummary(doc);if(new TextEncoder().encode(text).length>3900)text=text.slice(0,3700)+"\n… (full list in inputs/"+doc.id+")";
+  let copied=false;try{await navigator.clipboard.writeText(text);copied=true}catch{}
+  const ext=doc.chat&&/^https:\/\/claude\.ai\//.test(doc.chat);
+  if(ext){const e=n();if(e){e.textContent=`Saved ${filled.length} of ${INF.fields.length}. ${copied?"The values are copied: paste them into":"Open"} this set's chat${copied?"":" and say \"read the Loop inputs\""}. `;e.append(el("a",{href:doc.chat,target:"_blank",rel:"noopener",text:"Open chat ↗"}))}return}
+  let told=false,why="";
+  try{const anchor=comments?await comments.anchorFor($("#inputs")):null;const can=comments&&anchor?await comments.canSendToClaude():"off";why=can;
+    if(can==="available"){await comments.sendToClaude({anchor,text});told=true}}catch(e){why=(e&&e.code)||"error"}
+  const e=n();if(e)e.textContent=told?`Sent ${filled.length} of ${INF.fields.length} to Claude.`:`Saved ${filled.length} of ${INF.fields.length}${copied?" and copied them":""}, but Claude couldn't be called from here (${why}). Paste them in the project chat.`}
 
 /* ---------- submit for review ---------- */
 function drafts(){return docMarks().filter(m=>!m.submissionId&&!m.carriedFrom&&m.status==="open")}
@@ -1336,6 +1471,7 @@ if(!PUBLIC)(async()=>{
     if(!db)throw 0;
     colM=db.collection("markups");colD=db.collection("docs");
     db.collection("rounds").onSnapshot(sn=>{S.rounds=new Map(sn.docs.map(d=>[d.id,{...d.data(),id:d.id}]));renderLog()},()=>{});
+    db.collection("inputs").onSnapshot(sn=>{const prev=S.inputs;S.inputs=new Map(sn.docs.map(d=>{const v=d.data()||{},mine=prev.get(d.id);return[d.id,mine&&(mine.updatedAt||0)>(v.updatedAt||0)?{...v,values:{...(v.values||{}),...(mine.values||{})},updatedAt:mine.updatedAt}:v]}));for(const[k,v]of prev)if(!S.inputs.has(k))S.inputs.set(k,v);renderInputs()},()=>{});
     db.collection("submissions").orderBy("at","desc").limit(100).onSnapshot(sn=>{S.subs=new Map(sn.docs.map(d=>[d.id,{...d.data(),id:d.id}]));updateSubmit()},()=>{});
     let gotD=false,gotM=false;
     colD.onSnapshot(sn=>{
@@ -1362,7 +1498,8 @@ if(!PUBLIC)(async()=>{
 /* ---------- download marked-up PDF ---------- */
 async function downloadMarked(note,btn,mode){
   if(!S.doc||!pdf){note.hidden=false;note.textContent="Open a PDF first.";return}
-  const marks=docMarks();if(!marks.length){note.hidden=false;note.textContent="Add a markup first.";return}
+  const marks=docMarks(),fvals=PUBLIC?null:inValsFor();const hasVals=fvals&&Object.values(fvals).some(v=>String(v??"").trim()!=="");
+  if(!marks.length&&!hasVals){note.hidden=false;note.textContent="Add a markup first.";return}
   const author=(PUBLIC?$("#rname").value.trim():"")||(S.me&&S.names[S.me])||(PUBLIC?"Reviewer":"WOODWERD");
   if(PUBLIC){if(!$("#rname").value.trim()){note.hidden=false;note.textContent="Type your name first, so whoever reads the PDF knows whose comments these are.";$("#rname").focus();return}store.set("ww-redline-name",author)}
   btn.disabled=true;note.hidden=false;note.textContent="Writing your markups into the PDF…";
@@ -1372,11 +1509,11 @@ async function downloadMarked(note,btn,mode){
     numberAll();const byPage=new Map(),viewports={};
     for(const m of marks){if(!byPage.has(m.page))byPage.set(m.page,[]);byPage.get(m.page).push(m)}
     for(const n of byPage.keys()){viewports[n]=(await pdf.getPage(n)).getViewport({scale:1})}
-    const out=await WWExport.exportPdf({bytes:bytes.slice(),byPage,viewports,author,k:n=>Math.max(viewports[n].width,viewports[n].height)/3600});
+    const out=await WWExport.exportPdf({bytes:bytes.slice(),byPage,viewports,author,fields:hasVals?fvals:null,k:n=>Math.max(viewports[n].width,viewports[n].height)/3600});
     const d=new Date(),day=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
     const fname=`${(S.doc.name||"drawing").replace(/[\\/:*?"<>|]+/g,"-")} - redlines - ${author.replace(/[\\/:*?"<>|]+/g,"-")} - ${day}.pdf`;
     const blob=new Blob([out.bytes],{type:"application/pdf"});
-    const cnt=`${out.count} comment${out.count===1?"":"s"}`;
+    const cnt=`${out.count} comment${out.count===1?"":"s"}`+(out.filledFields?` and ${out.filledFields} input value${out.filledFields===1?"":"s"}`:"");
     if(PUBLIC&&mode==="github"){const src=S.doc.gh,dir=src?src.path.replace(/[^/]*$/,"").replace(/\/$/,""):GH.cfg.dir,path=(dir?dir+"/":"")+fname;
       note.textContent=`Saving to ${GH.cfg.repo}…`;
       const res=await ghPut(path,out.bytes,`Redlines: ${S.doc.name||"drawing"} (${cnt}) by ${author}`,src&&src.repo===GH.cfg.repo?src.branch:GH.cfg.branch);
@@ -1386,7 +1523,7 @@ async function downloadMarked(note,btn,mode){
     else if(PUBLIC){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=fname;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000);
       note.textContent=`Downloaded “${fname}” with ${cnt}. ${RET.to?"Send it back to "+RET.to+" however you like.":"Send it back however you like."}`}
     else{const dl=await window.claude.use("downloads");if(!dl)throw new Error("Downloads aren't available in this view.");
-      try{await dl.save({filename:fname,data:blob});note.textContent=`Saved “${fname}” with ${out.count} comment${out.count===1?"":"s"}.`}catch(err){note.textContent=err&&err.code==="declined"?"Download cancelled.":`Couldn't save the file (${err&&err.code||"error"}).`}}
+      try{await dl.save({filename:fname,data:blob});note.textContent=`Saved “${fname}” with ${cnt}.`}catch(err){note.textContent=err&&err.code==="declined"?"Download cancelled.":`Couldn't save the file (${err&&err.code||"error"}).`}}
   }catch(err){note.textContent=`Couldn't write the PDF: ${err&&err.message||"unknown error"}`}
   btn.disabled=false;
 }
@@ -1407,4 +1544,3 @@ $("#dlbtn").onclick=()=>downloadMarked($("#dlnote"),$("#dlbtn"));
 async function resolveNames(){if(!userApi||!userApi.profiles)return;const ids=[...new Set([...S.marks.values()].map(m=>m.author).filter(Boolean))].filter(i=>!(i in S.names));if(!ids.length)return;
   try{const ps=await userApi.profiles(ids);let ch=false;ids.forEach(i=>{const n=ps&&ps[i]&&ps[i].name;S.names[i]=n||"";ch=ch||!!n});if(ch&&S.doc)renderList()}catch{}}
 </script>
-

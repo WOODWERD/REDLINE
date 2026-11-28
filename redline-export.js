@@ -32,6 +32,8 @@ function shapes(m,k,num){
   else if(m.type==="area"){out.areaFill={pts:p,color:c,opacity:.08};const b=bbox(p),gap=18*k*1.41,lines=[];
     for(let t=b.x+b.y;t<=b.x+b.w+b.y+b.h;t+=gap)lines.push([[t-b.y,b.y],[t-(b.y+b.h),b.y+b.h]]);
     out.hatch={clip:p,lines,w:2.2*k,color:c,opacity:.55};S(p,4*k,true)}
+  else if(m.type==="pline")S(p,sw);
+  else if(m.type==="shape"){out.areaFill={pts:p,color:c,opacity:.2};S(p,4*k,true)}
   else if(m.type==="pen")S(p,sw);
   else if(m.type==="hl")S(p,26*k,false,.35);
   else if(m.type==="measure"){const[a,b]=p;S([a,b],3*k);const ang=Math.atan2(b[1]-a[1],b[0]-a[0]),nx=-Math.sin(ang)*8*k,ny=Math.cos(ang)*8*k;
@@ -54,6 +56,10 @@ async function exportPdf(opts){
   const ctx=doc.context,author=ansi(opts.author||"Reviewer");
   const fmt=v=>+v.toFixed(3);
   let count=0;
+  /* fill the PDF's own form fields with the typed Inputs values, so they print and show in any viewer */
+  let filledFields=0;
+  if(opts.fields){try{const form=doc.getForm();for(const[n,v]of Object.entries(opts.fields)){const t=String(v??"").trim();if(!t)continue;try{const f=form.getTextField(n);f.setText(ansi(t));try{const w=f.acroField.getWidgets()[0].getRectangle();f.setFontSize(Math.max(6,Math.min(w.height*.6,w.width/Math.max(1,t.length)*1.5)))}catch{}filledFields++}catch{}}
+    if(filledFields)form.updateFieldAppearances(font)}catch(e){console.warn("inputs not written",e)}}
   for(const[pageNo,marks]of opts.byPage){
     const page=doc.getPage(pageNo-1),vp=opts.viewports[pageNo];
     const P=(x,y)=>vp.convertToPdfPoint(x,y);
@@ -107,6 +113,8 @@ async function exportPdf(opts){
       else if(m.type==="cl"||m.type==="dash"){d.Subtype="Line";d.L=flat(m.pts.slice(0,2));d.LE=["None","None"];d.BS={W:fmt((m.type==="cl"?3.5:4)*k),S:"D",D:(m.type==="cl"?[70,16,14,16]:[24,14]).map(v=>fmt(v*k))}}
       else if(m.type==="xout"){d.Subtype="Square"}
       else if(m.type==="area"){d.Subtype="Polygon";d.Vertices=flat(m.pts);d.BS={W:fmt(4*k)}}
+      else if(m.type==="shape"){d.Subtype="Polygon";d.Vertices=flat(m.pts);d.BS={W:fmt(4*k)};d.IC=[fmt(cr),fmt(cg),fmt(cb)];d.CA=1}
+      else if(m.type==="pline"){d.Subtype="PolyLine";d.Vertices=flat(m.pts);d.BS={W:fmt(5*k)}}
       else if(m.type==="measure"){d.Subtype="Line";d.L=flat(m.pts.slice(0,2));d.LE=["Butt","Butt"];d.IT="LineDimension";d.Cap=true}
       else if(m.type==="pen"||m.type==="hl"){d.Subtype="Ink";d.InkList=[flat(m.pts)];if(m.type==="hl"){d.CA=.35;d.BS={W:fmt(26*k)}}}
       else if(m.type==="callout"){d.Subtype="FreeText";d.IT="FreeTextCallout";d.DA=PDFString.of(`/Helv ${fmt(36*k)} Tf ${fmt(cr)} ${fmt(cg)} ${fmt(cb)} rg`);
@@ -118,7 +126,7 @@ async function exportPdf(opts){
       count++;
     }
   }
-  return{bytes:await doc.save({useObjectStreams:false}),count};
+  return{bytes:await doc.save({useObjectStreams:false}),count,filledFields};
 }
 window.WWExport={exportPdf,loadLib};
 })();
